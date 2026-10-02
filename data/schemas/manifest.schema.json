@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://campaignlift.internal/schemas/manifest.schema.json",
+  "title": "DatasetManifest",
+  "description": "Canonical dataset release manifest schema. Tracks versioning, seeds, commit SHA, row counts, checksums, and validation status.",
+  "type": "object",
+  "properties": {
+    "dataset_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical version string formatted as cl-synth-<config_name>-<global_seed>-<git_sha>."
+    },
+    "config_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Name of the configuration profile used (e.g. dev, ml-dev, benchmark, fixture)."
+    },
+    "global_seed": {
+      "type": "integer",
+      "description": "Global random seed driving all generator sub-seeds."
+    },
+    "generator_git_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{7,40}$",
+      "description": "Git commit SHA of the generator code used to create this dataset release."
+    },
+    "row_counts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "description": "Mapping of table or split name to actual generated row count."
+    },
+    "treatment_rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Empirical treatment assignment rate among eligible customers."
+    },
+    "file_checksums": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Mapping of relative file path to SHA-256 checksum string. Never use fake placeholders."
+    },
+    "validation_status": {
+      "type": "string",
+      "enum": [
+        "not_run",
+        "passed",
+        "failed"
+      ],
+      "description": "Statistical and schema validation status. Defaults to not_run before Step 10 validation."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of dataset creation."
+    }
+  },
+  "required": [
+    "dataset_version",
+    "config_name",
+    "global_seed",
+    "generator_git_sha",
+    "row_counts",
+    "treatment_rate",
+    "file_checksums",
+    "validation_status",
+    "created_at"
+  ],
+  "additionalProperties": false
+}
