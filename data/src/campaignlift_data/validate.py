@@ -221,12 +221,14 @@ class DatasetValidator:
         if len(exposures) > 0:
             n_treat = sum(1 for e in exposures if e["treatment"] == 1)
             t_rate = n_treat / len(exposures)
+            min_tr, max_tr = (0.45, 0.55) if len(exposures) >= 500 else (0.40, 0.60)
             self._add_check(
                 name="treatment_rate_bounds",
-                passed=0.40 <= t_rate <= 0.60,  # Broader tolerance for small fixture (200), dev is 0.45-0.55
+                passed=min_tr <= t_rate <= max_tr,
                 description="Verify empirical treatment rate is balanced around 0.50",
-                observed=f"{t_rate:.4f}",
-                expected="Within [0.40, 0.60] for fixture, [0.45, 0.55] for release",
+                observed=f"{t_rate:.4f} ({n_treat}/{len(exposures)})",
+                expected=f"Within [{min_tr:.2f}, {max_tr:.2f}]",
+                is_blocker=True,
             )
 
         # 7. Leakage Validations (Step 10.2)
@@ -311,11 +313,150 @@ class DatasetValidator:
             is_blocker=True,
         )
 
+        # 8. Statistical Sanity Checks (Step 10.3)
+        # 8a. Both signs of true uplift in hidden oracle (negative uplift blocker)
+        if hidden_uplift is not None:
+            neg_uplift_count = sum(1 for row in hidden_uplift if row.get("true_uplift", 0) < 0)
+            self._add_check(
+                name="uplift_negative_contrast",
+                passed=neg_uplift_count > 0,
+                description="Verify hidden oracle produces negative-uplift customers (true_uplift < 0)",
+                observed=f"{neg_uplift_count} customers ({neg_uplift_count / len(hidden_uplift):.2%})" if len(hidden_uplift) > 0 else "0 customers",
+                expected="At least 1 customer with true_uplift < 0",
+                is_blocker=True,
+            )
+
+            pos_uplift_count = sum(1 for row in hidden_uplift if row.get("true_uplift", 0) > 0.02)
+            self._add_check(
+                name="uplift_positive_contrast",
+                passed=pos_uplift_count > 0,
+                description="Verify hidden oracle produces positive-uplift contrast (true_uplift > 0.02)",
+                observed=f"{pos_uplift_count} customers ({pos_uplift_count / len(hidden_uplift):.2%})" if len(hidden_uplift) > 0 else "0 customers",
+                expected="At least 1 customer with true_uplift > 0.02",
+                is_blocker=True,
+            )
+
+        # 8b. Outcome consistency
+        outcome_inconsistencies = []
+        camp_start_iso = camp_to_check["start_date"]
+        for idx, o in enumerate(outcomes):
+            y = o.get("y_transacted")
+            cnt = o.get("txn_count_window", 0)
+            amt = o.get("txn_amount_window_bdt", 0.0)
+            w_start = o.get("window_start")
+            w_end = o.get("window_end")
+
+            if y == 0 and (cnt != 0 or amt > 0):
+                outcome_inconsistencies.append(f"Row {idx} (cust {o.get('customer_id')}): y=0 but cnt={cnt}, amt={amt}")
+            elif y == 1 and (cnt < 1 or amt <= 0):
+                outcome_inconsistencies.append(f"Row {idx} (cust {o.get('customer_id')}): y=1 but cnt={cnt}, amt={amt}")
+
+            if w_start and w_end and w_start >= w_end:
+                outcome_inconsistencies.append(f"Row {idx}: window_start >= window_end ({w_start} >= {w_end})")
+            if w_start and w_start < camp_start_iso:
+                outcome_inconsistencies.append(f"Row {idx}: window_start before campaign start ({w_start} < {camp_start_iso})")
+
+        self._add_check(
+            name="outcome_consistency",
+            passed=len(outcome_inconsistencies) == 0,
+            description="Verify outcome labels, transaction window totals, and intervals are consistent",
+            observed=f"{len(outcome_inconsistencies)} inconsistent rows ({outcome_inconsistencies[:2]})" if outcome_inconsistencies else "All outcome rows consistent",
+            expected="0 inconsistent outcome rows",
+            is_blocker=True,
+        )
+
+        # 8c. Real transaction amounts positive
+        non_pos_txns = [t["transaction_id"] for t in transactions if t.get("amount_bdt", 0) <= 0]
+        self._add_check(
+            name="transaction_amount_positive",
+            passed=len(non_pos_txns) == 0,
+            description="Verify all transaction amounts are strictly positive (amount_bdt > 0)",
+            observed=f"{len(non_pos_txns)} transactions <= 0 ({non_pos_txns[:2]})" if non_pos_txns else "All transaction amounts > 0",
+            expected="0 transactions with amount_bdt <= 0",
+            is_blocker=True,
+        )
+
+        # 8d. Null checks on required fields
+        null_errors = []
+        table_reqs = [
+            ("customers", customers, schemas["customer"].get("required", [])),
+            ("transactions", transactions, [k for k in schemas["transaction"].get("required", []) if k != "merchant_category"]),
+            ("campaign", [camp_to_check], schemas["campaign"].get("required", [])),
+            ("exposures", exposures, schemas["exposure"].get("required", [])),
+            ("outcomes", outcomes, schemas["outcome"].get("required", [])),
+            ("features", features, schemas["feature_table"].get("required", [])),
+            ("splits", splits, ["customer_id", "split"]),
+        ]
+        for tbl_name, rows, req_keys in table_reqs:
+            for r_idx, r in enumerate(rows):
+                for k in req_keys:
+                    if r.get(k) is None:
+                        null_errors.append(f"{tbl_name}[{r_idx}].{k} is null")
+                        if len(null_errors) >= 10:
+                            break
+                if len(null_errors) >= 10:
+                    break
+            if len(null_errors) >= 10:
+                break
+
+        self._add_check(
+            name="null_checks_required",
+            passed=len(null_errors) == 0,
+            description="Verify no required fields contain null values",
+            observed=f"{len(null_errors)} null values in required fields ({null_errors[:2]})" if null_errors else "0 nulls in required fields",
+            expected="0 null values in required fields",
+            is_blocker=True,
+        )
+
+        # 8e. Warnings for extreme base rates and distributions (do not flip exit code)
+        if len(outcomes) > 0:
+            outcome_base_rate = sum(o["y_transacted"] for o in outcomes) / len(outcomes)
+            self._add_check(
+                name="warning_outcome_base_rate",
+                passed=0.02 <= outcome_base_rate <= 0.80,
+                description="Warn if outcome base rate is extreme (<2% or >80%)",
+                observed=f"{outcome_base_rate:.4f} ({sum(o['y_transacted'] for o in outcomes)}/{len(outcomes)})",
+                expected="Base rate between 0.02 and 0.80",
+                is_blocker=False,
+            )
+
+        if len(customers) > 0:
+            elig_rate = len(exposures) / len(customers)
+            self._add_check(
+                name="warning_eligibility_rate",
+                passed=0.10 <= elig_rate <= 0.95,
+                description="Warn if eligibility rate is extreme (<10% or >95%)",
+                observed=f"{elig_rate:.4f} ({len(exposures)}/{len(customers)})",
+                expected="Eligibility rate between 0.10 and 0.95",
+                is_blocker=False,
+            )
+
+        if len(features) > 0:
+            sparse_features = []
+            for col in features[0].keys():
+                if col in ("customer_id", "campaign_id", "objective", "offer_type", "age_band", "region_code", "kyc_level", "acquisition_channel"):
+                    continue
+                vals = [r.get(col) for r in features]
+                if all(isinstance(v, (int, float)) for v in vals):
+                    zero_ratio = sum(1 for v in vals if v == 0) / len(vals)
+                    if zero_ratio > 0.95:
+                        sparse_features.append((col, f"{zero_ratio:.2%}"))
+
+            self._add_check(
+                name="warning_feature_sparsity",
+                passed=len(sparse_features) == 0,
+                description="Warn if any numeric feature has >95% zero values",
+                observed=f"{len(sparse_features)} sparse features: {sparse_features}" if sparse_features else "All features have <=95% zeros",
+                expected="No features with >95% zeros",
+                is_blocker=False,
+            )
+
         report = self._build_report()
         self._save_report(report)
 
         is_valid = len(self.blockers) == 0
         return is_valid, report
+
 
     def _validate_rows_against_schema(self, check_name: str, rows: List[Dict[str, Any]], schema: Dict[str, Any]) -> None:
         errors = []
@@ -398,6 +539,10 @@ def main():
     print(f"Validation Report for: {dataset_dir}")
     print(f"Status: {report['validation_status'].upper()}")
     print(f"Checks: {report['passed_checks']}/{report['total_checks']} passed")
+    if report["warnings"]:
+        print("\nWARNINGS ENCOUNTERED:")
+        for w in report["warnings"]:
+            print(f"  - {w}")
     if report["blockers"]:
         print("\nBLOCKERS ENCOUNTERED:")
         for b in report["blockers"]:

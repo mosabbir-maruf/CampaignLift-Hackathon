@@ -188,3 +188,135 @@ def test_hidden_file_placed_inside_features_directory_fails(tmp_path):
     assert report["validation_status"] == "failed"
     assert any("leakage_hidden_file_placement" in b for b in report["blockers"])
 
+
+def test_zero_negative_uplift_fails_validation(tmp_path):
+    """Hidden oracle with zero negative uplift fails validation (Step 10.3 acceptance criteria)."""
+    fixture_dir = Path(__file__).resolve().parents[1] / "fixtures" / "fixture_v1"
+    mutated_dir = tmp_path / "mutated_no_neg_uplift"
+    shutil.copytree(fixture_dir, mutated_dir)
+
+    hidden_file = mutated_dir / "hidden_uplift.json"
+    with open(hidden_file, "r", encoding="utf-8") as f:
+        uplift_rows = json.load(f)
+
+    # Force all true_uplift values to be strictly positive
+    for row in uplift_rows:
+        row["true_uplift"] = abs(row["true_uplift"]) + 0.05
+
+    with open(hidden_file, "w", encoding="utf-8") as f:
+        json.dump(uplift_rows, f)
+
+    report_file = tmp_path / "report.json"
+    validator = DatasetValidator(dataset_dir=mutated_dir, report_path=report_file)
+    is_valid, report = validator.validate_all()
+
+    # Must fail because zero negative-uplift customers violate release blocker
+    assert is_valid is False
+    assert report["validation_status"] == "failed"
+    assert any("uplift_negative_contrast" in b for b in report["blockers"])
+
+
+def test_outcome_inconsistency_fails_validation(tmp_path):
+    """Inconsistent outcome rows (e.g. y=0 with nonzero amount) fails validation."""
+    fixture_dir = Path(__file__).resolve().parents[1] / "fixtures" / "fixture_v1"
+    mutated_dir = tmp_path / "mutated_outcome_inconsistency"
+    shutil.copytree(fixture_dir, mutated_dir)
+
+    outcomes_file = mutated_dir / "outcomes.json"
+    with open(outcomes_file, "r", encoding="utf-8") as f:
+        outcomes = json.load(f)
+
+    # Invalidate first row: y=0 but nonzero spend and transaction count
+    outcomes[0]["y_transacted"] = 0
+    outcomes[0]["txn_count_window"] = 2
+    outcomes[0]["txn_amount_window_bdt"] = 250.0
+
+    with open(outcomes_file, "w", encoding="utf-8") as f:
+        json.dump(outcomes, f)
+
+    report_file = tmp_path / "report.json"
+    validator = DatasetValidator(dataset_dir=mutated_dir, report_path=report_file)
+    is_valid, report = validator.validate_all()
+
+    assert is_valid is False
+    assert report["validation_status"] == "failed"
+    assert any("outcome_consistency" in b for b in report["blockers"])
+
+
+def test_negative_transaction_amount_fails_validation(tmp_path):
+    """A real transaction with amount <= 0 fails validation."""
+    fixture_dir = Path(__file__).resolve().parents[1] / "fixtures" / "fixture_v1"
+    mutated_dir = tmp_path / "mutated_txn_amount"
+    shutil.copytree(fixture_dir, mutated_dir)
+
+    txns_file = mutated_dir / "transactions.json"
+    with open(txns_file, "r", encoding="utf-8") as f:
+        txns = json.load(f)
+
+    txns[0]["amount_bdt"] = -5.0
+
+    with open(txns_file, "w", encoding="utf-8") as f:
+        json.dump(txns, f)
+
+    report_file = tmp_path / "report.json"
+    validator = DatasetValidator(dataset_dir=mutated_dir, report_path=report_file)
+    is_valid, report = validator.validate_all()
+
+    assert is_valid is False
+    assert report["validation_status"] == "failed"
+    assert any("transaction_amount_positive" in b for b in report["blockers"])
+
+
+def test_null_in_required_field_fails_validation(tmp_path):
+    """Null in a required field fails validation."""
+    fixture_dir = Path(__file__).resolve().parents[1] / "fixtures" / "fixture_v1"
+    mutated_dir = tmp_path / "mutated_null_field"
+    shutil.copytree(fixture_dir, mutated_dir)
+
+    cust_file = mutated_dir / "customers.json"
+    with open(cust_file, "r", encoding="utf-8") as f:
+        custs = json.load(f)
+
+    custs[0]["region_code"] = None
+
+    with open(cust_file, "w", encoding="utf-8") as f:
+        json.dump(custs, f)
+
+    report_file = tmp_path / "report.json"
+    validator = DatasetValidator(dataset_dir=mutated_dir, report_path=report_file)
+    is_valid, report = validator.validate_all()
+
+    assert is_valid is False
+    assert report["validation_status"] == "failed"
+    assert any("null_checks_required" in b or "schema_customers" in b for b in report["blockers"])
+
+
+def test_extreme_base_rate_generates_warning_without_failing(tmp_path):
+    """Extreme base rate produces a warning in the report but does not fail the run."""
+    fixture_dir = Path(__file__).resolve().parents[1] / "fixtures" / "fixture_v1"
+    mutated_dir = tmp_path / "mutated_extreme_base_rate"
+    shutil.copytree(fixture_dir, mutated_dir)
+
+    outcomes_file = mutated_dir / "outcomes.json"
+    with open(outcomes_file, "r", encoding="utf-8") as f:
+        outcomes = json.load(f)
+
+    # Set all rows to y=1 so base rate is 100% (> 80% warning threshold)
+    for o in outcomes:
+        o["y_transacted"] = 1
+        o["txn_count_window"] = 1
+        o["txn_amount_window_bdt"] = 50.0
+
+    with open(outcomes_file, "w", encoding="utf-8") as f:
+        json.dump(outcomes, f)
+
+    report_file = tmp_path / "report.json"
+    validator = DatasetValidator(dataset_dir=mutated_dir, report_path=report_file)
+    is_valid, report = validator.validate_all()
+
+    # Warning must NOT flip exit code or status to failed
+    assert is_valid is True
+    assert report["validation_status"] == "passed"
+    assert any("warning_outcome_base_rate" in w for w in report["warnings"])
+
+
