@@ -1,0 +1,9 @@
+{
+  "customer_id": "C00012345",
+  "campaign_id": "CMP2024_QR01",
+  "y_transacted": 1,
+  "txn_count_window": 2,
+  "txn_amount_window_bdt": 450.0,
+  "window_start": "2024-02-01T00:00:00Z",
+  "window_end": "2024-02-15T00:00:00Z"
+}
