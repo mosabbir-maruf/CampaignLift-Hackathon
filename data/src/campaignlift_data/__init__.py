@@ -11,6 +11,7 @@ from .seeds import (
     get_stage_seed,
 )
 from .customers import generate_customers
+from .transactions import generate_transactions
 
 __all__ = [
     "load_world_config",
@@ -18,5 +19,7 @@ __all__ = [
     "get_stage_seeds",
     "get_stage_seed",
     "generate_customers",
+    "generate_transactions",
 ]
+
 
