@@ -49,3 +49,51 @@ sizes:
   dev: 5000
   ml_dev: 25000
   benchmark: 100000
+
+# Four latent customer profiles forming the causal population mixture.
+# NOTE: Profile names are generator internals; they must never appear as training features.
+# Shares are design targets, not measured empirical outputs.
+latent_profiles:
+  sure_thing:
+    share_target: 0.25
+    description: "High natural propensity to transact organically; low sensitivity to marketing campaigns."
+    ranges:
+      natural_transaction_propensity: [0.70, 0.95]
+      qr_affinity: [0.20, 0.90]
+      price_sensitivity: [0.10, 0.35]
+      campaign_sensitivity: [0.05, 0.25]
+      digital_maturity: [0.50, 0.95]
+      offer_fatigue: [0.00, 0.20]
+
+  persuadable:
+    share_target: 0.35
+    description: "Moderate natural propensity but highly responsive to marketing interventions and incentives."
+    ranges:
+      natural_transaction_propensity: [0.30, 0.60]
+      qr_affinity: [0.15, 0.90]
+      price_sensitivity: [0.50, 0.90]
+      campaign_sensitivity: [0.65, 0.95]
+      digital_maturity: [0.30, 0.85]
+      offer_fatigue: [0.00, 0.35]
+
+  weak_responder:
+    share_target: 0.25
+    description: "Low organic transaction propensity and sluggish responsiveness to marketing campaigns."
+    ranges:
+      natural_transaction_propensity: [0.05, 0.25]
+      qr_affinity: [0.05, 0.50]
+      price_sensitivity: [0.05, 0.30]
+      campaign_sensitivity: [0.05, 0.30]
+      digital_maturity: [0.10, 0.50]
+      offer_fatigue: [0.10, 0.70]
+
+  negative_uplift:
+    share_target: 0.15
+    description: "Active organic users annoyed by frequent campaigns, resulting in reduced transaction probability under treatment (sleeping dogs)."
+    ranges:
+      natural_transaction_propensity: [0.50, 0.85]
+      qr_affinity: [0.10, 0.80]
+      price_sensitivity: [0.10, 0.40]
+      campaign_sensitivity: [0.05, 0.20]
+      digital_maturity: [0.40, 0.90]
+      offer_fatigue: [0.65, 0.95]
