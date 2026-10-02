@@ -1,5 +1,6 @@
-"""Tests for customer generator module."""
+"""Tests for customer generator module validating uniqueness, enums, dates, and seed stability."""
 
+from datetime import date, datetime
 import json
 from pathlib import Path
 import re
@@ -12,7 +13,10 @@ data_src = Path(__file__).resolve().parents[1] / "src"
 if str(data_src) not in sys.path:
     sys.path.insert(0, str(data_src))
 
-from campaignlift_data.customers import generate_customers
+from campaignlift_data.customers import (
+    DEFAULT_CAMPAIGN_START_DATE,
+    generate_customers,
+)
 
 
 def test_customer_generation_determinism():
@@ -88,3 +92,51 @@ def test_latent_separation_and_bounds():
         for var in required_latents:
             val = lat[var]
             assert 0.0 <= val <= 1.0, f"Latent {var}={val} out of bounds for {lat['customer_id']}"
+
+
+def test_customer_uniqueness_enums_and_signup_dates():
+    """Verify customer_id uniqueness, valid enums, and signup_date strictly before campaign start."""
+    customers, _ = generate_customers(500)
+
+    # 1. Uniqueness of customer_id
+    customer_ids = [c["customer_id"] for c in customers]
+    assert len(customer_ids) == len(set(customer_ids)), "Duplicate customer_id detected"
+
+    # 2. Strict enum membership according to data plan
+    allowed_age_bands = {"18-24", "25-34", "35-44", "45-54", "55+"}
+    allowed_region_codes = {"DHK", "CTG", "SYL", "RAJ", "KHU", "BAR", "RAN", "MYM"}
+    allowed_kyc_levels = {"limited", "verified"}
+    allowed_acquisition_channels = {"app", "agent", "referral"}
+
+    for c in customers:
+        assert c["age_band"] in allowed_age_bands, f"Invalid age_band: {c['age_band']}"
+        assert c["region_code"] in allowed_region_codes, f"Invalid region_code: {c['region_code']}"
+        assert c["kyc_level"] in allowed_kyc_levels, f"Invalid kyc_level: {c['kyc_level']}"
+        assert c["acquisition_channel"] in allowed_acquisition_channels, f"Invalid acquisition_channel: {c['acquisition_channel']}"
+
+        # 3. Signup date strictly before campaign start
+        signup_dt = date.fromisoformat(c["signup_date"])
+        assert signup_dt < DEFAULT_CAMPAIGN_START_DATE, (
+            f"Customer signup_date {signup_dt} is not before campaign start {DEFAULT_CAMPAIGN_START_DATE}"
+        )
+
+
+def test_seed_variation_changes_attributes():
+    """Verify that different seeds produce different customer attributes, while identical seeds match."""
+    customers_seed_a, _ = generate_customers(100, seed=12345)
+    customers_seed_a_repeat, _ = generate_customers(100, seed=12345)
+    customers_seed_b, _ = generate_customers(100, seed=99999)
+
+    # Same seed matches exactly
+    assert customers_seed_a == customers_seed_a_repeat
+
+    # Different seed produces different demographic attributes
+    assert customers_seed_a != customers_seed_b
+
+    # At least some attributes must differ
+    diff_count = sum(
+        1 for ca, cb in zip(customers_seed_a, customers_seed_b)
+        if (ca["age_band"], ca["region_code"], ca["kyc_level"], ca["acquisition_channel"], ca["signup_date"]) !=
+           (cb["age_band"], cb["region_code"], cb["kyc_level"], cb["acquisition_channel"], cb["signup_date"])
+    )
+    assert diff_count > 0, "Changing seed did not alter customer attributes"
