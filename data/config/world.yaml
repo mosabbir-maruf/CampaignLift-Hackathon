@@ -97,3 +97,59 @@ latent_profiles:
       campaign_sensitivity: [0.05, 0.20]
       digital_maturity: [0.40, 0.90]
       offer_fatigue: [0.65, 0.95]
+
+# ==============================================================================
+# Causal Score Configuration (Potential Outcomes Generator Weights)
+# NOTE: These weights represent generative simulation assumptions, NOT a fitted
+# statistical model or empirical upay data. They must never be tuned to fabricate
+# a desired Qini or ROI metric.
+# ==============================================================================
+causal_scoring:
+  # Probability clipping bounds on the open interval [0.01, 0.99] as specified in data_plan.md
+  probability_clip:
+    min: 0.01
+    max: 0.99
+
+  # Noise term is Gaussian on the logit scale before probability clipping
+  noise:
+    type: "gaussian_logit"
+    standard_deviation: 0.20
+
+  # Control outcome score: p_control = sigmoid(logit_control + noise)
+  # Depends strictly on natural propensity, digital maturity, and past activity
+  control_score:
+    intercept: -1.5
+    weights:
+      natural_transaction_propensity: 2.2
+      digital_maturity: 0.8
+      recent_activity_term: 0.5
+
+  # Treated outcome score: p_treat = sigmoid(logit_treat + noise)
+  # Adds campaign sensitivity, price sensitivity * incentive, offer match terms,
+  # and subtracts offer fatigue penalty.
+  treated_score:
+    intercept: -1.5
+    weights:
+      natural_transaction_propensity: 2.2
+      digital_maturity: 0.8
+      recent_activity_term: 0.5
+      campaign_sensitivity: 1.8
+      price_sensitivity_x_incentive: 1.5
+      offer_match_qr: 1.2
+      offer_match_reactivation: 1.0
+      offer_match_retention: -0.4
+      offer_fatigue_penalty: -1.6  # Subtracted penalty driven by offer fatigue
+
+    # --------------------------------------------------------------------------
+    # NEGATIVE UPLIFT MECHANISM:
+    # Annoyance term that allows p_treat < p_control (true_uplift < 0).
+    # When a customer has high offer fatigue and low campaign sensitivity
+    # (specifically prominent in the negative_uplift profile), this extra penalty
+    # drives the treated score below the control score.
+    # --------------------------------------------------------------------------
+    negative_uplift_annoyance:
+      enabled: true
+      fatigue_threshold: 0.60
+      campaign_sensitivity_threshold: 0.25
+      annoyance_penalty: -2.0       # Direct penalty driving treated logit below control logit
+      profile_multiplier: 1.5       # Extra weight applied for customers drawn from negative_uplift profile
