@@ -1,0 +1,8 @@
+{
+  "customer_id": "C00012345",
+  "signup_date": "2023-04-15",
+  "age_band": "25-34",
+  "region_code": "DHK",
+  "kyc_level": "verified",
+  "acquisition_channel": "app"
+}

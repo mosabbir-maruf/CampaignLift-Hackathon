@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://campaignlift.internal/schemas/customer.schema.json",
+  "title": "Customer",
+  "description": "Canonical customer record schema for CampaignLift synthetic data.",
+  "type": "object",
+  "properties": {
+    "customer_id": {
+      "type": "string",
+      "pattern": "^C[0-9]{8}$",
+      "description": "Unique customer identifier starting with 'C' followed by 8 digits."
+    },
+    "signup_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Customer signup date in YYYY-MM-DD format, strictly before the transaction history window."
+    },
+    "age_band": {
+      "type": "string",
+      "enum": [
+        "18-24",
+        "25-34",
+        "35-44",
+        "45-54",
+        "55+"
+      ],
+      "description": "Customer age band."
+    },
+    "region_code": {
+      "type": "string",
+      "enum": [
+        "DHK",
+        "CTG",
+        "SYL",
+        "RAJ",
+        "KHU",
+        "BAR",
+        "RAN",
+        "MYM"
+      ],
+      "description": "Synthetic Bangladesh division code."
+    },
+    "kyc_level": {
+      "type": "string",
+      "enum": [
+        "limited",
+        "verified"
+      ],
+      "description": "Customer KYC verification level."
+    },
+    "acquisition_channel": {
+      "type": "string",
+      "enum": [
+        "app",
+        "agent",
+        "referral"
+      ],
+      "description": "Acquisition channel through which the customer onboarded."
+    }
+  },
+  "required": [
+    "customer_id",
+    "signup_date",
+    "age_band",
+    "region_code",
+    "kyc_level",
+    "acquisition_channel"
+  ],
+  "additionalProperties": false
+}
