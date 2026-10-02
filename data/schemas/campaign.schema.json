@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://campaignlift.internal/schemas/campaign.schema.json",
+  "title": "Campaign",
+  "description": "Canonical campaign definition schema for CampaignLift synthetic evaluation and optimization scenarios.",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for the campaign."
+    },
+    "campaign_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Synthetic campaign name / descriptive label."
+    },
+    "objective": {
+      "type": "string",
+      "enum": [
+        "activation",
+        "qr_adoption",
+        "reactivation",
+        "retention"
+      ],
+      "description": "Strategic marketing objective."
+    },
+    "offer_type": {
+      "type": "string",
+      "enum": [
+        "flat_cashback",
+        "pct_cashback",
+        "fee_waiver"
+      ],
+      "description": "Incentive structure offered to targeted customers."
+    },
+    "incentive_value": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Numerical offer magnitude: BDT amount for flat cashback, percentage for pct cashback, 0 for fee waiver."
+    },
+    "incentive_cost_bdt": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Expected unit cost in BDT charged against campaign budget if targeted. Must be non-negative (>= 0). Never treat as measured profit or ROI."
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "push",
+        "sms",
+        "in_app"
+      ],
+      "description": "Delivery communication channel."
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Campaign launch and assignment date (YYYY-MM-DD)."
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Campaign conclusion date (YYYY-MM-DD), must be on or after start_date."
+    },
+    "outcome_window_days": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 14,
+      "description": "Observation window in days post-assignment to measure conversion outcome. Default is 14 days."
+    }
+  },
+  "required": [
+    "campaign_id",
+    "campaign_name",
+    "objective",
+    "offer_type",
+    "incentive_value",
+    "incentive_cost_bdt",
+    "channel",
+    "start_date",
+    "end_date",
+    "outcome_window_days"
+  ],
+  "additionalProperties": false
+}
