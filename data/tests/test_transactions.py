@@ -152,3 +152,117 @@ def test_qr_share_increases_with_qr_affinity():
 
     print(f"QR share high affinity: {qr_hi:.4f}, low affinity: {qr_lo:.4f}")
     assert qr_hi > qr_lo, f"Expected qr_share_hi ({qr_hi}) > qr_share_lo ({qr_lo})"
+
+
+def test_merchant_category_rules_on_generated_transactions():
+    """Verify merchant_category and direction rules across all generated transactions."""
+    customers, latents = generate_customers(150)
+    txns = generate_transactions(customers, latents)
+
+    assert len(txns) > 0
+    for t in txns:
+        txn_type = t["txn_type"]
+        cat = t["merchant_category"]
+        direction = t["direction"]
+        amount = t["amount_bdt"]
+
+        # Amount bounds
+        assert 0 < amount <= 100000.0, f"Transaction amount out of bounds: {amount}"
+
+        # Merchant category rule: required for merchant_pay and qr_pay, null otherwise
+        if txn_type in ["merchant_pay", "qr_pay"]:
+            assert cat is not None, f"Expected merchant_category for {txn_type}, got None"
+            assert cat in ["grocery", "transport", "food", "telecom", "other"]
+            assert direction == "out"
+        else:
+            assert cat is None, f"Expected null merchant_category for {txn_type}, got {cat}"
+
+        # Inflow vs outflow direction rule
+        if txn_type in ["cash_in", "p2p_receive"]:
+            assert direction == "in"
+        else:
+            assert direction == "out"
+
+
+def test_negative_cutoff_detection():
+    """Negative test: Deliberately bad rows at or after assigned_at must fail the cutoff check."""
+    assigned_dt = datetime.combine(
+        DEFAULT_CAMPAIGN_START_DATE,
+        datetime.min.time(),
+        tzinfo=timezone.utc,
+    )
+
+    def check_cutoff(event_time_str: str):
+        event_dt = datetime.fromisoformat(event_time_str.replace("Z", "+00:00"))
+        if event_dt >= assigned_dt:
+            raise AssertionError(f"Leakage detected: event_time {event_dt} >= assigned_at {assigned_dt}")
+
+    # Case 1: event_time exactly at assignment time (2024-02-01T00:00:00Z)
+    with pytest.raises(AssertionError, match="Leakage detected"):
+        check_cutoff("2024-02-01T00:00:00Z")
+
+    # Case 2: event_time 1 second into campaign window (2024-02-01T00:00:01Z)
+    with pytest.raises(AssertionError, match="Leakage detected"):
+        check_cutoff("2024-02-01T00:00:01Z")
+
+    # Case 3: event_time well after assignment (e.g., 2024-02-15T12:00:00Z)
+    with pytest.raises(AssertionError, match="Leakage detected"):
+        check_cutoff("2024-02-15T12:00:00Z")
+
+    # Positive control: 1 second prior to assignment is valid
+    check_cutoff("2024-01-31T23:59:59Z")
+
+
+def test_negative_merchant_category_schema_rejection():
+    """Negative test: Deliberately bad rows violating merchant_category rules must fail schema validation."""
+    schema_path = Path(__file__).resolve().parents[1] / "schemas" / "transaction.schema.json"
+    with open(schema_path, "r", encoding="utf-8") as f:
+        schema = json.load(f)
+
+    valid_base = {
+        "transaction_id": "TXN0000000001",
+        "customer_id": "C00000001",
+        "event_time": "2024-01-15T10:30:00Z",
+        "txn_type": "merchant_pay",
+        "amount_bdt": 250.0,
+        "channel": "app",
+        "merchant_category": "grocery",
+        "direction": "out",
+    }
+    # Verify baseline is valid
+    jsonschema.validate(instance=valid_base, schema=schema)
+
+    # 1. merchant_pay missing merchant_category (set to null) -> must fail
+    bad_merchant_pay = dict(valid_base, merchant_category=None)
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        jsonschema.validate(instance=bad_merchant_pay, schema=schema)
+
+    # 2. cash_in with merchant_category set -> must fail
+    bad_cash_in = dict(
+        valid_base,
+        txn_type="cash_in",
+        direction="in",
+        merchant_category="grocery",
+    )
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        jsonschema.validate(instance=bad_cash_in, schema=schema)
+
+    # 3. p2p_send with invalid direction "in" -> must fail
+    bad_p2p = dict(
+        valid_base,
+        txn_type="p2p_send",
+        direction="in",
+        merchant_category=None,
+    )
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        jsonschema.validate(instance=bad_p2p, schema=schema)
+
+    # 4. amount_bdt <= 0 or > 100,000 -> must fail
+    bad_amount_zero = dict(valid_base, amount_bdt=0.0)
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        jsonschema.validate(instance=bad_amount_zero, schema=schema)
+
+    bad_amount_over = dict(valid_base, amount_bdt=100000.50)
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        jsonschema.validate(instance=bad_amount_over, schema=schema)
+
