@@ -103,3 +103,88 @@ def test_mutated_copy_with_orphan_foreign_key_fails(tmp_path):
     assert is_valid is False
     assert report["validation_status"] == "failed"
     assert any("fk_transactions_customers" in b for b in report["blockers"])
+
+
+def test_feature_frame_with_true_uplift_added_fails(tmp_path):
+    """A feature frame with true_uplift added fails validation (Step 10.2 acceptance criteria)."""
+    fixture_dir = Path(__file__).resolve().parents[1] / "fixtures" / "fixture_v1"
+    mutated_dir = tmp_path / "mutated_features"
+    shutil.copytree(fixture_dir, mutated_dir)
+
+    features_file = mutated_dir / "features.json"
+    with open(features_file, "r", encoding="utf-8") as f:
+        features = json.load(f)
+
+    # Inject forbidden column 'true_uplift' into the first feature record
+    assert len(features) > 0
+    features[0]["true_uplift"] = 0.045
+
+    with open(features_file, "w", encoding="utf-8") as f:
+        json.dump(features, f)
+
+    report_file = tmp_path / "report.json"
+    validator = DatasetValidator(dataset_dir=mutated_dir, report_path=report_file)
+    is_valid, report = validator.validate_all()
+
+    assert is_valid is False
+    assert report["validation_status"] == "failed"
+    assert any("leakage_forbidden_columns" in b for b in report["blockers"])
+
+
+def test_future_event_transaction_at_or_after_assignment_fails(tmp_path):
+    """A transaction occurring at or after assignment time fails validation."""
+    fixture_dir = Path(__file__).resolve().parents[1] / "fixtures" / "fixture_v1"
+    mutated_dir = tmp_path / "mutated_future_event"
+    shutil.copytree(fixture_dir, mutated_dir)
+
+    features_file = mutated_dir / "features.json"
+    with open(features_file, "r", encoding="utf-8") as f:
+        features = json.load(f)
+    assert len(features) > 0
+    target_cid = features[0]["customer_id"]
+
+    txns_file = mutated_dir / "transactions.json"
+    with open(txns_file, "r", encoding="utf-8") as f:
+        txns = json.load(f)
+
+    # Find a transaction for target_cid and set event_time on or after campaign start (2024-02-01)
+    modified = False
+    for t in txns:
+        if t["customer_id"] == target_cid:
+            t["event_time"] = "2024-02-05T12:00:00Z"
+            modified = True
+            break
+    assert modified, f"Customer {target_cid} should have transactions"
+
+    with open(txns_file, "w", encoding="utf-8") as f:
+        json.dump(txns, f)
+
+    report_file = tmp_path / "report.json"
+    validator = DatasetValidator(dataset_dir=mutated_dir, report_path=report_file)
+    is_valid, report = validator.validate_all()
+
+    assert is_valid is False
+    assert report["validation_status"] == "failed"
+    assert any("leakage_future_events" in b for b in report["blockers"])
+
+
+
+def test_hidden_file_placed_inside_features_directory_fails(tmp_path):
+    """A hidden oracle file placed inside the features directory fails validation."""
+    fixture_dir = Path(__file__).resolve().parents[1] / "fixtures" / "fixture_v1"
+    mutated_dir = tmp_path / "mutated_hidden_placement"
+    shutil.copytree(fixture_dir, mutated_dir)
+
+    features_dir = mutated_dir / "features"
+    features_dir.mkdir(parents=True, exist_ok=True)
+    leaked_hidden_file = features_dir / "hidden_potential_outcomes.json"
+    leaked_hidden_file.write_text('{"note": "leaked"}', encoding="utf-8")
+
+    report_file = tmp_path / "report.json"
+    validator = DatasetValidator(dataset_dir=mutated_dir, report_path=report_file)
+    is_valid, report = validator.validate_all()
+
+    assert is_valid is False
+    assert report["validation_status"] == "failed"
+    assert any("leakage_hidden_file_placement" in b for b in report["blockers"])
+

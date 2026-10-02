@@ -9,7 +9,7 @@ Performs rigorous automated gatekeeping on generated datasets and fixtures:
 6. Exits with code 1 if any blocker check fails.
 """
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 import json
 from pathlib import Path
 import sys
@@ -228,6 +228,88 @@ class DatasetValidator:
                 observed=f"{t_rate:.4f}",
                 expected="Within [0.40, 0.60] for fixture, [0.45, 0.55] for release",
             )
+
+        # 7. Leakage Validations (Step 10.2)
+        # 7a. Intersect feature columns with FORBIDDEN_TRAINING_COLUMNS.txt
+        forbidden_file = self.schemas_dir / "FORBIDDEN_TRAINING_COLUMNS.txt"
+        if forbidden_file.exists():
+            with open(forbidden_file, "r", encoding="utf-8") as f:
+                forbidden_cols = {line.strip() for line in f if line.strip() and not line.startswith("#")}
+        else:
+            forbidden_cols = {
+                "natural_transaction_propensity",
+                "qr_affinity",
+                "price_sensitivity",
+                "campaign_sensitivity",
+                "digital_maturity",
+                "offer_fatigue",
+                "p_y_control",
+                "p_y_treat",
+                "true_uplift",
+            }
+
+        leaked_cols = set()
+        for row in features:
+            leaked_cols.update(set(row.keys()) & forbidden_cols)
+
+        self._add_check(
+            name="leakage_forbidden_columns",
+            passed=len(leaked_cols) == 0,
+            description="Verify training feature table contains zero forbidden columns",
+            observed=f"Leaked columns: {list(leaked_cols)}" if leaked_cols else "0 forbidden columns",
+            expected="0 forbidden columns in features",
+            is_blocker=True,
+        )
+
+        # 7b. Assert max transaction time < min assigned_at for each customer used in features
+        assigned_dt = datetime.combine(
+            date.fromisoformat(camp_to_check["start_date"]),
+            datetime.min.time(),
+            tzinfo=timezone.utc,
+        )
+
+        txns_by_cust: Dict[str, List[datetime]] = {}
+        for t in transactions:
+            dt = datetime.fromisoformat(t["event_time"].replace("Z", "+00:00"))
+            txns_by_cust.setdefault(t["customer_id"], []).append(dt)
+
+        future_events = []
+        for f in features:
+            cid = f["customer_id"]
+            cust_txns = txns_by_cust.get(cid, [])
+            if cust_txns:
+                max_txn_dt = max(cust_txns)
+                if max_txn_dt >= assigned_dt:
+                    future_events.append((cid, max_txn_dt.isoformat(), assigned_dt.isoformat()))
+
+        self._add_check(
+            name="leakage_future_events",
+            passed=len(future_events) == 0,
+            description="Assert max transaction time < assigned_at for each customer used in features",
+            observed=f"{len(future_events)} customers with transactions >= assigned_at ({future_events[:2]})"
+            if future_events else "All customer transactions strictly < assigned_at",
+            expected="All historical transactions occur strictly before assigned_at",
+            is_blocker=True,
+        )
+
+        # 7c. Assert the hidden file is not inside the features directory or feature records
+        features_dir = self.dataset_dir / "features"
+        leaked_in_dir = False
+        if features_dir.is_dir():
+            hidden_matches = list(features_dir.glob("*hidden*")) + list(features_dir.glob("*uplift*"))
+            if hidden_matches:
+                leaked_in_dir = True
+
+        leaked_in_features_file = any("true_uplift" in row for row in features)
+
+        self._add_check(
+            name="leakage_hidden_file_placement",
+            passed=(not leaked_in_dir) and (not leaked_in_features_file),
+            description="Assert the hidden oracle file is not inside the features directory or records",
+            observed="Hidden oracle data found in features" if (leaked_in_dir or leaked_in_features_file) else "Hidden file cleanly separated",
+            expected="No hidden oracle data in features directory or records",
+            is_blocker=True,
+        )
 
         report = self._build_report()
         self._save_report(report)
