@@ -186,3 +186,46 @@ eligibility:
       description: "at least one transaction in the last 30 days"
       criteria:
         min_txn_count_30d: 1
+
+# ==============================================================================
+# Offer Fatigue and Prior Exposure Configuration
+# Distinguishes UNBIASED OBSERVED FEATURES from INTERNAL LATENT FATIGUE.
+# NOTE: Interactive Fatigue UI / manager sliders are OUT OF SCOPE for this step.
+# ==============================================================================
+fatigue:
+  # Synthetic priors for historical campaign exposures:
+  prior_campaigns:
+    mean_prior_campaigns: 1.8   # Average prior exposures per customer (0 to 4 typical)
+    min_exposures: 0
+    max_exposures: 6
+
+  # 1. OBSERVED FEATURES: Realized counts and recency available at assigned_at.
+  # Included in feature table for ML training.
+  observed_features:
+    campaign_exposures_prior_30d:
+      type: "integer"
+      description: "Observed count of campaign touches received in prior 30 days."
+    campaign_exposures_prior_90d:
+      type: "integer"
+      description: "Observed count of campaign touches received in prior 90 days."
+    days_since_last_campaign:
+      type: "integer"
+      default_if_none: 999
+      description: "Observed days elapsed since last campaign exposure. 999 if no prior campaign."
+
+  # 2. LATENT FATIGUE MAPPING: Unobservable internal state in [0, 1].
+  # Strictly forbidden in ML training; stored in oracle evaluation file only.
+  latent_mapping:
+    target_latent: "offer_fatigue"
+    range: [0.0, 1.0]
+    description: "Maps observed prior exposure counts (recent 30d weighted heavier than 90d) into latent offer_fatigue."
+    weights:
+      prior_30d_weight: 0.20   # +0.20 per touch in past 30 days
+      prior_90d_weight: 0.08   # +0.08 per touch in days 31-90
+      recency_decay_halflife_days: 21.0
+    clip:
+      min: 0.0
+      max: 1.0
+
+  # Scope boundary note:
+  ui_status: "OUT_OF_SCOPE: Interactive fatigue controls, sliders, and overrides belong to frontend UI / backend optimization steps."
