@@ -1,0 +1,30 @@
+{
+  "dataset_version": "cl-synth-fixture-20261006-1c11dce",
+  "config_name": "fixture",
+  "global_seed": 20261006,
+  "generator_git_sha": "1c11dceb5ef958e21c4508bde82dfb31fb505d56",
+  "row_counts": {
+    "customers": 200,
+    "transactions": 3964,
+    "campaign": 1,
+    "exposures": 103,
+    "outcomes": 103,
+    "features": 103,
+    "splits": 200,
+    "hidden_uplift": 200
+  },
+  "treatment_rate": 0.4757,
+  "file_checksums": {
+    "customers.json": "9a87e9c91f952ddc690410f874ea8c5c56628d4cf93b56c5ec1b6795e0155882",
+    "transactions.json": "29d6c7f9b396b23b59b597d71231efa89bc2e612de324082ddf54a249454da02",
+    "campaign.json": "edea734944af427da06d17d4aa194a23779ba561ab94285fb61f3458f7b0274b",
+    "exposures.json": "a1b597e0dfba3abf89d1fce2416e3157e337754ab2d322df53ed9bd3ca8198b1",
+    "outcomes.json": "af8eb9c72399d020e6d34ef7755e8345a50b85bc834d54ec53009fe64b126d24",
+    "features.json": "45825afffa98bcf6b01ff62b679bcf8ab113b4e0ba7694eeee55b97be09c739b",
+    "splits.json": "a64ba0eb08e5436e0a3734e0e26b6e43c64c8789211bfbc8cbfb272c826cb6c4",
+    "hidden_uplift.json": "08bc66e0b7958bbc6edafdb0af007e293bb0e281bf746ea49f26cc54cec5f069",
+    "README.md": "96f2f0ffc5d04285169e743928c1a34352280a8631f30f4c94ba195ed386419b"
+  },
+  "validation_status": "not_run",
+  "created_at": "2024-02-01T00:00:00Z"
+}
