@@ -153,3 +153,36 @@ causal_scoring:
       campaign_sensitivity_threshold: 0.25
       annoyance_penalty: -2.0       # Direct penalty driving treated logit below control logit
       profile_multiplier: 1.5       # Extra weight applied for customers drawn from negative_uplift profile
+
+# ==============================================================================
+# Campaign Eligibility Rules Configuration
+# NOTE: Eligibility is strictly pre-assignment (< assigned_at). It evaluates
+# history and static attributes. It NEVER uses post-assignment outcome events
+# or conversion labels (y_transacted).
+# ==============================================================================
+eligibility:
+  # Default objective demonstrated in UI and tests
+  default_demo_objective: "qr_adoption"
+
+  rules:
+    activation:
+      description: "tenure_days <= 30"
+      criteria:
+        max_tenure_days: 30
+
+    reactivation:
+      description: "no transaction in the last 30 days and tenure > 30"
+      criteria:
+        min_tenure_days: 31
+        max_txn_count_30d: 0
+
+    qr_adoption:
+      description: "at least one historical transaction and QR share below a configured cap"
+      criteria:
+        min_historical_txns_90d: 1
+        max_qr_txn_share_90d: 0.20   # Cap: customers with <= 20% QR transactions
+
+    retention:
+      description: "at least one transaction in the last 30 days"
+      criteria:
+        min_txn_count_30d: 1
