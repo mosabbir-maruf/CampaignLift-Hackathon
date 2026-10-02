@@ -1,0 +1,932 @@
+openapi: 3.0.3
+info:
+  title: CampaignLift Decision Support API
+  version: 1.0.0
+  description: >-
+    AI-Powered Incremental Campaign Decision Engine for MFS.
+    Provides decision support for campaign managers to estimate incremental customer uplift,
+    optimize marketing budget allocation, and evaluate simulated randomized experiments.
+    This system does not execute autonomous campaign sends or financial transactions.
+
+paths:
+  /health:
+    get:
+      summary: Liveness check
+      description: Returns process status with no external dependency checks.
+      operationId: getHealth
+      responses:
+        '200':
+          description: Process is running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
+  /ready:
+    get:
+      summary: Readiness check
+      description: Verifies model artifact is loaded, feature table is readable, and database is writable.
+      operationId: getReady
+      responses:
+        '200':
+          description: System is ready to score and optimize
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadyStatus'
+        '503':
+          description: System components not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/campaigns:
+    post:
+      summary: Create campaign definition
+      description: >-
+        Creates a new campaign scenario. Rejects uploaded customer lists (scores pre-generated
+        eligible population for the active dataset version).
+      operationId: createCampaign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CampaignCreateRequest'
+      responses:
+        '201':
+          description: Campaign created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '400':
+          description: Validation error or invalid body (e.g. uploaded customer list rejected)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/campaigns/{id}:
+    get:
+      summary: Read campaign definition
+      description: Retrieves campaign parameters by ID.
+      operationId: getCampaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Campaign identifier
+      responses:
+        '200':
+          description: Campaign details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '404':
+          description: Campaign not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/campaigns/{id}/score:
+    post:
+      summary: Score eligible customers
+      description: >-
+        Scores eligible customers for the campaign using the active model artifact.
+        Returns response probability (p_treat), control probability (p_control), and uplift.
+      operationId: scoreCampaign
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Campaign identifier
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 200
+          description: Number of customer score records to return per page
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          description: Pagination offset
+      responses:
+        '200':
+          description: Customer score run results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoreRunResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Campaign not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Model or feature file not ready, or feature schema mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/campaigns/{id}/optimize:
+    post:
+      summary: Allocate campaign budget
+      description: >-
+        Greedy knapsack audience selection under budget constraints.
+        Maximizes expected incremental value and optionally excludes negative uplift.
+      operationId: optimizeBudget
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Campaign identifier
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptimizeRequest'
+      responses:
+        '200':
+          description: Optimization and budget allocation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizeResponse'
+        '400':
+          description: Invalid budget or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Campaign or score run not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Scored population not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/campaigns/{id}/comparison:
+    get:
+      summary: Compare targeting strategies
+      description: >-
+        Compares Random, Traditional Response, and Uplift targeting strategies under
+        identical budget and eligibility constraints.
+      operationId: getStrategyComparison
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Campaign identifier
+      responses:
+        '200':
+          description: Strategy comparison metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StrategyComparisonResponse'
+        '404':
+          description: Campaign or comparison not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Evaluation data or model artifacts not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/campaigns/{id}/customers/{customer_id}/explanation:
+    get:
+      summary: Get customer-level explanation
+      description: >-
+        Provides grounded reasoning, feature contributions, probabilities, and reason code
+        for an individual customer recommendation.
+      operationId: getCustomerExplanation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Campaign identifier
+        - name: customer_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Customer identifier
+      responses:
+        '200':
+          description: Customer explanation object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerExplanationResponse'
+        '404':
+          description: Campaign or customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Scoring or explanation service not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/campaigns/{id}/experiment:
+    get:
+      summary: Treatment vs control experiment summary
+      description: >-
+        Summarizes randomized trial outcomes and slice-level performance from simulated
+        treatment versus control arms.
+      operationId: getExperimentSummary
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Campaign identifier
+      responses:
+        '200':
+          description: Experiment summary results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExperimentSummaryResponse'
+        '404':
+          description: Campaign or experiment run not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Experiment data not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/campaigns/{id}/copilot:
+    post:
+      summary: Grounded campaign copilot
+      description: >-
+        Answers campaign manager questions strictly using verified run JSON context.
+        Rejects prompt injection and does not invent metrics or causal claims.
+      operationId: queryCopilot
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Campaign identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CopilotRequest'
+      responses:
+        '200':
+          description: Copilot grounded answer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CopilotResponse'
+        '400':
+          description: Invalid question or missing run_id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Campaign or score run not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Copilot disabled (missing API key) or Gemini service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          example: ok
+
+    ReadyStatus:
+      type: object
+      required:
+        - status
+        - model_loaded
+        - feature_file_readable
+        - database_writable
+      properties:
+        status:
+          type: string
+          example: ready
+        model_loaded:
+          type: boolean
+          example: true
+        model_version:
+          type: string
+          example: cl-model-v1-logistic_t_learner-01
+        dataset_version:
+          type: string
+          example: cl-synth-dev-20261006-a1b2c3d
+        feature_file_readable:
+          type: boolean
+          example: true
+        database_writable:
+          type: boolean
+          example: true
+
+    CampaignCreateRequest:
+      type: object
+      required:
+        - name
+        - objective
+        - offer_type
+        - incentive_value
+        - incentive_cost_bdt
+        - budget_bdt
+        - channel
+      properties:
+        name:
+          type: string
+          example: Q4 Merchant QR Adoption Drive
+        objective:
+          type: string
+          enum:
+            - activation
+            - qr_adoption
+            - reactivation
+            - retention
+          example: qr_adoption
+        offer_type:
+          type: string
+          enum:
+            - flat_cashback
+            - pct_cashback
+            - fee_waiver
+          example: flat_cashback
+        incentive_value:
+          type: number
+          minimum: 0
+          description: BDT amount for flat, percentage for pct, 0 for fee waiver
+          example: 25.0
+        incentive_cost_bdt:
+          type: number
+          minimum: 0
+          description: Expected unit incentive cost in BDT charged against budget
+          example: 25.0
+        budget_bdt:
+          type: number
+          exclusiveMinimum: 0
+          description: Total campaign incentive budget in BDT
+          example: 50000.0
+        channel:
+          type: string
+          enum:
+            - push
+            - sms
+            - in_app
+          example: push
+
+    CampaignResponse:
+      type: object
+      required:
+        - id
+        - name
+        - objective
+        - offer_type
+        - incentive_value
+        - incentive_cost_bdt
+        - budget_bdt
+        - channel
+        - created_at
+      properties:
+        id:
+          type: string
+          example: camp_20261006_001
+        name:
+          type: string
+          example: Q4 Merchant QR Adoption Drive
+        objective:
+          type: string
+          enum:
+            - activation
+            - qr_adoption
+            - reactivation
+            - retention
+        offer_type:
+          type: string
+          enum:
+            - flat_cashback
+            - pct_cashback
+            - fee_waiver
+        incentive_value:
+          type: number
+          example: 25.0
+        incentive_cost_bdt:
+          type: number
+          example: 25.0
+        budget_bdt:
+          type: number
+          example: 50000.0
+        channel:
+          type: string
+          enum:
+            - push
+            - sms
+            - in_app
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-10-06T10:00:00Z'
+
+    CustomerScoreItem:
+      type: object
+      required:
+        - customer_id
+        - eligible
+        - p_treat
+        - p_control
+        - uplift
+        - response_rank
+        - uplift_rank
+      properties:
+        customer_id:
+          type: string
+          example: C00012345
+        eligible:
+          type: boolean
+          example: true
+        p_treat:
+          type: number
+          format: float
+          description: Probability of transaction if offered (response score)
+          example: 0.62
+        p_control:
+          type: number
+          format: float
+          description: Probability of transaction if not offered (organic score)
+          example: 0.38
+        uplift:
+          type: number
+          format: float
+          description: Incremental change in probability (p_treat - p_control)
+          example: 0.24
+        response_rank:
+          type: integer
+          example: 142
+        uplift_rank:
+          type: integer
+          example: 18
+
+    UpliftDecile:
+      type: object
+      required:
+        - decile
+        - customer_count
+        - mean_uplift
+        - min_uplift
+        - max_uplift
+      properties:
+        decile:
+          type: integer
+          example: 1
+        customer_count:
+          type: integer
+          example: 500
+        mean_uplift:
+          type: number
+          example: 0.185
+        min_uplift:
+          type: number
+          example: 0.120
+        max_uplift:
+          type: number
+          example: 0.340
+
+    ScoreRunResponse:
+      type: object
+      required:
+        - run_id
+        - campaign_id
+        - model_version
+        - dataset_version
+        - total_eligible
+        - total_scored
+        - items
+        - limit
+        - offset
+        - total_count
+      properties:
+        run_id:
+          type: string
+          example: run_20261006_090000
+        campaign_id:
+          type: string
+          example: camp_20261006_001
+        model_version:
+          type: string
+          example: cl-model-v1-logistic_t_learner-01
+        dataset_version:
+          type: string
+          example: cl-synth-dev-20261006-a1b2c3d
+        total_eligible:
+          type: integer
+          example: 5000
+        total_scored:
+          type: integer
+          example: 5000
+        uplift_deciles:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpliftDecile'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerScoreItem'
+        limit:
+          type: integer
+          example: 50
+        offset:
+          type: integer
+          example: 0
+        total_count:
+          type: integer
+          example: 5000
+
+    OptimizeRequest:
+      type: object
+      properties:
+        budget_bdt:
+          type: number
+          exclusiveMinimum: 0
+          description: Optional budget override; defaults to campaign budget
+          example: 50000.0
+        exclude_negative_uplift:
+          type: boolean
+          default: true
+          description: Whether to exclude customers with predicted uplift < 0
+          example: true
+        max_customers:
+          type: integer
+          minimum: 1
+          description: Optional maximum number of customers to target
+          example: 2000
+        value_per_incremental_transaction_bdt:
+          type: number
+          minimum: 0
+          description: Assumed value per incremental transaction in BDT supplied by manager
+          example: 100.0
+
+    OptimizeResponse:
+      type: object
+      required:
+        - strategy
+        - selected_count
+        - budget_bdt
+        - spend_bdt
+        - expected_incremental_value
+        - customers_excluded_negative
+        - comparison
+      properties:
+        strategy:
+          type: string
+          example: uplift
+        selected_count:
+          type: integer
+          example: 2000
+        budget_bdt:
+          type: number
+          example: 50000.0
+        spend_bdt:
+          type: number
+          example: 50000.0
+        expected_incremental_value:
+          type: number
+          description: Sum of expected incremental outcomes from model scores
+          example: 342.5
+        customers_excluded_negative:
+          type: integer
+          example: 318
+        selected_customer_ids:
+          type: array
+          items:
+            type: string
+          description: Truncated sample or full list of selected IDs
+        comparison:
+          $ref: '#/components/schemas/StrategyComparisonResponse'
+
+    StrategyMetricItem:
+      type: object
+      required:
+        - strategy
+        - selected_count
+        - spend_bdt
+        - expected_incremental_value
+        - support
+        - negative_uplift_selected_share
+      properties:
+        strategy:
+          type: string
+          enum:
+            - random
+            - response
+            - uplift
+          example: uplift
+        selected_count:
+          type: integer
+          example: 2000
+        spend_bdt:
+          type: number
+          example: 50000.0
+        expected_incremental_value:
+          type: number
+          example: 342.5
+        support:
+          type: string
+          enum:
+            - sufficient
+            - insufficient
+          example: sufficient
+        measured_incremental_response:
+          type: number
+          nullable: true
+          description: Factual treated outcome rate minus control outcome rate on test slice
+          example: 0.142
+        cost_per_incremental_txn_bdt:
+          type: number
+          nullable: true
+          description: Spend divided by measured incremental transactions if positive
+          example: 176.05
+        negative_uplift_selected_share:
+          type: number
+          description: Proportion of selected audience predicted to have negative uplift
+          example: 0.0
+
+    StrategyComparisonResponse:
+      type: object
+      required:
+        - campaign_id
+        - strategies
+      properties:
+        campaign_id:
+          type: string
+          example: camp_20261006_001
+        run_id:
+          type: string
+          example: run_20261006_090000
+        evaluation_split:
+          type: string
+          example: test
+        strategies:
+          type: array
+          items:
+            $ref: '#/components/schemas/StrategyMetricItem'
+
+    FeatureContribution:
+      type: object
+      required:
+        - name
+        - value
+        - contribution
+      properties:
+        name:
+          type: string
+          example: qr_txn_share_90d
+        value:
+          type: string
+          example: '0.05'
+        contribution:
+          type: number
+          example: 0.12
+
+    CustomerExplanationResponse:
+      type: object
+      required:
+        - customer_id
+        - p_treat
+        - p_control
+        - uplift
+        - reason_code
+        - feature_contributions
+        - template_text
+      properties:
+        customer_id:
+          type: string
+          example: C00012345
+        p_treat:
+          type: number
+          example: 0.62
+        p_control:
+          type: number
+          example: 0.38
+        uplift:
+          type: number
+          example: 0.24
+        reason_code:
+          type: string
+          enum:
+            - likely_without_offer
+            - incremental_candidate
+            - weak_response
+            - negative_uplift
+          example: incremental_candidate
+        feature_contributions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeatureContribution'
+        template_text:
+          type: string
+          example: >-
+            Control probability is 0.38. Treated probability is 0.62.
+            Estimated uplift is 0.24. Reason code: incremental_candidate.
+            Largest feature differences: qr_txn_share_90d (+0.12), days_since_last_txn (+0.08).
+
+    ExperimentSliceItem:
+      type: object
+      required:
+        - slice_name
+        - slice_value
+        - treated_count
+        - control_count
+        - support
+      properties:
+        slice_name:
+          type: string
+          example: region_code
+        slice_value:
+          type: string
+          example: DHK
+        treated_count:
+          type: integer
+          example: 450
+        control_count:
+          type: integer
+          example: 430
+        support:
+          type: string
+          enum:
+            - sufficient
+            - insufficient
+          example: sufficient
+        treated_outcome_rate:
+          type: number
+          nullable: true
+          example: 0.48
+        control_outcome_rate:
+          type: number
+          nullable: true
+          example: 0.31
+        incremental_outcome:
+          type: number
+          nullable: true
+          example: 0.17
+
+    ExperimentSummaryResponse:
+      type: object
+      required:
+        - campaign_id
+        - total_treated
+        - total_control
+        - treated_outcome_rate
+        - control_outcome_rate
+        - overall_incremental_outcome
+        - slices
+      properties:
+        campaign_id:
+          type: string
+          example: camp_20261006_001
+        run_id:
+          type: string
+          example: run_20261006_090000
+        total_treated:
+          type: integer
+          example: 2500
+        total_control:
+          type: integer
+          example: 2500
+        treated_outcome_rate:
+          type: number
+          example: 0.44
+        control_outcome_rate:
+          type: number
+          example: 0.28
+        overall_incremental_outcome:
+          type: number
+          example: 0.16
+        slices:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExperimentSliceItem'
+
+    CopilotRequest:
+      type: object
+      required:
+        - question
+        - run_id
+      properties:
+        question:
+          type: string
+          maxLength: 1000
+          example: Why was customer C00012345 selected even though their response score was moderate?
+        run_id:
+          type: string
+          example: run_20261006_090000
+
+    CopilotResponse:
+      type: object
+      required:
+        - answer
+        - context_fields_used
+        - unavailable
+      properties:
+        answer:
+          type: string
+          example: >-
+            Customer C00012345 has an estimated control transaction probability of 0.38
+            and a treated transaction probability of 0.62, giving an incremental uplift of +0.24.
+            Although their raw response score (0.62) is moderate compared to sure-thing customers,
+            their behavior changes significantly when offered the incentive.
+        context_fields_used:
+          type: array
+          items:
+            type: string
+          example:
+            - run_id
+            - customer_id
+            - p_treat
+            - p_control
+            - uplift
+            - reason_code
+        unavailable:
+          type: boolean
+          example: false
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: not_ready
+        message:
+          type: string
+          example: Model artifact not loaded. Service is not ready to score.
+        detail:
+          type: string
+          example: Artifact file missing at MODEL_ARTIFACT_DIR
