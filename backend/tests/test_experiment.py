@@ -1,11 +1,4 @@
-"""Unit and integration tests for Experiment Intelligence API.
-
-Canonical planning sources:
-- planning/backend_plan.md
-- planning/ml_plan.md
-- tasks/assaduzzaman/20_experiment_intelligence_api.md
-- backend/openapi.yaml
-"""
+"""Unit and integration tests for Experiment Intelligence API."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Unit tests for Segment and Oracle Report module (Step 15.3).
+"""Unit tests for Segment and Oracle Report module.
 
 Verifies:
 1. Acceptance criteria: Run without hidden file produces Qini block with synthetic_oracle=None.

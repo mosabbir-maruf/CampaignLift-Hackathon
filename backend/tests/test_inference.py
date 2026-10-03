@@ -1,11 +1,4 @@
-"""Tests for CampaignLift Inference API (Step 18).
-
-Canonical validation requirements:
-- tasks/assaduzzaman/18_inference_api.md:
-  "Validation: API test on the fixture returns finite uplift and no forbidden field."
-  "Acceptance criteria: API test on the fixture returns finite uplift and no forbidden field."
-- Failure condition: Returning true_uplift.
-"""
+"""Tests for CampaignLift Inference API."""
 
 from __future__ import annotations
 

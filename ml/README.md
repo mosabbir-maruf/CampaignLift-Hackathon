@@ -37,7 +37,7 @@ To maintain reproducibility, compute efficiency, and clear separation of concern
 
 | Forbidden Category | Files / Directories | Rationale |
 | :--- | :--- | :--- |
-| **Internal Planning & Decisions** | `planning/**`, `tasks/**`, `decisions/**` | Internal contest strategies and scratch records must remain private. |
+| **Internal Strategy & Notes** | Development notes and scratch records | Internal strategies and scratch records must remain private. |
 | **Credentials & Secrets** | `.env`, API keys (`GEMINI_API_KEY`), AWS tokens | Security violation; credentials must never leave local environments. |
 | **Raw Transaction Data** | `data/generated/**/transactions.json` | Unaggregated 2M+ raw transaction tables are unnecessary for feature-trained models. |
 | **Oracle in Training Inputs** | `hidden_uplift.json` inside `campaignlift-dataset` | **Absolute Causal Breach**: Unobservable potential outcomes ($p_0, p_1, \tau$) must never be accessible during model fitting. |

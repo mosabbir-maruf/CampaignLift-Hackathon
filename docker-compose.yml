@@ -1,6 +1,5 @@
 # ==============================================================================
-# CampaignLift Canonical Docker Compose Configuration
-# Canonical planning source: tasks/phase_25_container_deployment.md
+# CampaignLift Docker Compose Configuration
 # Serves both local integration testing and production VPS/AWS deployment.
 # ==============================================================================
 

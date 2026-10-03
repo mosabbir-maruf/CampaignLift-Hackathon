@@ -1,10 +1,4 @@
-"""Inference service for CampaignLift uplift scoring.
-
-Canonical planning sources:
-- planning/backend_plan.md
-- planning/ml_plan.md
-- backend/openapi.yaml
-"""
+"""Inference service for CampaignLift uplift scoring."""
 
 from __future__ import annotations
 

@@ -106,7 +106,7 @@ def test_mutated_copy_with_orphan_foreign_key_fails(tmp_path):
 
 
 def test_feature_frame_with_true_uplift_added_fails(tmp_path):
-    """A feature frame with true_uplift added fails validation (Step 10.2 acceptance criteria)."""
+    """A feature frame with true_uplift added fails validation."""
     fixture_dir = Path(__file__).resolve().parents[1] / "fixtures" / "fixture_v1"
     mutated_dir = tmp_path / "mutated_features"
     shutil.copytree(fixture_dir, mutated_dir)
@@ -190,7 +190,7 @@ def test_hidden_file_placed_inside_features_directory_fails(tmp_path):
 
 
 def test_zero_negative_uplift_fails_validation(tmp_path):
-    """Hidden oracle with zero negative uplift fails validation (Step 10.3 acceptance criteria)."""
+    """Hidden oracle with zero negative uplift fails validation."""
     fixture_dir = Path(__file__).resolve().parents[1] / "fixtures" / "fixture_v1"
     mutated_dir = tmp_path / "mutated_no_neg_uplift"
     shutil.copytree(fixture_dir, mutated_dir)

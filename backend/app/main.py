@@ -1,10 +1,4 @@
-"""FastAPI main application for CampaignLift backend.
-
-Canonical planning sources:
-- planning/backend_plan.md
-- planning/architecture_plan.md
-- backend/openapi.yaml
-"""
+"""FastAPI main application for CampaignLift backend."""
 
 from __future__ import annotations
 

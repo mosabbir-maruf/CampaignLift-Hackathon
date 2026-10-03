@@ -1,11 +1,4 @@
-"""Tests for backend foundation: settings, db, /health, and /ready endpoints.
-
-Canonical requirements:
-- Step 17 in planning/master_project_plan.md
-- tasks/assaduzzaman/17_backend_foundation.md
-- planning/backend_plan.md
-- backend/openapi.yaml
-"""
+"""Tests for backend foundation: settings, db, /health, and /ready endpoints."""
 
 import os
 import sqlite3

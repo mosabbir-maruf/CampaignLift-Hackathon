@@ -1,11 +1,4 @@
-"""Unit and integration tests for Explanation API.
-
-Canonical planning sources:
-- planning/backend_plan.md
-- planning/ml_plan.md
-- tasks/assaduzzaman/21_explanation_api.md
-- backend/openapi.yaml
-"""
+"""Unit and integration tests for Explanation API."""
 
 from __future__ import annotations
 

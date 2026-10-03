@@ -1,4 +1,4 @@
-"""Tests for Model Artifact Packaging and Fresh-Process Verification (Step 16).
+"""Tests for Model Artifact Packaging and Fresh-Process Verification.
 
 Verifies:
 1. All JSON metadata files exist in artifacts/models/<model_version>/.
@@ -116,8 +116,8 @@ def test_feature_mismatch_raises():
 def test_fresh_process_smoke_score_matches_saved_validation():
     """Verify that loading the artifact in a fresh Python process matches saved fixture smoke scores.
 
-    This directly satisfies the Step 16 acceptance criteria:
-    'Fresh-process smoke score matches the saved validation routine on the fixture within floating point tolerance.'
+    Verifies that the fresh-process smoke score matches the saved validation routine
+    on the fixture within floating point tolerance.
     """
     metadata_path = ARTIFACT_DIR / "metadata.json"
     with open(metadata_path, "r", encoding="utf-8") as f:

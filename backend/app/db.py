@@ -1,9 +1,4 @@
-"""Database connection and session management for CampaignLift backend.
-
-Canonical planning sources:
-- planning/architecture_plan.md (Persistence: SQLite file for campaign definitions)
-- planning/backend_plan.md
-"""
+"""Database connection and session management for CampaignLift backend."""
 
 from __future__ import annotations
 

@@ -1,11 +1,4 @@
-"""Gemini Copilot adapter service for CampaignLift backend.
-
-Canonical planning sources:
-- planning/gemini_plan.md
-- planning/backend_plan.md
-- tasks/assaduzzaman/22_gemini_adapter.md
-- backend/openapi.yaml
-"""
+"""Gemini Copilot adapter service for CampaignLift backend."""
 
 from __future__ import annotations
 

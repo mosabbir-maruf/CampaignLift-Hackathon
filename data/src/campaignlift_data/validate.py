@@ -231,7 +231,7 @@ class DatasetValidator:
                 is_blocker=True,
             )
 
-        # 7. Leakage Validations (Step 10.2)
+        # 7. Leakage Validations
         # 7a. Intersect feature columns with FORBIDDEN_TRAINING_COLUMNS.txt
         forbidden_file = self.schemas_dir / "FORBIDDEN_TRAINING_COLUMNS.txt"
         if forbidden_file.exists():
@@ -313,7 +313,7 @@ class DatasetValidator:
             is_blocker=True,
         )
 
-        # 8. Statistical Sanity Checks (Step 10.3)
+        # 8. Statistical Sanity Checks
         # 8a. Both signs of true uplift in hidden oracle (negative uplift blocker)
         if hidden_uplift is not None:
             neg_uplift_count = sum(1 for row in hidden_uplift if row.get("true_uplift", 0) < 0)

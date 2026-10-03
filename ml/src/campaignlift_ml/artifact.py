@@ -2,11 +2,6 @@
 
 Handles saving, versioning, serialization, and loading of production uplift models
 for FastAPI serving and batch inference.
-
-Canonical Planning Sources:
-- planning/kaggle_plan.md (Artifact export and metadata specification)
-- planning/ml_plan.md (Model selection and constraint validation)
-- tasks/assaduzzaman/16_model_artifact_package.md (Step 16 specification)
 """
 
 from dataclasses import dataclass

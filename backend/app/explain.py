@@ -1,9 +1,4 @@
-"""Top-level explain package re-export for CampaignLift backend.
-
-Canonical planning sources:
-- planning/backend_plan.md
-- tasks/assaduzzaman/21_explanation_api.md
-"""
+"""Top-level explain package re-export for CampaignLift backend."""
 
 from backend.app.services.explain import (
     CustomerNotFoundError,

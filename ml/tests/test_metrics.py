@@ -1,4 +1,4 @@
-"""Unit tests for Uplift Metrics (Step 15.1: Qini, Cumulative Gain, Support Checks).
+"""Unit tests for Uplift Metrics (Qini, Cumulative Gain, Support Checks).
 
 Verifies:
 1. Hand-computed analytical validation on a known tiny frame matches hand-calculated numbers.

@@ -2,9 +2,9 @@
 
 Implements causal uplift modeling candidates:
 - U0: Logistic Regression T-Learner (two models: treatment vs control)
-- U1: LightGBM T-Learner (Step 14.2)
-- B1: Logistic Regression S-Learner (Step 14.3)
-- U2: LightGBM S-Learner (Step 14.3)
+- U1: LightGBM T-Learner
+- B1: Logistic Regression S-Learner
+- U2: LightGBM S-Learner
 
 Strict Causal & Anti-Leakage Rules:
 1. Potential outcomes are estimated from factual outcomes: y_transacted.
@@ -269,7 +269,7 @@ class LogisticTLearner:
     def score_test(self, test_df: pd.DataFrame) -> UpliftEvaluationResult:
         """Score held-out test split once for final benchmark reporting.
 
-        RESERVED: Call only after final model selection has occurred (Step 15.4).
+        RESERVED: Call only after final model selection has occurred.
         """
         return self.evaluate(test_df, eval_type="test_evaluation")
 
@@ -412,7 +412,7 @@ class LogisticSLearner:
         )
 
     def score_test(self, test_df: pd.DataFrame) -> UpliftEvaluationResult:
-        """Score held-out test split once for final benchmark reporting (Step 15.4)."""
+        """Score held-out test split once for final benchmark reporting."""
         return self.evaluate(test_df, eval_type="test_evaluation")
 
 
@@ -500,7 +500,7 @@ class LightGBMTLearner:
         if not LIGHTGBM_AVAILABLE:
             raise ImportError(
                 f"LightGBM is not available on this system ({LIGHTGBM_IMPORT_ERROR}). "
-                "Per Step 14.2 instructions, keep LogisticTLearner as the validated fallback."
+                "Keep LogisticTLearner as the validated fallback."
             )
 
         self.candidate_id = "U1"
@@ -634,7 +634,7 @@ class LightGBMTLearner:
         )
 
     def score_test(self, test_df: pd.DataFrame) -> UpliftEvaluationResult:
-        """Score held-out test split once for final benchmark reporting (Step 15.4)."""
+        """Score held-out test split once for final benchmark reporting."""
         return self.evaluate(test_df, eval_type="test_evaluation")
 
 
@@ -665,7 +665,7 @@ class LightGBMSLearner:
         if not LIGHTGBM_AVAILABLE:
             raise ImportError(
                 f"LightGBM is not available on this system ({LIGHTGBM_IMPORT_ERROR}). "
-                "Per Step 14.3 instructions, keep LogisticSLearner as the validated fallback."
+                "Keep LogisticSLearner as the validated fallback."
             )
 
         self.candidate_id = "U2"
@@ -788,7 +788,7 @@ class LightGBMSLearner:
         )
 
     def score_test(self, test_df: pd.DataFrame) -> UpliftEvaluationResult:
-        """Score held-out test split once for final benchmark reporting (Step 15.4)."""
+        """Score held-out test split once for final benchmark reporting."""
         return self.evaluate(test_df, eval_type="test_evaluation")
 
 

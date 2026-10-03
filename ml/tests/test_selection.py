@@ -1,4 +1,4 @@
-"""Validation tests for Model Selection (Step 15.4).
+"""Validation tests for Model Selection.
 
 Verifies that selection.json and metadata_draft.json:
 1. Exist in ml/experiments/

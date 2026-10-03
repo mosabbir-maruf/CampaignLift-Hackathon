@@ -1,11 +1,4 @@
-"""Explanation service for CampaignLift customer-level grounded reasoning.
-
-Canonical planning sources:
-- planning/backend_plan.md
-- planning/ml_plan.md
-- tasks/assaduzzaman/21_explanation_api.md
-- backend/openapi.yaml
-"""
+"""Explanation service for CampaignLift customer-level grounded reasoning."""
 
 from __future__ import annotations
 

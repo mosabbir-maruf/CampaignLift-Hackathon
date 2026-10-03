@@ -1,15 +1,10 @@
-"""Tests for CampaignLift Budget Optimizer API (Step 19).
+"""Tests for CampaignLift Budget Optimizer API.
 
-Canonical validation requirements:
-- tasks/assaduzzaman/19_budget_optimizer_api.md:
-  "Validation: Tests: budget not exceeded, negative uplift excluded when asked, stable ids."
-  "Acceptance criteria: Tests: budget not exceeded, negative uplift excluded when asked, stable ids."
-  "Failure condition: Hardcoding ROI."
-- planning/optimizer_plan.md:
-  - Budget is never exceeded on the fixture.
-  - Negative uplift customers are absent when exclusion is on.
-  - Response strategy can include a customer the uplift strategy rejects.
-  - Same input returns the same selected IDs.
+Validation requirements:
+- Budget is never exceeded on the fixture.
+- Negative uplift customers are absent when exclusion is on.
+- Response strategy can include a customer the uplift strategy rejects.
+- Same input returns the same selected IDs.
 """
 
 from __future__ import annotations

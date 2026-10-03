@@ -1,6 +1,5 @@
 # ==============================================================================
 # CampaignLift ML Training & Evaluation Dependencies
-# Canonical planning source: planning/ml_plan.md & planning/kaggle_plan.md
 # ==============================================================================
 
 # Core numerical and tabular processing

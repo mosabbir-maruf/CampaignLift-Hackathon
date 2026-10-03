@@ -1,6 +1,5 @@
 # ==============================================================================
 # CampaignLift ML Training & Hyperparameter Configuration
-# Canonical planning source: planning/ml_plan.md & planning/kaggle_plan.md
 # ==============================================================================
 
 global_seed: 20261006

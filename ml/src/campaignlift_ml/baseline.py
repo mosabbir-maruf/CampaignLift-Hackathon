@@ -223,7 +223,7 @@ class ResponseBaselineModel:
         """Score the held-out test split once for final benchmark reporting.
 
         CRITICAL PROTOCOL NOTICE: This method is intended to be called ONLY ONCE during
-        final release evaluation (Step 15.4 / 16). It must not be called during iterative tuning.
+        final release evaluation. It must not be called during iterative tuning.
 
         Args:
             test_df: Held-out test split DataFrame.

@@ -5,11 +5,6 @@ Compares three customer targeting strategies on validation or test cohorts under
 2. 'response': Ranked by response propensity p_treat descending (traditional targeting).
 3. 'uplift': Ranked by predicted causal uplift descending (CampaignLift targeting).
 
-Canonical Planning Source:
-- planning/ml_plan.md (Section 'Strategy comparison')
-- planning/optimizer_plan.md (Section 'Comparison' and 'Objective')
-- tasks/assaduzzaman/15.2_strategy_comparison_calculator.md
-
 Core Constraints:
 - Budget must be strictly respected (total spend <= budget_bdt).
 - Same budget and cost inputs applied identically to all three strategies.
@@ -167,7 +162,7 @@ def _evaluate_selected_cohort(
         n_c = int(np.sum(t == 0))
         has_both_arms = n_t > 0 and n_c > 0
 
-        # Support check using the 30/30 rule from Step 15.1
+        # Support check using the 30/30 rule
         inc_support = compute_incremental_response(y, t, min_support=30)
         treatment_rate = compute_treatment_rate(t)
 

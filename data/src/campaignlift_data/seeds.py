@@ -3,7 +3,7 @@
 from typing import Any, Dict, Optional
 from .config import load_world_config
 
-# Canonical stage offsets from planning/data_plan.md
+# Deterministic stage seed offsets
 STAGE_OFFSETS: Dict[str, int] = {
     "customers": 1,
     "transactions": 2,

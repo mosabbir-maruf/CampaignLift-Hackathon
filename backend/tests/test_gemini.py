@@ -1,11 +1,4 @@
-"""Unit and integration tests for Gemini Copilot adapter.
-
-Canonical planning sources:
-- planning/gemini_plan.md
-- planning/backend_plan.md
-- tasks/assaduzzaman/22_gemini_adapter.md
-- backend/openapi.yaml
-"""
+"""Unit and integration tests for Gemini Copilot adapter."""
 
 from __future__ import annotations
 

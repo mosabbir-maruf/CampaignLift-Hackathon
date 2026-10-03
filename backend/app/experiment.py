@@ -1,9 +1,4 @@
-"""Top-level experiment package re-export for CampaignLift backend.
-
-Canonical planning sources:
-- planning/backend_plan.md
-- tasks/assaduzzaman/20_experiment_intelligence_api.md
-"""
+"""Top-level experiment package re-export for CampaignLift backend."""
 
 from backend.app.services.experiment import (
     CANONICAL_SLICE_DIMENSIONS,

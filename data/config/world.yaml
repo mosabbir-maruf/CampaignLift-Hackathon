@@ -1,6 +1,5 @@
 # ==============================================================================
 # CampaignLift Causal World Simulation Configuration
-# Canonical planning source: planning/data_plan.md
 # ==============================================================================
 
 # Global seed: Changing this creates a new dataset version.

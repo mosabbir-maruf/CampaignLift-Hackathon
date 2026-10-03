@@ -1,10 +1,4 @@
-"""Campaign definition and scoring API routes for CampaignLift.
-
-Canonical planning sources:
-- planning/backend_plan.md
-- backend/openapi.yaml
-- tasks/assaduzzaman/18_inference_api.md
-"""
+"""Campaign definition and scoring API routes for CampaignLift."""
 
 from __future__ import annotations
 

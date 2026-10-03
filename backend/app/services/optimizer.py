@@ -1,11 +1,4 @@
-"""Budget optimizer service implementing greedy knapsack allocation and strategy comparison.
-
-Canonical planning sources:
-- planning/optimizer_plan.md
-- planning/backend_plan.md
-- backend/openapi.yaml
-- tasks/assaduzzaman/19_budget_optimizer_api.md
-"""
+"""Budget optimizer service implementing greedy knapsack allocation and strategy comparison."""
 
 from __future__ import annotations
 

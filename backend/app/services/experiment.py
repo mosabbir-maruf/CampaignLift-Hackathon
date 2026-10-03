@@ -1,11 +1,4 @@
-"""Experiment intelligence service for CampaignLift backend.
-
-Canonical planning sources:
-- planning/backend_plan.md
-- planning/ml_plan.md
-- tasks/assaduzzaman/20_experiment_intelligence_api.md
-- backend/openapi.yaml
-"""
+"""Experiment intelligence service for CampaignLift backend."""
 
 from __future__ import annotations
 

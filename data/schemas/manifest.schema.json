@@ -52,7 +52,7 @@
         "passed",
         "failed"
       ],
-      "description": "Statistical and schema validation status. Defaults to not_run before Step 10 validation."
+      "description": "Statistical and schema validation status. Defaults to not_run before dataset validation."
     },
     "created_at": {
       "type": "string",

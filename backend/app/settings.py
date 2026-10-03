@@ -1,10 +1,4 @@
-"""Application settings and environment configuration for CampaignLift backend.
-
-Canonical planning sources:
-- planning/architecture_plan.md
-- planning/backend_plan.md
-- backend/openapi.yaml
-"""
+"""Application settings and environment configuration for CampaignLift backend."""
 
 from __future__ import annotations
 

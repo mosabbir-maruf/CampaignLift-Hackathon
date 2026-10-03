@@ -1,4 +1,4 @@
-"""Unit tests for Strategy Comparison Calculator (Step 15.2).
+"""Unit tests for Strategy Comparison Calculator.
 
 Verifies:
 1. Budget is strictly respected across Random, Response, and Uplift strategies.

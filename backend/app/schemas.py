@@ -1,9 +1,4 @@
-"""Pydantic schemas for CampaignLift API matching backend/openapi.yaml.
-
-Canonical planning sources:
-- backend/openapi.yaml
-- planning/backend_plan.md
-"""
+"""Pydantic schemas for CampaignLift API matching backend/openapi.yaml."""
 
 from __future__ import annotations
 

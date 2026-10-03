@@ -1,9 +1,4 @@
-"""Top-level gemini package re-export for CampaignLift backend.
-
-Canonical planning sources:
-- planning/gemini_plan.md
-- tasks/assaduzzaman/22_gemini_adapter.md
-"""
+"""Top-level gemini package re-export for CampaignLift backend."""
 
 from backend.app.services.gemini import (
     SYSTEM_INSTRUCTION,
