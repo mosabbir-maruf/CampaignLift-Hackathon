@@ -85,6 +85,7 @@ jobs:
         env:
           APP_ENV: local
           LOG_LEVEL: INFO
+          PYTHONPATH: .
 
   # ============================================================================
   # 3. Docker Build & Publish to GHCR (main branch push only)
