@@ -272,20 +272,238 @@ class LogisticTLearner:
         return self.evaluate(test_df, eval_type="test_evaluation")
 
 
+# -----------------------------------------------------------------------------
+# LightGBM T-Learner (Candidate U1)
+# -----------------------------------------------------------------------------
+
+try:
+    import lightgbm as lgb
+    LIGHTGBM_AVAILABLE = True
+    LIGHTGBM_IMPORT_ERROR: Optional[str] = None
+except Exception as _lgb_err:
+    lgb = None  # type: ignore
+    LIGHTGBM_AVAILABLE = False
+    LIGHTGBM_IMPORT_ERROR = str(_lgb_err)
+
+
+def load_train_config(config_path: Optional[Union[str, Path]] = None) -> Dict[str, Any]:
+    """Load hyperparameters from ml/config/train.yaml if present."""
+    default_cfg: Dict[str, Any] = {
+        "global_seed": 20261006,
+        "lightgbm_t_learner": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "max_depth": 4,
+            "min_child_samples": 5,
+            "subsample": 0.8,
+            "colsample_bytree": 0.8,
+            "objective": "binary",
+            "verbosity": -1,
+        },
+    }
+
+    if config_path:
+        p = Path(config_path)
+    else:
+        # Default relative to this file
+        p = Path(__file__).resolve().parents[2] / "config" / "train.yaml"
+
+    if p.is_file():
+        try:
+            import yaml
+            with p.open("r", encoding="utf-8") as f:
+                loaded = yaml.safe_load(f)
+                if loaded and isinstance(loaded, dict):
+                    return loaded
+        except Exception:
+            pass
+
+    return default_cfg
+
+
+class LightGBMTLearner:
+    """Candidate U1: Two-model T-Learner using LightGBM Gradient Boosted Decision Trees.
+
+    Fits two separate LightGBM binary classifiers:
+        - model_treat: fits P(Y=1 | X, T=1) on treated cohort
+        - model_control: fits P(Y=1 | X, T=0) on control cohort
+
+    Categorical features are one-hot encoded; numeric features pass through on natural scale.
+    """
+
+    def __init__(
+        self,
+        random_state: int = 20261006,
+        n_estimators: Optional[int] = None,
+        learning_rate: Optional[float] = None,
+        num_leaves: Optional[int] = None,
+        max_depth: Optional[int] = None,
+        min_child_samples: Optional[int] = None,
+        config_path: Optional[Union[str, Path]] = None,
+    ) -> None:
+        if not LIGHTGBM_AVAILABLE:
+            raise ImportError(
+                f"LightGBM is not available on this system ({LIGHTGBM_IMPORT_ERROR}). "
+                "Per Step 14.2 instructions, keep LogisticTLearner as the validated fallback."
+            )
+
+        self.candidate_id = "U1"
+        self.model_name = "lightgbm_t_learner"
+        self.categorical_cols = list(CATEGORICAL_COLUMNS)
+        self.numeric_cols = list(NUMERIC_COLUMNS)
+        self.feature_cols = list(FEATURE_COLUMNS)
+
+        # Load train.yaml defaults
+        cfg = load_train_config(config_path)
+        lgb_params = cfg.get("lightgbm_t_learner", {})
+
+        self.random_state = random_state or cfg.get("global_seed", 20261006)
+        self.n_estimators = n_estimators if n_estimators is not None else lgb_params.get("n_estimators", 100)
+        self.learning_rate = learning_rate if learning_rate is not None else lgb_params.get("learning_rate", 0.05)
+        self.num_leaves = num_leaves if num_leaves is not None else lgb_params.get("num_leaves", 15)
+        self.max_depth = max_depth if max_depth is not None else lgb_params.get("max_depth", 4)
+        self.min_child_samples = min_child_samples if min_child_samples is not None else lgb_params.get("min_child_samples", 5)
+
+        self.model_treat: Optional[Pipeline] = None
+        self.model_control: Optional[Pipeline] = None
+        self.is_fitted: bool = False
+        self.n_train_treat: int = 0
+        self.n_train_control: int = 0
+
+    def _build_pipeline(self, seed_offset: int = 0) -> Pipeline:
+        """Create preprocessing and LightGBM pipeline."""
+        preprocessor = ColumnTransformer(
+            transformers=[
+                (
+                    "cat",
+                    OneHotEncoder(handle_unknown="ignore", sparse_output=False),
+                    self.categorical_cols,
+                ),
+            ],
+            remainder="passthrough",  # Tree models operate on natural numerical scales
+        )
+
+        classifier = lgb.LGBMClassifier(
+            n_estimators=self.n_estimators,
+            learning_rate=self.learning_rate,
+            num_leaves=self.num_leaves,
+            max_depth=self.max_depth,
+            min_child_samples=self.min_child_samples,
+            random_state=self.random_state + seed_offset,
+            objective="binary",
+            verbosity=-1,
+        )
+
+        return Pipeline(
+            steps=[
+                ("preprocessor", preprocessor),
+                ("classifier", classifier),
+            ]
+        )
+
+    def fit(self, train_df: pd.DataFrame) -> "LightGBMTLearner":
+        """Fit treated and control LightGBM models on their respective arms."""
+        assert_no_forbidden_columns(train_df)
+
+        for col in [TARGET_COLUMN, TREATMENT_COLUMN]:
+            if col not in train_df.columns:
+                raise ValueError(f"Training DataFrame missing required column '{col}'")
+
+        treat_mask = train_df[TREATMENT_COLUMN] == 1
+        control_mask = train_df[TREATMENT_COLUMN] == 0
+
+        treated_df = train_df[treat_mask]
+        control_df = train_df[control_mask]
+
+        if len(treated_df) == 0:
+            raise ValueError("No treated rows (treatment == 1) found in training DataFrame")
+        if len(control_df) == 0:
+            raise ValueError("No control rows (treatment == 0) found in training DataFrame")
+
+        self.n_train_treat = len(treated_df)
+        self.n_train_control = len(control_df)
+
+        X_treat = treated_df[self.feature_cols]
+        y_treat = treated_df[TARGET_COLUMN].values
+
+        X_control = control_df[self.feature_cols]
+        y_control = control_df[TARGET_COLUMN].values
+
+        self.model_treat = self._build_pipeline(seed_offset=1)
+        self.model_treat.fit(X_treat, y_treat)
+
+        self.model_control = self._build_pipeline(seed_offset=2)
+        self.model_control.fit(X_control, y_control)
+
+        self.is_fitted = True
+        return self
+
+    def predict_uplift(self, df: pd.DataFrame) -> UpliftPredictions:
+        """Predict counterfactual response probabilities and individual uplift via LightGBM."""
+        if not self.is_fitted or self.model_treat is None or self.model_control is None:
+            raise RuntimeError("Model is not fitted yet. Call fit() before predict_uplift().")
+
+        missing = [c for c in self.feature_cols if c not in df.columns]
+        if missing:
+            raise ValueError(f"Input DataFrame missing required feature columns: {missing}")
+
+        X = df[self.feature_cols]
+
+        p_treat = self.model_treat.predict_proba(X)[:, 1]
+        p_control = self.model_control.predict_proba(X)[:, 1]
+        uplift = p_treat - p_control
+
+        return UpliftPredictions(
+            p_treat=p_treat,
+            p_control=p_control,
+            uplift=uplift,
+        )
+
+    def evaluate(self, val_df: pd.DataFrame, eval_type: str = "smoke") -> UpliftEvaluationResult:
+        """Evaluate LightGBM T-Learner on validation split."""
+        preds = self.predict_uplift(val_df)
+
+        return UpliftEvaluationResult(
+            candidate_id=self.candidate_id,
+            model_name=self.model_name,
+            mean_uplift=float(np.mean(preds.uplift)),
+            mean_abs_uplift=float(np.mean(np.abs(preds.uplift))),
+            std_uplift=float(np.std(preds.uplift)),
+            min_uplift=float(np.min(preds.uplift)),
+            max_uplift=float(np.max(preds.uplift)),
+            p_treat_mean=float(np.mean(preds.p_treat)),
+            p_control_mean=float(np.mean(preds.p_control)),
+            n_eval=len(val_df),
+            eval_type=eval_type,
+        )
+
+    def score_test(self, test_df: pd.DataFrame) -> UpliftEvaluationResult:
+        """Score held-out test split once for final benchmark reporting (Step 15.4)."""
+        return self.evaluate(test_df, eval_type="test_evaluation")
+
+
+# -----------------------------------------------------------------------------
+# Convenience Functions & Runners
+# -----------------------------------------------------------------------------
+
 def train_logistic_t_learner(
     train_df: pd.DataFrame,
     random_state: int = 20261006,
 ) -> LogisticTLearner:
-    """Convenience helper to instantiate and fit a LogisticTLearner.
-
-    Args:
-        train_df: Training DataFrame.
-        random_state: Reproducibility seed.
-
-    Returns:
-        Fitted LogisticTLearner instance.
-    """
+    """Convenience helper to instantiate and fit a LogisticTLearner."""
     learner = LogisticTLearner(random_state=random_state)
+    learner.fit(train_df)
+    return learner
+
+
+def train_lightgbm_t_learner(
+    train_df: pd.DataFrame,
+    random_state: int = 20261006,
+    config_path: Optional[Union[str, Path]] = None,
+) -> LightGBMTLearner:
+    """Convenience helper to instantiate and fit a LightGBMTLearner."""
+    learner = LightGBMTLearner(random_state=random_state, config_path=config_path)
     learner.fit(train_df)
     return learner
 
@@ -293,21 +511,48 @@ def train_logistic_t_learner(
 def run_smoke_logistic_t_learner(
     dataset_dir: Union[str, Path] = "data/fixtures/fixture_v1",
 ) -> Dict[str, Any]:
-    """Execute smoke validation run for Logistic T-Learner on fixture/dev data.
-
-    Args:
-        dataset_dir: Directory containing features and splits (default: fixture_v1).
-
-    Returns:
-        Metrics dictionary marked as 'smoke'.
-    """
+    """Execute smoke validation run for Logistic T-Learner on fixture/dev data."""
     train_df, val_df = load_train_val(dataset_dir)
     learner = train_logistic_t_learner(train_df)
     eval_result = learner.evaluate(val_df, eval_type="smoke")
     return eval_result.to_dict()
 
 
+def run_smoke_lightgbm_t_learner(
+    dataset_dir: Union[str, Path] = "data/fixtures/fixture_v1",
+    output_metrics_path: Optional[Union[str, Path]] = None,
+) -> Dict[str, Any]:
+    """Execute smoke validation run for LightGBM T-Learner on fixture/dev data.
+
+    Returns:
+        Metrics dictionary or failure notification if LightGBM is unavailable.
+    """
+    if not LIGHTGBM_AVAILABLE:
+        result = {
+            "candidate_id": "U1",
+            "model_name": "lightgbm_t_learner",
+            "status": "import_failed",
+            "error": LIGHTGBM_IMPORT_ERROR,
+            "fallback": "logistic_t_learner",
+        }
+    else:
+        train_df, val_df = load_train_val(dataset_dir)
+        learner = train_lightgbm_t_learner(train_df)
+        eval_result = learner.evaluate(val_df, eval_type="smoke")
+        result = eval_result.to_dict()
+
+    if output_metrics_path:
+        out_p = Path(output_metrics_path)
+        out_p.parent.mkdir(parents=True, exist_ok=True)
+        with out_p.open("w", encoding="utf-8") as f:
+            json.dump(result, f, indent=2)
+
+    return result
+
+
 if __name__ == "__main__":
-    metrics = run_smoke_logistic_t_learner()
     print("Logistic T-Learner Smoke Metrics:")
-    print(json.dumps(metrics, indent=2))
+    print(json.dumps(run_smoke_logistic_t_learner(), indent=2))
+    print("\nLightGBM T-Learner Smoke Metrics:")
+    print(json.dumps(run_smoke_lightgbm_t_learner(), indent=2))
+
