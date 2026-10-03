@@ -11,7 +11,7 @@
 
 ## 1. Demo Narrative & Walkthrough Protocol
 
-This log captures the live execution of the 11-step submission demo path specified in `planning/submission_plan.md` and `planning/master_project_plan.md`. Every value, customer ID, probability, and uplift score recorded below was captured directly from real API responses.
+This log captures the live execution of the 11-step submission demo path specified in the submission demonstration protocol. Every value, customer ID, probability, and uplift score recorded below was captured directly from real API responses.
 
 | Step | Action / Workflow Node | Endpoint / Resource | Observed Status | Verified Response Key / Evidence |
 | :---: | :--- | :--- | :---: | :--- |
