@@ -28,26 +28,13 @@ export interface ErrorResponse {
   detail?: string
 }
 
-export type CampaignObjective =
-  | "activation"
-  | "qr_adoption"
-  | "reactivation"
-  | "retention"
+export type CampaignObjective = "activation" | "qr_adoption" | "reactivation" | "retention"
 
-export type CampaignOfferType =
-  | "flat_cashback"
-  | "pct_cashback"
-  | "fee_waiver"
+export type CampaignOfferType = "flat_cashback" | "pct_cashback" | "fee_waiver"
 
 export type CampaignChannel = "push" | "sms" | "in_app"
 
-export type CampaignStatus =
-  | "draft"
-  | "configured"
-  | "scored"
-  | "optimized"
-  | "active"
-  | "completed"
+export type CampaignStatus = "draft" | "configured" | "scored" | "optimized" | "active" | "completed"
 
 export interface CampaignCreateRequest {
   name: string
@@ -148,11 +135,7 @@ export interface FeatureContributionItem {
   contribution: number
 }
 
-export type ExplanationReasonCode =
-  | "likely_without_offer"
-  | "incremental_candidate"
-  | "weak_response"
-  | "negative_uplift"
+export type ExplanationReasonCode = "likely_without_offer" | "incremental_candidate" | "weak_response" | "negative_uplift"
 
 export interface CustomerExplanationResponse {
   customer_id: string
@@ -200,7 +183,10 @@ export interface CopilotResponse {
 // --- Client Configuration & Infrastructure ---
 
 const BASE_URL =
-  (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/+$/, "") || ""
+  (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(
+    /\/+$/,
+    "",
+  ) || ""
 
 export const hasBackend = Boolean(BASE_URL)
 
@@ -210,9 +196,32 @@ export class ApiError extends Error {
     public readonly errorResponse?: ErrorResponse,
     message?: string,
   ) {
-    super(message || errorResponse?.message || `API request failed with status ${status}`)
+    super(
+      message ||
+        errorResponse?.message ||
+        `API request failed with status ${status}`,
+    )
     this.name = "ApiError"
   }
+}
+
+export function buildUrl(path: string): string {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`
+  if (!BASE_URL) {
+    return normalizedPath
+  }
+  // If BASE_URL already ends with /api and path starts with /api/, avoid /api/api/
+  if (BASE_URL.endsWith("/api") && normalizedPath.startsWith("/api/")) {
+    return `${BASE_URL.slice(0, -4)}${normalizedPath}`
+  }
+  // If BASE_URL is /api and path is top-level endpoint like /ready or /health
+  if (
+    BASE_URL === "/api" &&
+    (normalizedPath === "/ready" || normalizedPath === "/health")
+  ) {
+    return normalizedPath
+  }
+  return `${BASE_URL}${normalizedPath}`
 }
 
 export async function fetchJson<T>(
@@ -222,8 +231,7 @@ export async function fetchJson<T>(
   if (!BASE_URL) {
     throw new Error("VITE_API_BASE_URL is not configured")
   }
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`
-  const url = `${BASE_URL}${normalizedPath}`
+  const url = buildUrl(path)
 
   const res = await fetch(url, {
     ...init,
@@ -236,7 +244,7 @@ export async function fetchJson<T>(
   if (!res.ok) {
     let errBody: ErrorResponse | undefined
     try {
-      errBody = (await res.json()) as ErrorResponse
+      errBody = ((await res.json()) as ErrorResponse)
     } catch {
       // response was not JSON
     }
@@ -266,7 +274,9 @@ export async function createCampaign(
 }
 
 export async function getCampaign(id: string): Promise<CampaignResponse> {
-  return fetchJson<CampaignResponse>(`/api/v1/campaigns/${encodeURIComponent(id)}`)
+  return fetchJson<CampaignResponse>(
+    `/api/v1/campaigns/${encodeURIComponent(id)}`,
+  )
 }
 
 export async function scoreCampaign(
@@ -275,7 +285,8 @@ export async function scoreCampaign(
 ): Promise<ScoreRunResponse> {
   const params = new URLSearchParams()
   if (options?.limit !== undefined) params.set("limit", String(options.limit))
-  if (options?.offset !== undefined) params.set("offset", String(options.offset))
+  if (options?.offset !== undefined)
+    params.set("offset", String(options.offset))
   const qs = params.toString() ? `?${params.toString()}` : ""
   return fetchJson<ScoreRunResponse>(
     `/api/v1/campaigns/${encodeURIComponent(id)}/score${qs}`,
