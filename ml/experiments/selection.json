@@ -1,0 +1,181 @@
+{
+  "dataset_version": "cl-synth-ml_dev-20261006-8ad556a",
+  "global_seed": 20261006,
+  "selection_rule": {
+    "primary_metric": "validation_qini_score",
+    "simplicity_margin": 0.01,
+    "tie_break_rule": "Rank candidates by validation Qini. If the highest Qini model is LightGBM, the simpler Logistic T-Learner (U0) wins if the difference in Qini is less than 0.01. Faster training breaks further ties.",
+    "constraints": [
+      "Finished training within session limits",
+      "Finite uplift for all rows",
+      "Non-constant predicted uplift",
+      "Feature list exposed by API"
+    ],
+    "evaluation_cohort": "validation_split_only"
+  },
+  "validation_rankings": [
+    {
+      "candidate_id": "U2",
+      "model_name": "LightGBM S-Learner",
+      "role": "uplift_candidate",
+      "fit_time_seconds": 0.057,
+      "validation_qini_score": 48.457804,
+      "validation_normalized_qini": 0.134195,
+      "validation_top10_incremental_rate": 0.186313,
+      "mean_uplift": 0.005366,
+      "std_uplift": 0.063089,
+      "qini_endpoint": -23.335389,
+      "ate": -0.019826,
+      "passes_constraints": true
+    },
+    {
+      "candidate_id": "U1",
+      "model_name": "LightGBM T-Learner",
+      "role": "uplift_candidate",
+      "fit_time_seconds": 2.6766,
+      "validation_qini_score": 40.23467,
+      "validation_normalized_qini": 0.111423,
+      "validation_top10_incremental_rate": 0.238444,
+      "mean_uplift": 0.010978,
+      "std_uplift": 0.165926,
+      "qini_endpoint": -23.335389,
+      "ate": -0.019826,
+      "passes_constraints": true
+    },
+    {
+      "candidate_id": "U0",
+      "model_name": "Logistic Regression T-Learner",
+      "role": "uplift_candidate",
+      "fit_time_seconds": 0.0445,
+      "validation_qini_score": 39.277829,
+      "validation_normalized_qini": 0.108773,
+      "validation_top10_incremental_rate": 0.127765,
+      "mean_uplift": 0.015033,
+      "std_uplift": 0.11152,
+      "qini_endpoint": -23.335389,
+      "ate": -0.019826,
+      "passes_constraints": true
+    },
+    {
+      "candidate_id": "B1",
+      "model_name": "Logistic Regression S-Learner",
+      "role": "uplift_candidate",
+      "fit_time_seconds": 0.0318,
+      "validation_qini_score": 3.371305,
+      "validation_normalized_qini": 0.009336,
+      "validation_top10_incremental_rate": 0.038182,
+      "mean_uplift": 0.014711,
+      "std_uplift": 0.001995,
+      "qini_endpoint": -23.335389,
+      "ate": -0.019826,
+      "passes_constraints": true
+    }
+  ],
+  "validation_all_candidates": {
+    "B0": {
+      "candidate_id": "B0",
+      "model_name": "Logistic Regression Baseline (Response)",
+      "role": "response_baseline",
+      "fit_time_seconds": 0.1461,
+      "validation_qini_score": 18.088672,
+      "validation_normalized_qini": 0.050093,
+      "validation_top10_incremental_rate": 0.072139,
+      "brier_score": 0.2194295032541906,
+      "qini_endpoint": -23.335389,
+      "passes_constraints": true
+    },
+    "B1": {
+      "candidate_id": "B1",
+      "model_name": "Logistic Regression S-Learner",
+      "role": "uplift_candidate",
+      "fit_time_seconds": 0.0318,
+      "validation_qini_score": 3.371305,
+      "validation_normalized_qini": 0.009336,
+      "validation_top10_incremental_rate": 0.038182,
+      "mean_uplift": 0.014711,
+      "std_uplift": 0.001995,
+      "qini_endpoint": -23.335389,
+      "ate": -0.019826,
+      "passes_constraints": true
+    },
+    "U0": {
+      "candidate_id": "U0",
+      "model_name": "Logistic Regression T-Learner",
+      "role": "uplift_candidate",
+      "fit_time_seconds": 0.0445,
+      "validation_qini_score": 39.277829,
+      "validation_normalized_qini": 0.108773,
+      "validation_top10_incremental_rate": 0.127765,
+      "mean_uplift": 0.015033,
+      "std_uplift": 0.11152,
+      "qini_endpoint": -23.335389,
+      "ate": -0.019826,
+      "passes_constraints": true
+    },
+    "U1": {
+      "candidate_id": "U1",
+      "model_name": "LightGBM T-Learner",
+      "role": "uplift_candidate",
+      "fit_time_seconds": 2.6766,
+      "validation_qini_score": 40.23467,
+      "validation_normalized_qini": 0.111423,
+      "validation_top10_incremental_rate": 0.238444,
+      "mean_uplift": 0.010978,
+      "std_uplift": 0.165926,
+      "qini_endpoint": -23.335389,
+      "ate": -0.019826,
+      "passes_constraints": true
+    },
+    "U2": {
+      "candidate_id": "U2",
+      "model_name": "LightGBM S-Learner",
+      "role": "uplift_candidate",
+      "fit_time_seconds": 0.057,
+      "validation_qini_score": 48.457804,
+      "validation_normalized_qini": 0.134195,
+      "validation_top10_incremental_rate": 0.186313,
+      "mean_uplift": 0.005366,
+      "std_uplift": 0.063089,
+      "qini_endpoint": -23.335389,
+      "ate": -0.019826,
+      "passes_constraints": true
+    }
+  },
+  "decision": {
+    "selected_candidate_id": "U2",
+    "selected_model_name": "LightGBM S-Learner",
+    "highest_raw_qini_candidate": "U2",
+    "highest_raw_qini": 48.457804,
+    "u0_fallback_qini": 39.277829,
+    "qini_difference": 9.179975,
+    "simplicity_margin_applied": false,
+    "rationale": "Candidate U2 achieved validation Qini of 48.457804, outperforming U0 (39.277829) by 9.179975, which exceeds the 0.01 simplicity margin. U2 is selected as the winning production model.",
+    "refit_on_train_val": true,
+    "refit_cohort_size": 9961,
+    "refit_time_seconds": 0.0752
+  },
+  "test_evaluation": {
+    "selected_model": {
+      "candidate_id": "U2",
+      "model_name": "LightGBM S-Learner",
+      "test_qini_score": 65.22574,
+      "test_normalized_qini": 0.175499,
+      "test_top10_incremental_rate": 0.187328,
+      "test_ate": -0.007641,
+      "mean_predicted_uplift": -0.004565,
+      "std_predicted_uplift": 0.07675,
+      "n_test": 2530
+    },
+    "response_baseline_b0": {
+      "candidate_id": "B0",
+      "model_name": "Logistic Regression Baseline (Response)",
+      "test_qini_score": 17.372514,
+      "test_top10_incremental_rate": 0.104387,
+      "n_test": 2530
+    },
+    "single_test_call_verified": true,
+    "note": "Scored once on held-out test split after freezing the winner chosen strictly on validation."
+  },
+  "status": "completed",
+  "timestamp": "2026-10-03T10:47:51Z"
+}

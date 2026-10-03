@@ -1,0 +1,85 @@
+{
+  "model_version": "campaignlift-u2-v1",
+  "dataset_version": "cl-synth-ml_dev-20261006-8ad556a",
+  "global_seed": 20261006,
+  "selected_candidate": {
+    "candidate_id": "U2",
+    "model_name": "LightGBM S-Learner",
+    "role": "Primary Causal Uplift Model",
+    "algorithm": "S-Learner",
+    "base_estimator": "LightGBM"
+  },
+  "selection_summary": {
+    "rule": "validation_qini_with_0.01_simplicity_margin",
+    "validation_qini": 48.457804,
+    "test_qini": 65.22574,
+    "validation_top10_incremental_rate": 0.186313,
+    "test_top10_incremental_rate": 0.187328
+  },
+  "candidates_evaluated": [
+    {
+      "candidate_id": "B0",
+      "model_name": "Logistic Regression Baseline (Response)",
+      "val_qini": 18.088672,
+      "selected": false
+    },
+    {
+      "candidate_id": "B1",
+      "model_name": "Logistic Regression S-Learner",
+      "val_qini": 3.371305,
+      "selected": false
+    },
+    {
+      "candidate_id": "U0",
+      "model_name": "Logistic Regression T-Learner",
+      "val_qini": 39.277829,
+      "selected": false
+    },
+    {
+      "candidate_id": "U1",
+      "model_name": "LightGBM T-Learner",
+      "val_qini": 40.23467,
+      "selected": false
+    },
+    {
+      "candidate_id": "U2",
+      "model_name": "LightGBM S-Learner",
+      "val_qini": 48.457804,
+      "selected": true
+    }
+  ],
+  "training_metadata": {
+    "train_val_cohort_size": 9961,
+    "test_cohort_size": 2530,
+    "feature_count": 22,
+    "categorical_features": [
+      "age_band",
+      "region_code",
+      "kyc_level",
+      "acquisition_channel",
+      "objective",
+      "offer_type"
+    ],
+    "numeric_features": [
+      "tenure_days",
+      "txn_count_30d",
+      "txn_count_90d",
+      "txn_amount_30d_bdt",
+      "txn_amount_90d_bdt",
+      "qr_txn_share_90d",
+      "cashout_share_90d",
+      "merchant_pay_share_90d",
+      "days_since_last_txn",
+      "avg_ticket_90d_bdt",
+      "app_channel_share_90d",
+      "campaign_exposures_prior_30d",
+      "campaign_exposures_prior_90d",
+      "days_since_last_campaign",
+      "incentive_value",
+      "incentive_cost_bdt"
+    ],
+    "refitted_on_train_val": true,
+    "single_test_look": true
+  },
+  "draft_created_at": "2026-10-03T10:47:51Z"
+}
