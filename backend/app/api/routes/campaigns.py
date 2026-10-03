@@ -21,6 +21,8 @@ from backend.app.db import get_db
 from backend.app.schemas import (
     CampaignCreateRequest,
     CampaignResponse,
+    CopilotRequest,
+    CopilotResponse,
     CustomerExplanationResponse,
     ErrorResponse,
     ExperimentSummaryResponse,
@@ -45,6 +47,12 @@ from backend.app.services.explain import (
     CustomerNotFoundError,
     ensure_explain_db_schema,
     explain_customer,
+)
+from backend.app.services.gemini import (
+    CopilotDisabledError,
+    CopilotUnavailableError,
+    RunNotFoundError,
+    query_copilot,
 )
 from backend.app.services.optimizer import (
     ensure_optimizer_db_schema,
@@ -642,5 +650,91 @@ def get_customer_explanation(
                 detail=str(exc),
             ).model_dump(),
         )
+
+
+@router.post(
+    "/{id}/copilot",
+    response_model=CopilotResponse,
+    responses={
+        400: {"model": ErrorResponse, "description": "Invalid question or missing run_id"},
+        404: {"model": ErrorResponse, "description": "Campaign or run not found"},
+        503: {"model": ErrorResponse, "description": "Copilot disabled or unavailable"},
+    },
+    summary="Grounded campaign copilot",
+    description="Answers campaign manager questions strictly using verified run JSON context. Rejects prompt injection and does not invent metrics or causal claims.",
+)
+def ask_copilot(
+    id: str,
+    payload: CopilotRequest,
+    settings: Settings = Depends(get_settings),
+    conn: sqlite3.Connection = Depends(get_db),
+) -> Any:
+    """Answer question strictly using verified run JSON context."""
+    ensure_db_schema(conn)
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM campaigns WHERE id = ?", (id,))
+    if not cursor.fetchone():
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=ErrorResponse(
+                error="campaign_not_found",
+                message=f"Campaign '{id}' not found.",
+            ).model_dump(),
+        )
+
+    try:
+        response = query_copilot(
+            campaign_id=id,
+            request=payload,
+            conn=conn,
+            settings=settings,
+        )
+        return response
+    except RunNotFoundError as err:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=ErrorResponse(
+                error="run_not_found",
+                message=f"Run '{payload.run_id}' not found for campaign '{id}'.",
+                detail=str(err),
+            ).model_dump(),
+        )
+    except CopilotDisabledError as err:
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content=ErrorResponse(
+                error="copilot_disabled",
+                message="Copilot is disabled. GEMINI_API_KEY is not configured.",
+                detail=str(err),
+            ).model_dump(),
+        )
+    except CopilotUnavailableError as err:
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content=ErrorResponse(
+                error="copilot_unavailable",
+                message="Gemini Copilot service is currently unavailable.",
+                detail=str(err),
+            ).model_dump(),
+        )
+    except ValueError as val_err:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=ErrorResponse(
+                error="invalid_copilot_request",
+                message=str(val_err),
+            ).model_dump(),
+        )
+    except Exception as exc:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=ErrorResponse(
+                error="copilot_failed",
+                message="Unexpected error executing Copilot inquiry.",
+                detail=str(exc),
+            ).model_dump(),
+        )
+
 
 

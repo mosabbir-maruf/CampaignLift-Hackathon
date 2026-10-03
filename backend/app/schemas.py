@@ -227,3 +227,22 @@ class CustomerExplanationResponse(BaseModel):
     )
     template_text: str = Field(..., description="Grounded template explanation text")
 
+
+class CopilotRequest(BaseModel):
+    """Grounded campaign copilot inquiry request."""
+
+    model_config = ConfigDict(extra="forbid")
+    question: str = Field(..., min_length=1, max_length=1000, description="Campaign manager question")
+    run_id: str = Field(..., min_length=1, description="Verified run ID providing context grounding")
+
+
+class CopilotResponse(BaseModel):
+    """Grounded natural-language copilot response."""
+
+    model_config = ConfigDict(extra="forbid")
+    answer: str = Field(..., description="Grounded natural language answer")
+    context_fields_used: List[str] = Field(
+        default_factory=list, description="List of verified run JSON fields used for answer grounding"
+    )
+    unavailable: bool = Field(False, description="Whether Gemini service was unavailable")
+
