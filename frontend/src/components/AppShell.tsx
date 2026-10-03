@@ -100,17 +100,48 @@ function NavList({
 function Wordmark({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <svg aria-hidden width="20" height="20" viewBox="0 0 20 20">
-        <circle
-          cx="5"
-          cy="14"
-          r="3"
-          fill="none"
-          stroke="#a4a9ae"
-          strokeWidth="1.6"
+      <svg
+        aria-hidden
+        width="20"
+        height="20"
+        viewBox="0 0 20 20"
+        fill="none"
+        className="shrink-0"
+      >
+        <defs>
+          <linearGradient
+            id="cl-wm-bar"
+            x1="5"
+            y1="15"
+            x2="15"
+            y2="5"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor="#12805F" />
+            <stop offset="100%" stopColor="#2ED8A3" />
+          </linearGradient>
+          <radialGradient id="cl-wm-bl" cx="35%" cy="35%" r="65%">
+            <stop offset="0%" stopColor="#1B9E78" />
+            <stop offset="70%" stopColor="#0E6B4F" />
+            <stop offset="100%" stopColor="#084E39" />
+          </radialGradient>
+          <radialGradient id="cl-wm-tr" cx="35%" cy="35%" r="65%">
+            <stop offset="0%" stopColor="#4EEDB9" />
+            <stop offset="65%" stopColor="#2ED8A3" />
+            <stop offset="100%" stopColor="#1DB584" />
+          </radialGradient>
+        </defs>
+        <line
+          x1="5"
+          y1="15"
+          x2="15"
+          y2="5"
+          stroke="url(#cl-wm-bar)"
+          strokeWidth="2.2"
+          strokeLinecap="round"
         />
-        <circle cx="15" cy="6" r="3" fill="#7cc4d1" />
-        <path d="M7.2 12 L12.8 8" stroke="#7cc4d1" strokeWidth="1.6" />
+        <circle cx="5" cy="15" r="4.2" fill="url(#cl-wm-bl)" />
+        <circle cx="15" cy="5" r="4.2" fill="url(#cl-wm-tr)" />
       </svg>
       {!compact && (
         <div className="leading-none">
