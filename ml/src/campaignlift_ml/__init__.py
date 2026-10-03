@@ -28,6 +28,13 @@ from .baseline import (
     train_response_baseline,
     run_smoke_baseline,
 )
+from .uplift import (
+    LogisticTLearner,
+    UpliftPredictions,
+    UpliftEvaluationResult,
+    train_logistic_t_learner,
+    run_smoke_logistic_t_learner,
+)
 
 __all__ = [
     "DatasetSplits",
@@ -49,4 +56,9 @@ __all__ = [
     "BaselineEvaluationResult",
     "train_response_baseline",
     "run_smoke_baseline",
+    "LogisticTLearner",
+    "UpliftPredictions",
+    "UpliftEvaluationResult",
+    "train_logistic_t_learner",
+    "run_smoke_logistic_t_learner",
 ]
