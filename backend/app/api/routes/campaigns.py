@@ -366,20 +366,34 @@ async def optimize_budget(
             ).model_dump(),
         )
 
-    # 2. Fetch scored customers or score on-the-fly
-    cursor.execute("SELECT * FROM customer_scores WHERE campaign_id = ?", (id,))
+    # 2. Fetch scored customers from latest score run or score on-the-fly
+    cursor.execute(
+        """
+        SELECT * FROM customer_scores
+        WHERE run_id = (
+            SELECT run_id FROM score_runs
+            WHERE campaign_id = ?
+            ORDER BY created_at DESC, rowid DESC
+            LIMIT 1
+        )
+        """,
+        (id,),
+    )
     scored_rows = [dict(r) for r in cursor.fetchall()]
 
     if not scored_rows:
         try:
-            score_campaign_population(
+            score_res = score_campaign_population(
                 campaign=campaign_data,
                 limit=200,
                 offset=0,
                 settings=settings,
                 conn=conn,
             )
-            cursor.execute("SELECT * FROM customer_scores WHERE campaign_id = ?", (id,))
+            cursor.execute(
+                "SELECT * FROM customer_scores WHERE run_id = ?",
+                (score_res.run_id,),
+            )
             scored_rows = [dict(r) for r in cursor.fetchall()]
         except ModelNotReadyError as err:
             return JSONResponse(
