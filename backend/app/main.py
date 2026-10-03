@@ -139,7 +139,7 @@ def inspect_feature_file(feature_file_path: Path) -> tuple[bool, Optional[str]]:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Lifespan event handler for application startup and shutdown."""
-    settings = get_settings()
+    settings = getattr(app.state, "settings", None) or get_settings()
 
     # Configure logger level from settings
     logger.setLevel(getattr(logging, settings.log_level, logging.INFO))
@@ -179,6 +179,7 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
         ),
         lifespan=lifespan,
     )
+    app.state.settings = settings
 
     # Enable CORS for local dev and frontend communication
     app.add_middleware(
@@ -273,6 +274,10 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
                 database_writable=True,
             ).model_dump(),
         )
+
+    # Mount API routes
+    from backend.app.api.routes import api_router
+    app.include_router(api_router)
 
     return app
 

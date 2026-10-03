@@ -98,8 +98,10 @@ def check_database_writable(settings: Optional[Settings] = None) -> bool:
         return False
 
 
+from fastapi import Depends
+
 def get_db(
-    settings: Optional[Settings] = None,
+    settings: Settings = Depends(get_settings),
 ) -> Generator[sqlite3.Connection, None, None]:
     """FastAPI dependency yielding a managed database connection."""
     conn = get_connection(settings)
