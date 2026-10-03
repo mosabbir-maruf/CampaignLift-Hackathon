@@ -1,0 +1,150 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  # ============================================================================
+  # 1. Frontend Quality Gate
+  # ============================================================================
+  frontend-check:
+    name: Frontend Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Enable Corepack & pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: TypeScript typecheck
+        working-directory: ./frontend
+        run: pnpm run typecheck
+
+      - name: Lint check (oxfmt)
+        working-directory: ./frontend
+        run: pnpm run lint
+
+      - name: Production bundle build
+        working-directory: ./frontend
+        run: pnpm run build
+
+  # ============================================================================
+  # 2. Backend Quality Gate
+  # ============================================================================
+  backend-check:
+    name: Backend Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libgomp1
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt ruff mypy pytest
+
+      - name: Lint check (ruff)
+        run: python -m ruff check --line-length=120 --select=E,F,W --ignore=E501 backend/app
+
+      - name: Type check (mypy)
+        run: python -m mypy backend/app --ignore-missing-imports --explicit-package-bases
+
+      - name: Automated unit & integration tests (pytest)
+        run: pytest backend/tests/ -v
+        env:
+          APP_ENV: local
+          LOG_LEVEL: INFO
+
+  # ============================================================================
+  # 3. Docker Build & Publish to GHCR (main branch push only)
+  # ============================================================================
+  build-and-publish:
+    name: Build & Publish Docker Images
+    needs: [frontend-check, backend-check]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate lowercase repository owner & tag names
+        run: |
+          OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "REPO_OWNER=${OWNER_LOWER}" >> $GITHUB_ENV
+          echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
+
+      - name: Build and push Frontend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ env.REPO_OWNER }}/campaignlift-frontend:latest
+            ghcr.io/${{ env.REPO_OWNER }}/campaignlift-frontend:sha-${{ github.sha }}
+            ghcr.io/${{ env.REPO_OWNER }}/campaignlift-frontend:sha-${{ env.SHORT_SHA }}
+
+      - name: Build and push Backend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ env.REPO_OWNER }}/campaignlift-backend:latest
+            ghcr.io/${{ env.REPO_OWNER }}/campaignlift-backend:sha-${{ github.sha }}
+            ghcr.io/${{ env.REPO_OWNER }}/campaignlift-backend:sha-${{ env.SHORT_SHA }}
+
+      - name: Setup Python for GHCR cleanup
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Execute GHCR package retention cleanup (keep newest 2 versions)
+        run: python scripts/cleanup-ghcr.py --owner ${{ env.REPO_OWNER }} --retain 2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

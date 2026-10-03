@@ -23,7 +23,7 @@ from backend.app.schemas import (
     StrategyComparisonResponse,
     StrategyMetricItem,
 )
-from backend.app.settings import REPO_ROOT, Settings, get_settings
+from backend.app.settings import REPO_ROOT
 
 
 def ensure_optimizer_db_schema(conn: sqlite3.Connection) -> None:

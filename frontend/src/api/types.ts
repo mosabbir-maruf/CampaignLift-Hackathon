@@ -69,6 +69,12 @@ export interface StrategyResult {
   measured: Partial<StrategyMetrics> | null
 }
 
+export interface BudgetConstraint {
+  label: string
+  value: string
+  binding: boolean
+}
+
 export interface OptimizationResult {
   status: "optimal" | "budget_unused" | "insufficient_support" | "infeasible"
   budget: number
@@ -81,7 +87,7 @@ export interface OptimizationResult {
   expected_incremental_conversions: number
   expected_incremental_value: number
   excluded_negative: number
-  constraints: { label: string; value: string; binding: boolean }[]
+  constraints: BudgetConstraint[]
   message?: string
 }
 

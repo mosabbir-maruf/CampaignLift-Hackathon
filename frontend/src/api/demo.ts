@@ -31,7 +31,12 @@ export const DEMO_CAMPAIGN: Campaign = {
   created_at: "2026-10-01T09:20:00Z",
 }
 
-const REASONS: Record<TargetingStatus, { code: string; segment: string }[]> = {
+interface ReasonEntry {
+  code: string
+  segment: string
+}
+
+const REASONS: Record<TargetingStatus, ReasonEntry[]> = {
   high_incremental: [
     { code: "R01_HIGH_SENSITIVITY", segment: "Offer-sensitive, low baseline" },
     { code: "R02_DIGITAL_ENGAGED", segment: "Digitally engaged, lapsed" },

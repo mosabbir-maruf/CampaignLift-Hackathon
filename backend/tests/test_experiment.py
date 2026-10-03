@@ -19,11 +19,11 @@ from fastapi.testclient import TestClient
 from backend.app.main import app
 from backend.app.schemas import ExperimentSummaryResponse
 from backend.app.services.experiment import (
-    ForbiddenColumnError,
     compute_experiment_summary,
     derive_activity_band,
     derive_exposure_band,
 )
+from backend.app.services.inference import ForbiddenColumnError
 from backend.app.main import create_app
 from backend.app.settings import Settings, get_settings
 

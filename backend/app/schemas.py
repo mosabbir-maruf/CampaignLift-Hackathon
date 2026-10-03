@@ -113,11 +113,11 @@ class OptimizeRequest(BaseModel):
     """Audience optimization and budget allocation request."""
 
     model_config = ConfigDict(extra="forbid")
-    budget_bdt: Optional[float] = Field(None, gt=0.0, description="Optional budget override; defaults to campaign budget")
-    exclude_negative_uplift: bool = Field(True, description="Whether to exclude customers with predicted uplift < 0")
-    max_customers: Optional[int] = Field(None, ge=1, description="Optional maximum number of customers to target")
+    budget_bdt: Optional[float] = Field(default=None, gt=0.0, description="Optional budget override; defaults to campaign budget")
+    exclude_negative_uplift: bool = Field(default=True, description="Whether to exclude customers with predicted uplift < 0")
+    max_customers: Optional[int] = Field(default=None, ge=1, description="Optional maximum number of customers to target")
     value_per_incremental_transaction_bdt: Optional[float] = Field(
-        None, ge=0.0, description="Assumed value per incremental transaction in BDT supplied by manager"
+        default=None, ge=0.0, description="Assumed value per incremental transaction in BDT supplied by manager"
     )
 
 

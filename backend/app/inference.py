@@ -2,7 +2,6 @@
 
 from backend.app.services.inference import (
     CAMPAIGN_FIELDS,
-    DEFAULT_FORBIDDEN_COLUMNS if "DEFAULT_FORBIDDEN_COLUMNS" in locals() else FORBIDDEN_COLUMNS,
     FORBIDDEN_COLUMNS,
     FeatureMismatchError,
     FeatureTableNotReadyError,

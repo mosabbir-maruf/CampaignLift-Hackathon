@@ -101,7 +101,9 @@ export default function Audience() {
     c.customer_id.toLowerCase().includes(q.trim().toLowerCase()),
   )
 
-  const totalPages = data ? Math.max(1, Math.ceil(data.total_count / PAGE_SIZE)) : 1
+  const totalPages = data
+    ? Math.max(1, Math.ceil(data.total_count / PAGE_SIZE))
+    : 1
 
   return (
     <div className="space-y-6">
@@ -113,7 +115,9 @@ export default function Audience() {
           data ? (
             <div className="flex items-center gap-2">
               <Badge tone="neu" dot={false}>
-                <span className="font-mono text-[11px]">{data.campaign_id}</span>
+                <span className="font-mono text-[11px]">
+                  {data.campaign_id}
+                </span>
               </Badge>
               <Button
                 onClick={() =>
@@ -145,8 +149,8 @@ export default function Audience() {
               </Link>
             }
           >
-            No active campaign scenario was selected. Define a campaign scenario in
-            Campaign Setup before running audience scoring.
+            No active campaign scenario was selected. Define a campaign scenario
+            in Campaign Setup before running audience scoring.
           </EmptyState>
         </Panel>
       )}
@@ -154,12 +158,12 @@ export default function Audience() {
       {/* Error State: Backend scoring failure */}
       {activeId && error && (
         <Panel className="p-6">
-          <ErrorState
-            message={error}
-            onRetry={() => setNonce((n) => n + 1)}
-          />
+          <ErrorState message={error} onRetry={() => setNonce((n) => n + 1)} />
           <div className="mt-4 flex items-center gap-3 border-t border-line pt-4 text-[12.5px]">
-            <Link to="/setup" className="font-medium text-primary hover:underline">
+            <Link
+              to="/setup"
+              className="font-medium text-primary hover:underline"
+            >
               ← Return to Campaign Setup
             </Link>
             <span className="text-mute">·</span>
@@ -198,12 +202,18 @@ export default function Audience() {
               />
               <MetricBlock
                 label="Model Version"
-                value={<span className="font-mono text-[14px]">{data.model_version}</span>}
+                value={
+                  <span className="font-mono text-[14px]">
+                    {data.model_version}
+                  </span>
+                }
                 note={`Dataset: ${data.dataset_version}`}
               />
               <MetricBlock
                 label="Batch Run ID"
-                value={<span className="font-mono text-[12px]">{data.run_id}</span>}
+                value={
+                  <span className="font-mono text-[12px]">{data.run_id}</span>
+                }
                 note={`Limit: ${data.limit} · Offset: ${data.offset}`}
               />
             </div>
@@ -217,7 +227,9 @@ export default function Audience() {
               className="flex flex-col gap-3 border-b border-line p-3 md:flex-row md:items-center"
             >
               <label className="relative md:w-72">
-                <span className="sr-only">Search customer ID on current page</span>
+                <span className="sr-only">
+                  Search customer ID on current page
+                </span>
                 <input
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
@@ -231,7 +243,8 @@ export default function Audience() {
                 </Button>
               )}
               <div className="text-[12px] text-mute md:ml-2">
-                Showing {displayedItems.length} of {data.items.length} items on page
+                Showing {displayedItems.length} of {data.items.length} items on
+                page
               </div>
               <div className="md:ml-auto">
                 <DumbbellLegend />
@@ -360,7 +373,9 @@ export default function Audience() {
                 </span>
                 <Button
                   variant="ghost"
-                  disabled={(page + 1) * PAGE_SIZE >= data.total_count || loading}
+                  disabled={
+                    (page + 1) * PAGE_SIZE >= data.total_count || loading
+                  }
                   onClick={() => setPage((p) => p + 1)}
                 >
                   Next →
@@ -436,9 +451,7 @@ export default function Audience() {
               </div>
               <div className="flex justify-between py-2">
                 <dt className="text-mute">Eligible</dt>
-                <dd className="text-ink">
-                  {selected.eligible ? "Yes" : "No"}
-                </dd>
+                <dd className="text-ink">{selected.eligible ? "Yes" : "No"}</dd>
               </div>
             </dl>
 

@@ -454,7 +454,8 @@ export function Resource<T>({
       <>
         {empty ?? (
           <EmptyState title="Data not loaded">
-            Data is not loaded. Connect the backend service or select a preview state.
+            Data is not loaded. Connect the backend service or select a preview
+            state.
           </EmptyState>
         )}
       </>

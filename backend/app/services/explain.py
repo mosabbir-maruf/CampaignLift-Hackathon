@@ -12,10 +12,8 @@ from __future__ import annotations
 import json
 import sqlite3
 import sys
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 
 from backend.app.schemas import (
@@ -26,13 +24,13 @@ from backend.app.services.inference import (
     CAMPAIGN_FIELDS,
     FORBIDDEN_COLUMNS,
     FeatureMismatchError,
-    FeatureTableNotReadyError,
-    ModelNotReadyError,
     assert_no_forbidden_columns,
     load_feature_table,
     load_model_artifact,
 )
 from backend.app.settings import REPO_ROOT, Settings, get_settings
+
+ReasonCode = Literal["likely_without_offer", "incremental_candidate", "weak_response", "negative_uplift"]
 
 # Ensure ML package is available
 ml_src_path = str(REPO_ROOT / "ml" / "src")
@@ -73,7 +71,7 @@ def determine_reason_code(
     uplift: float,
     high_p_control_threshold: float = 0.5,
     uplift_operating_threshold: float = 0.02,
-) -> str:
+) -> ReasonCode:
     """Determine customer-level reason code based on canonical ML plan rules.
 
     Rules:

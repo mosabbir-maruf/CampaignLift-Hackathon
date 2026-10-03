@@ -1,34 +1,56 @@
+# ==============================================================================
+# CampaignLift Canonical Docker Compose Configuration
+# Canonical planning source: tasks/phase_25_container_deployment.md
+# Serves both local integration testing and production VPS/AWS deployment.
+# ==============================================================================
+
 services:
-  web:
+  frontend:
+    image: ${FRONTEND_IMAGE:-ghcr.io/mosabbir-maruf/campaignlift-frontend:latest}
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    container_name: campaignlift-frontend
     ports:
       - "${PORT:-80}:80"
     depends_on:
-      api:
+      backend:
         condition: service_healthy
     networks:
       - campaignlift-net
     restart: unless-stopped
 
-  api:
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/mosabbir-maruf/campaignlift-backend:latest}
     build:
       context: .
       dockerfile: backend/Dockerfile
+    container_name: campaignlift-backend
     expose:
       - "8000"
     environment:
-      - APP_ENV=local
-      - LOG_LEVEL=INFO
-      - DATABASE_URL=sqlite:///./campaignlift.db
-      - MODEL_ARTIFACT_DIR=artifacts/models/cl-model-ml_dev_20261006-lgbm_s_learner-r01
-      - FEATURE_TABLE_PATH=data/fixtures/fixture_v1/features.json
-      - DATASET_VERSION=cl-synth-ml_dev-20261006-8ad556a
+      - APP_ENV=${APP_ENV:-production}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:////app/db/campaignlift.db}
+      - MODEL_ARTIFACT_DIR=${MODEL_ARTIFACT_DIR:-artifacts/models/cl-model-ml_dev_20261006-lgbm_s_learner-r01}
+      - FEATURE_TABLE_PATH=${FEATURE_TABLE_PATH:-data/fixtures/fixture_v1/features.json}
+      - DATASET_VERSION=${DATASET_VERSION:-cl-synth-ml_dev-20261006-8ad556a}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash}
+    volumes:
+      - campaignlift-db:/app/db
     networks:
-      - campaignlift-net
+      campaignlift-net:
+        aliases:
+          - backend
+          - api
     restart: unless-stopped
+
+volumes:
+  campaignlift-db:
+    name: campaignlift-db
 
 networks:
   campaignlift-net:
+    name: campaignlift-net
     driver: bridge

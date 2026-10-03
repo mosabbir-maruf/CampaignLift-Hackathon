@@ -9,7 +9,6 @@ Canonical planning sources:
 from __future__ import annotations
 
 import json
-import math
 import sqlite3
 import sys
 import time
@@ -81,11 +80,13 @@ def assert_no_forbidden_columns(cols: Any) -> None:
         candidate_cols = set(cols.columns)
     elif isinstance(cols, dict):
         candidate_cols = set(cols.keys())
-    elif isinstance(cols, (list, tuple, set)):
+    elif isinstance(cols, (list, tuple)):
         if cols and isinstance(cols[0], dict):
             candidate_cols = set(cols[0].keys())
         else:
             candidate_cols = set(cols)
+    elif isinstance(cols, set):
+        candidate_cols = cols
     else:
         return
 

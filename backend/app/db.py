@@ -11,6 +11,8 @@ import sqlite3
 from pathlib import Path
 from typing import Generator, Optional
 
+from fastapi import Depends
+
 from backend.app.settings import Settings, get_settings, REPO_ROOT
 
 
@@ -97,8 +99,6 @@ def check_database_writable(settings: Optional[Settings] = None) -> bool:
     except Exception:
         return False
 
-
-from fastapi import Depends
 
 def get_db(
     settings: Settings = Depends(get_settings),

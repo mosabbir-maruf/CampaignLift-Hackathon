@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react"
-import {
-  apiClient,
-  ApiError,
-  type ScoreRunResponse,
-} from "../api/client"
+import { apiClient, ApiError, type ScoreRunResponse } from "../api/client"
 import DecileChart from "../components/DecileChart"
 import {
   Badge,
@@ -92,7 +88,9 @@ export default function UpliftAnalysis() {
           data ? (
             <div className="flex items-center gap-2">
               <Badge tone="neu" dot={false}>
-                <span className="font-mono text-[11px]">{data.campaign_id}</span>
+                <span className="font-mono text-[11px]">
+                  {data.campaign_id}
+                </span>
               </Badge>
               <Button
                 onClick={() =>
@@ -124,8 +122,8 @@ export default function UpliftAnalysis() {
               </Link>
             }
           >
-            No active campaign scenario was selected. Define a campaign scenario in
-            Campaign Setup before analyzing uplift deciles.
+            No active campaign scenario was selected. Define a campaign scenario
+            in Campaign Setup before analyzing uplift deciles.
           </EmptyState>
         </Panel>
       )}
@@ -133,13 +131,14 @@ export default function UpliftAnalysis() {
       {/* Error State: Scoring / Decile fetch error */}
       {activeId && error && (
         <Panel className="p-6">
-          <ErrorState
-            message={error}
-            onRetry={() => setNonce((n) => n + 1)}
-          />
+          <ErrorState message={error} onRetry={() => setNonce((n) => n + 1)} />
           <div className="mt-4 flex items-center gap-3 border-t border-line pt-4 text-[12.5px]">
             <Link
-              to={activeId ? `/audience?campaign_id=${encodeURIComponent(activeId)}` : "/audience"}
+              to={
+                activeId
+                  ? `/audience?campaign_id=${encodeURIComponent(activeId)}`
+                  : "/audience"
+              }
               className="font-medium text-primary hover:underline"
             >
               ← Go to Audience Scoring
@@ -173,7 +172,8 @@ export default function UpliftAnalysis() {
                   Top Scored Customer Profiles
                 </h2>
                 <p className="mt-0.5 text-[12px] text-mute">
-                  Top customer predictions ranked by incremental uplift from backend model inference.
+                  Top customer predictions ranked by incremental uplift from
+                  backend model inference.
                 </p>
               </div>
               <DumbbellLegend />
@@ -182,7 +182,8 @@ export default function UpliftAnalysis() {
             {topProfiles.length === 0 ? (
               <div className="p-6">
                 <EmptyState title="No customer profiles returned">
-                  No individual customer score items were returned in the scoring response.
+                  No individual customer score items were returned in the
+                  scoring response.
                 </EmptyState>
               </div>
             ) : (
@@ -266,8 +267,10 @@ export default function UpliftAnalysis() {
             )}
 
             <p className="border-t border-line bg-paper px-5 py-3 text-[12.5px] text-ink-2">
-              A high baseline responder is not the optimal target if they would transact regardless of incentive.
-              Uplift targeting prioritizes customers with the widest positive gap between treatment and control.
+              A high baseline responder is not the optimal target if they would
+              transact regardless of incentive. Uplift targeting prioritizes
+              customers with the widest positive gap between treatment and
+              control.
             </p>
           </Panel>
 
@@ -275,8 +278,8 @@ export default function UpliftAnalysis() {
           {deciles.length === 0 ? (
             <Panel className="p-6">
               <EmptyState title="Uplift Deciles Unavailable">
-                The scoring response did not contain uplift decile buckets for this campaign.
-                Run scoring in Audience to generate deciles.
+                The scoring response did not contain uplift decile buckets for
+                this campaign. Run scoring in Audience to generate deciles.
               </EmptyState>
             </Panel>
           ) : (
@@ -344,8 +347,9 @@ export default function UpliftAnalysis() {
           {/* Workflow Footer Navigation */}
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-[4px] border border-line bg-surface p-4 text-[13px]">
             <div className="text-mute">
-              Campaign: <span className="font-mono text-ink">{data.campaign_id}</span> · Run:{" "}
-              <span className="font-mono text-ink">{data.run_id}</span>
+              Campaign:{" "}
+              <span className="font-mono text-ink">{data.campaign_id}</span> ·
+              Run: <span className="font-mono text-ink">{data.run_id}</span>
             </div>
             <div className="flex items-center gap-3">
               <Link

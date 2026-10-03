@@ -10,6 +10,11 @@ export interface Column<T> {
   hideBelow?: "lg"
 }
 
+export interface InitialSort {
+  key: string
+  dir: "asc" | "desc"
+}
+
 interface Props<T> {
   rows: T[]
   columns: Column<T>[]
@@ -19,7 +24,7 @@ interface Props<T> {
   pageSize?: number
   mobileCard: (row: T) => ReactNode
   caption: string
-  initialSort?: { key: string; dir: "asc" | "desc" }
+  initialSort?: InitialSort
 }
 
 export default function DataTable<T>({

@@ -52,7 +52,12 @@ function ArmCard({
   )
 }
 
-function SliceRow({ s, max }: { s: ExperimentSliceItem max: number }) {
+interface SliceRowProps {
+  s: ExperimentSliceItem
+  max: number
+}
+
+function SliceRow({ s, max }: SliceRowProps) {
   const isSufficient = s.support === "sufficient"
   const t = s.treated_outcome_rate
   const c = s.control_outcome_rate

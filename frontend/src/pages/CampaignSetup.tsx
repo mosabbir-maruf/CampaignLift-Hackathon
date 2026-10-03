@@ -211,7 +211,7 @@ export default function CampaignSetup() {
         // Parse field-level errors if backend detail contains field names
         if (detail) {
           const fieldErrors: Errors = {}
-          const fields: (keyof CampaignCreateRequest)[] = [
+          const fields: Array<keyof CampaignCreateRequest> = [
             "name",
             "objective",
             "offer_type",

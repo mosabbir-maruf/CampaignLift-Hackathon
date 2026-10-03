@@ -13,7 +13,7 @@ import json
 import sqlite3
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 from backend.app.schemas import (
     ExperimentSliceItem,
@@ -21,7 +21,6 @@ from backend.app.schemas import (
 )
 from backend.app.services.inference import (
     FORBIDDEN_COLUMNS,
-    ForbiddenColumnError,
     assert_no_forbidden_columns,
 )
 from backend.app.settings import REPO_ROOT, Settings, get_settings
@@ -254,13 +253,14 @@ def compute_experiment_summary(
         c_cnt = counts["control_count"]
 
         # Support rule: must have at least min_support treated AND min_support control
-        if t_cnt >= min_support and c_cnt >= min_support:
-            support = "sufficient"
+        support: Literal["sufficient", "insufficient"] = (
+            "sufficient" if (t_cnt >= min_support and c_cnt >= min_support) else "insufficient"
+        )
+        if support == "sufficient":
             t_rate = round(counts["treated_successes"] / t_cnt, 4)
             c_rate = round(counts["control_successes"] / c_cnt, 4)
             inc = round(t_rate - c_rate, 4)
         else:
-            support = "insufficient"
             t_rate = None
             c_rate = None
             inc = None

@@ -59,11 +59,13 @@ const REASON_CONFIG: Record<ExplanationReasonCode, {
   },
 }
 
-function ContributionChart({
-  items,
-}: {
-  items: { name: string value: string contribution: number }[]
-}) {
+interface ContributionChartItem {
+  name: string
+  value: string
+  contribution: number
+}
+
+function ContributionChart({ items }: { items: ContributionChartItem[] }) {
   if (!items || items.length === 0) {
     return (
       <p className="text-[12.5px] text-mute py-4">

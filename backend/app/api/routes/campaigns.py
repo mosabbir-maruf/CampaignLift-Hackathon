@@ -14,7 +14,7 @@ import time
 import uuid
 from typing import Any, Dict, Optional, Set
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from fastapi.responses import JSONResponse
 
 from backend.app.db import get_db

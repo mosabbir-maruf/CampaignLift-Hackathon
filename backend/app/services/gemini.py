@@ -24,7 +24,6 @@ from backend.app.services.experiment import ensure_experiment_db_schema
 from backend.app.services.explain import explain_customer
 from backend.app.services.inference import (
     FORBIDDEN_COLUMNS,
-    assert_no_forbidden_columns,
     ensure_db_schema,
 )
 from backend.app.services.optimizer import ensure_optimizer_db_schema

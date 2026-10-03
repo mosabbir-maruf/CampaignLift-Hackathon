@@ -279,9 +279,14 @@ export async function getCampaign(id: string): Promise<CampaignResponse> {
   )
 }
 
+export interface ScoreCampaignOptions {
+  limit?: number
+  offset?: number
+}
+
 export async function scoreCampaign(
   id: string,
-  options?: { limit?: number; offset?: number },
+  options?: ScoreCampaignOptions,
 ): Promise<ScoreRunResponse> {
   const params = new URLSearchParams()
   if (options?.limit !== undefined) params.set("limit", String(options.limit))
