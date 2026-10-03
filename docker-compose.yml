@@ -1,0 +1,34 @@
+services:
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT:-80}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - campaignlift-net
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - APP_ENV=local
+      - LOG_LEVEL=INFO
+      - DATABASE_URL=sqlite:///./campaignlift.db
+      - MODEL_ARTIFACT_DIR=artifacts/models/cl-model-ml_dev_20261006-lgbm_s_learner-r01
+      - FEATURE_TABLE_PATH=data/fixtures/fixture_v1/features.json
+      - DATASET_VERSION=cl-synth-ml_dev-20261006-8ad556a
+    networks:
+      - campaignlift-net
+    restart: unless-stopped
+
+networks:
+  campaignlift-net:
+    driver: bridge
