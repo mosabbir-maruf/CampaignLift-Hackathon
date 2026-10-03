@@ -12,6 +12,9 @@ services:
     container_name: campaignlift-frontend
     ports:
       - "${PORT:-80}:80"
+      - "443:443"
+    volumes:
+      - ${CERTS_DIR:-/home/ubuntu/campaignlift/certs}:/etc/nginx/certs:ro
     depends_on:
       backend:
         condition: service_healthy
