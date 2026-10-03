@@ -1,0 +1,14 @@
+{
+  "candidate_id": "U2",
+  "model_name": "LightGBM S-Learner",
+  "role": "uplift_candidate",
+  "fit_time_seconds": 0.057,
+  "validation_qini_score": 48.457804,
+  "validation_normalized_qini": 0.134195,
+  "validation_top10_incremental_rate": 0.186313,
+  "mean_uplift": 0.005366,
+  "std_uplift": 0.063089,
+  "qini_endpoint": -23.335389,
+  "ate": -0.019826,
+  "passes_constraints": true
+}
