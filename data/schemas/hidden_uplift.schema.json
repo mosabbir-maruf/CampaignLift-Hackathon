@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://campaignlift.internal/schemas/hidden_uplift.schema.json",
+  "title": "HiddenUplift",
+  "description": "Internal oracle evaluation schema containing unobservable ground truth, counterfactuals, and latent parameters. Strictly forbidden in any training, validation, or test feature set.",
+  "type": "object",
+  "properties": {
+    "customer_id": {
+      "type": "string",
+      "pattern": "^C[0-9]{8}$",
+      "description": "Foreign key referencing the customer."
+    },
+    "campaign_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Campaign identifier."
+    },
+    "natural_transaction_propensity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Latent customer propensity to transact without an incentive."
+    },
+    "qr_affinity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Latent customer inclination toward QR / merchant pay channels."
+    },
+    "price_sensitivity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Latent sensitivity modifying the treatment effect based on incentive magnitude."
+    },
+    "campaign_sensitivity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Latent responsiveness to marketing outreach."
+    },
+    "digital_maturity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Latent customer comfort with app channel vs agent/USSD."
+    },
+    "offer_fatigue": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Latent annoyance accumulated from recent prior campaign exposures."
+    },
+    "p_y_control": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Potential outcome probability of transacting under control condition (no offer)."
+    },
+    "p_y_treat": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Potential outcome probability of transacting under treatment condition (offer received)."
+    },
+    "true_uplift": {
+      "type": "number",
+      "minimum": -1,
+      "maximum": 1,
+      "description": "Unobservable true individual treatment effect: p_y_treat - p_y_control. Strictly reserved for oracle evaluation."
+    }
+  },
+  "required": [
+    "customer_id",
+    "campaign_id",
+    "natural_transaction_propensity",
+    "qr_affinity",
+    "price_sensitivity",
+    "campaign_sensitivity",
+    "digital_maturity",
+    "offer_fatigue",
+    "p_y_control",
+    "p_y_treat",
+    "true_uplift"
+  ],
+  "additionalProperties": false
+}

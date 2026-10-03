@@ -1,0 +1,10 @@
+{
+  "transaction_id": "TXN0000000001",
+  "customer_id": "C00012345",
+  "event_time": "2024-01-15T10:30:00Z",
+  "txn_type": "qr_pay",
+  "amount_bdt": 250.0,
+  "channel": "app",
+  "merchant_category": "grocery",
+  "direction": "out"
+}

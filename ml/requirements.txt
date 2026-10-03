@@ -1,0 +1,20 @@
+# ==============================================================================
+# CampaignLift ML Training & Evaluation Dependencies
+# Canonical planning source: planning/ml_plan.md & planning/kaggle_plan.md
+# ==============================================================================
+
+# Core numerical and tabular processing
+numpy>=1.26.0
+pandas>=2.1.0
+scipy>=1.11.0
+
+# Uplift modeling candidates and baseline algorithms (B0, B1, U0, U1, U2)
+scikit-learn>=1.3.0
+lightgbm>=4.1.0
+
+# Model serialization and configuration
+joblib>=1.3.0
+pyyaml>=6.0.1
+
+# Testing and verification
+pytest>=8.0.0

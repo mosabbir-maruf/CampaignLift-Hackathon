@@ -1,0 +1,37 @@
+# ==============================================================================
+# CampaignLift ML Training & Hyperparameter Configuration
+# Canonical planning source: planning/ml_plan.md & planning/kaggle_plan.md
+# ==============================================================================
+
+global_seed: 20261006
+
+# Candidate U0: Logistic Regression T-Learner (Interpretable Fallback)
+logistic_t_learner:
+  c_penalty: 1.0
+  max_iter: 1000
+  solver: "lbfgs"
+
+# Candidate U1: LightGBM T-Learner (Primary Uplift Candidate)
+lightgbm_t_learner:
+  n_estimators: 100
+  learning_rate: 0.05
+  num_leaves: 15
+  max_depth: 4
+  min_child_samples: 5
+  subsample: 0.8
+  colsample_bytree: 0.8
+  objective: "binary"
+  verbosity: -1
+  importance_type: "gain"
+
+# Candidate U2: LightGBM S-Learner (Comparison Benchmark)
+lightgbm_s_learner:
+  n_estimators: 100
+  learning_rate: 0.05
+  num_leaves: 15
+  max_depth: 4
+  min_child_samples: 5
+  subsample: 0.8
+  colsample_bytree: 0.8
+  objective: "binary"
+  verbosity: -1

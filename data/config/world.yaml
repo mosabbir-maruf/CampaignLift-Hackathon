@@ -1,0 +1,231 @@
+# ==============================================================================
+# CampaignLift Causal World Simulation Configuration
+# Canonical planning source: planning/data_plan.md
+# ==============================================================================
+
+# Global seed: Changing this creates a new dataset version.
+global_seed: 20261006
+
+# Stage seed offsets as documented in data_plan.md:
+# Stage                               | Offset
+# ------------------------------------+-------
+# customers                           | +1
+# transactions                        | +2
+# prior exposures                     | +3
+# treatment assignment                | +4
+# outcome noise and Bernoulli draws   | +5
+# split                               | +6
+stage_seed_offsets:
+  customers: 1
+  transactions: 2
+  prior_exposures: 3
+  treatment_assignment: 4
+  outcome_noise_and_bernoulli: 5
+  split: 6
+
+# Resolved stage seeds (each equals global_seed + documented offset)
+stage_seeds:
+  customers: 20261007                   # 20261006 + 1
+  transactions: 20261008                # 20261006 + 2
+  prior_exposures: 20261009             # 20261006 + 3
+  treatment_assignment: 20261010        # 20261006 + 4
+  outcome_noise_and_bernoulli: 20261011 # 20261006 + 5
+  split: 20261012                       # 20261006 + 6
+
+# World timeline and experimental design parameters
+timeline:
+  history_days: 90
+  outcome_window_days: 14
+  assignment_probability: 0.5
+  currency: "BDT"
+  decision_unit: "one current campaign per customer"
+
+# Customer population size targets for dataset releases.
+# CRITICAL NOTICE: Sizes are design targets. Full generated dataset exports
+# (dev, ml_dev, benchmark) MUST NEVER be committed to Git repositories.
+# Only the minimal fixture (200 customers) is committed for automated unit testing.
+sizes:
+  fixture: 200
+  dev: 5000
+  ml_dev: 25000
+  benchmark: 100000
+
+# Four latent customer profiles forming the causal population mixture.
+# NOTE: Profile names are generator internals; they must never appear as training features.
+# Shares are design targets, not measured empirical outputs.
+latent_profiles:
+  sure_thing:
+    share_target: 0.25
+    description: "High natural propensity to transact organically; low sensitivity to marketing campaigns."
+    ranges:
+      natural_transaction_propensity: [0.70, 0.95]
+      qr_affinity: [0.20, 0.90]
+      price_sensitivity: [0.10, 0.35]
+      campaign_sensitivity: [0.05, 0.25]
+      digital_maturity: [0.50, 0.95]
+      offer_fatigue: [0.00, 0.20]
+
+  persuadable:
+    share_target: 0.35
+    description: "Moderate natural propensity but highly responsive to marketing interventions and incentives."
+    ranges:
+      natural_transaction_propensity: [0.30, 0.60]
+      qr_affinity: [0.15, 0.90]
+      price_sensitivity: [0.50, 0.90]
+      campaign_sensitivity: [0.65, 0.95]
+      digital_maturity: [0.30, 0.85]
+      offer_fatigue: [0.00, 0.35]
+
+  weak_responder:
+    share_target: 0.25
+    description: "Low organic transaction propensity and sluggish responsiveness to marketing campaigns."
+    ranges:
+      natural_transaction_propensity: [0.05, 0.25]
+      qr_affinity: [0.05, 0.50]
+      price_sensitivity: [0.05, 0.30]
+      campaign_sensitivity: [0.05, 0.30]
+      digital_maturity: [0.10, 0.50]
+      offer_fatigue: [0.10, 0.70]
+
+  negative_uplift:
+    share_target: 0.15
+    description: "Active organic users annoyed by frequent campaigns, resulting in reduced transaction probability under treatment (sleeping dogs)."
+    ranges:
+      natural_transaction_propensity: [0.50, 0.85]
+      qr_affinity: [0.10, 0.80]
+      price_sensitivity: [0.10, 0.40]
+      campaign_sensitivity: [0.05, 0.20]
+      digital_maturity: [0.40, 0.90]
+      offer_fatigue: [0.65, 0.95]
+
+# ==============================================================================
+# Causal Score Configuration (Potential Outcomes Generator Weights)
+# NOTE: These weights represent generative simulation assumptions, NOT a fitted
+# statistical model or empirical upay data. They must never be tuned to fabricate
+# a desired Qini or ROI metric.
+# ==============================================================================
+causal_scoring:
+  # Probability clipping bounds on the open interval [0.01, 0.99] as specified in data_plan.md
+  probability_clip:
+    min: 0.01
+    max: 0.99
+
+  # Noise term is Gaussian on the logit scale before probability clipping
+  noise:
+    type: "gaussian_logit"
+    standard_deviation: 0.20
+
+  # Control outcome score: p_control = sigmoid(logit_control + noise)
+  # Depends strictly on natural propensity, digital maturity, and past activity
+  control_score:
+    intercept: -1.5
+    weights:
+      natural_transaction_propensity: 2.2
+      digital_maturity: 0.8
+      recent_activity_term: 0.5
+
+  # Treated outcome score: p_treat = sigmoid(logit_treat + noise)
+  # Adds campaign sensitivity, price sensitivity * incentive, offer match terms,
+  # and subtracts offer fatigue penalty.
+  treated_score:
+    intercept: -1.5
+    weights:
+      natural_transaction_propensity: 2.2
+      digital_maturity: 0.8
+      recent_activity_term: 0.5
+      campaign_sensitivity: 1.8
+      price_sensitivity_x_incentive: 1.5
+      offer_match_qr: 1.2
+      offer_match_reactivation: 1.0
+      offer_match_retention: -0.4
+      offer_fatigue_penalty: -1.6  # Subtracted penalty driven by offer fatigue
+
+    # --------------------------------------------------------------------------
+    # NEGATIVE UPLIFT MECHANISM:
+    # Annoyance term that allows p_treat < p_control (true_uplift < 0).
+    # When a customer has high offer fatigue and low campaign sensitivity
+    # (specifically prominent in the negative_uplift profile), this extra penalty
+    # drives the treated score below the control score.
+    # --------------------------------------------------------------------------
+    negative_uplift_annoyance:
+      enabled: true
+      fatigue_threshold: 0.60
+      campaign_sensitivity_threshold: 0.25
+      annoyance_penalty: -2.0       # Direct penalty driving treated logit below control logit
+      profile_multiplier: 1.5       # Extra weight applied for customers drawn from negative_uplift profile
+
+# ==============================================================================
+# Campaign Eligibility Rules Configuration
+# NOTE: Eligibility is strictly pre-assignment (< assigned_at). It evaluates
+# history and static attributes. It NEVER uses post-assignment outcome events
+# or conversion labels (y_transacted).
+# ==============================================================================
+eligibility:
+  # Default objective demonstrated in UI and tests
+  default_demo_objective: "qr_adoption"
+
+  rules:
+    activation:
+      description: "tenure_days <= 30"
+      criteria:
+        max_tenure_days: 30
+
+    reactivation:
+      description: "no transaction in the last 30 days and tenure > 30"
+      criteria:
+        min_tenure_days: 31
+        max_txn_count_30d: 0
+
+    qr_adoption:
+      description: "at least one historical transaction and QR share below a configured cap"
+      criteria:
+        min_historical_txns_90d: 1
+        max_qr_txn_share_90d: 0.20   # Cap: customers with <= 20% QR transactions
+
+    retention:
+      description: "at least one transaction in the last 30 days"
+      criteria:
+        min_txn_count_30d: 1
+
+# ==============================================================================
+# Offer Fatigue and Prior Exposure Configuration
+# Distinguishes UNBIASED OBSERVED FEATURES from INTERNAL LATENT FATIGUE.
+# NOTE: Interactive Fatigue UI / manager sliders are OUT OF SCOPE for this step.
+# ==============================================================================
+fatigue:
+  # Synthetic priors for historical campaign exposures:
+  prior_campaigns:
+    mean_prior_campaigns: 1.8   # Average prior exposures per customer (0 to 4 typical)
+    min_exposures: 0
+    max_exposures: 6
+
+  # 1. OBSERVED FEATURES: Realized counts and recency available at assigned_at.
+  # Included in feature table for ML training.
+  observed_features:
+    campaign_exposures_prior_30d:
+      type: "integer"
+      description: "Observed count of campaign touches received in prior 30 days."
+    campaign_exposures_prior_90d:
+      type: "integer"
+      description: "Observed count of campaign touches received in prior 90 days."
+    days_since_last_campaign:
+      type: "integer"
+      default_if_none: 999
+      description: "Observed days elapsed since last campaign exposure. 999 if no prior campaign."
+
+  # 2. LATENT FATIGUE MAPPING: Unobservable internal state in [0, 1].
+  # Strictly forbidden in ML training; stored in oracle evaluation file only.
+  latent_mapping:
+    target_latent: "offer_fatigue"
+    range: [0.0, 1.0]
+    description: "Maps observed prior exposure counts (recent 30d weighted heavier than 90d) into latent offer_fatigue."
+    weights:
+      prior_30d_weight: 0.20   # +0.20 per touch in past 30 days
+      prior_90d_weight: 0.08   # +0.08 per touch in days 31-90
+      recency_decay_halflife_days: 21.0
+    clip:
+      min: 0.0
+      max: 1.0
+
+  # Scope boundary note:
+  ui_status: "OUT_OF_SCOPE: Interactive fatigue controls, sliders, and overrides belong to frontend UI / backend optimization steps."

@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://campaignlift.internal/schemas/outcome.schema.json",
+  "title": "Outcome",
+  "description": "Canonical factual outcome record schema for the 14-day post-assignment evaluation window. Contains only observed factual draw, never potential outcomes or true uplift.",
+  "type": "object",
+  "properties": {
+    "customer_id": {
+      "type": "string",
+      "pattern": "^C[0-9]{8}$",
+      "description": "Foreign key matching the exposure record."
+    },
+    "campaign_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Campaign identifier matching the exposure record."
+    },
+    "y_transacted": {
+      "type": "integer",
+      "enum": [
+        0,
+        1
+      ],
+      "description": "Binary factual conversion outcome (1 if customer transacted during the outcome window, 0 otherwise)."
+    },
+    "txn_count_window": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Count of transactions within the 14-day outcome window. Must be strictly 0 when y_transacted is 0; >= 1 otherwise."
+    },
+    "txn_amount_window_bdt": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Total transaction volume in BDT within the outcome window. Must be strictly 0 when y_transacted is 0; > 0 otherwise."
+    },
+    "window_start": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp marking the start of the outcome window (identical to assigned_at)."
+    },
+    "window_end": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp marking the end of the 14-day outcome window."
+    }
+  },
+  "required": [
+    "customer_id",
+    "campaign_id",
+    "y_transacted",
+    "txn_count_window",
+    "txn_amount_window_bdt",
+    "window_start",
+    "window_end"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "y_transacted": {
+            "const": 0
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "txn_count_window": {
+            "const": 0
+          },
+          "txn_amount_window_bdt": {
+            "maximum": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "txn_count_window": {
+            "minimum": 1
+          },
+          "txn_amount_window_bdt": {
+            "exclusiveMinimum": 0
+          }
+        }
+      }
+    }
+  ]
+}

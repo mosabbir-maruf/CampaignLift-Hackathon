@@ -1,0 +1,12 @@
+{
+  "campaign_id": "CMP2024_QR01",
+  "campaign_name": "Q1 2024 QR Merchant Pay Booster",
+  "objective": "qr_adoption",
+  "offer_type": "flat_cashback",
+  "incentive_value": 20.0,
+  "incentive_cost_bdt": 20.0,
+  "channel": "in_app",
+  "start_date": "2024-02-01",
+  "end_date": "2024-02-14",
+  "outcome_window_days": 14
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://campaignlift.internal/schemas/exposure.schema.json",
+  "title": "Exposure",
+  "description": "Canonical exposure record schema for randomized treatment assignment among eligible customers.",
+  "type": "object",
+  "properties": {
+    "exposure_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this exposure record."
+    },
+    "customer_id": {
+      "type": "string",
+      "pattern": "^C[0-9]{8}$",
+      "description": "Foreign key referencing the eligible customer."
+    },
+    "campaign_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier of the modeled campaign."
+    },
+    "eligible": {
+      "type": "boolean",
+      "const": true,
+      "description": "Eligibility indicator: strictly true for rows in this exposure table."
+    },
+    "treatment": {
+      "type": "integer",
+      "enum": [
+        0,
+        1
+      ],
+      "description": "Randomized treatment assignment: 1 for treated (offer received), 0 for control."
+    },
+    "assignment_probability": {
+      "type": "number",
+      "const": 0.5,
+      "description": "Known randomized assignment probability (strictly 0.5 for unbiased ATE/Qini estimation)."
+    },
+    "assigned_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp representing the exact assignment time at campaign start."
+    }
+  },
+  "required": [
+    "exposure_id",
+    "customer_id",
+    "campaign_id",
+    "eligible",
+    "treatment",
+    "assignment_probability",
+    "assigned_at"
+  ],
+  "additionalProperties": false
+}

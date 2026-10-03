@@ -1,0 +1,929 @@
+[
+  {
+    "customer_id": "C00000001",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 1210.85,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000004",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000005",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 1,
+    "txn_amount_window_bdt": 67.52,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000006",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 1073.76,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000008",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000010",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 220.3,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000011",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 1552.41,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000013",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 1010.18,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000014",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000015",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000017",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 1098.07,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000019",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 1868.35,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000020",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000022",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000023",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000024",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000026",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 1751.52,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000027",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 1,
+    "txn_amount_window_bdt": 211.96,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000029",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000030",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000035",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000036",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 989.12,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000037",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 530.34,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000040",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 917.54,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000041",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 650.33,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000042",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 1,
+    "txn_amount_window_bdt": 442.99,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000043",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000044",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000045",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000046",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 1169.67,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000047",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 2410.95,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000049",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 2014.06,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000050",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000051",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000052",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000053",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000054",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 352.17,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000057",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000058",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000062",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 1267.43,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000063",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 1,
+    "txn_amount_window_bdt": 131.97,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000064",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000065",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000066",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000068",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000070",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 1,
+    "txn_amount_window_bdt": 534.39,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000075",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 3075.21,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000077",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000078",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 1,
+    "txn_amount_window_bdt": 465.95,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000080",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 540.76,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000081",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 1293.58,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000083",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 579.42,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000084",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 1596.82,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000085",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 1,
+    "txn_amount_window_bdt": 239.43,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000086",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 1632.5,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000087",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 2150.68,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000095",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000097",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000100",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000102",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000104",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000105",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 2194.55,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000106",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 427.94,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000115",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 1274.95,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000116",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 602.65,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000117",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 927.21,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000118",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000119",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000122",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000127",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 2151.92,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000129",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 679.65,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000133",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 1174.65,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000134",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000135",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 3549.38,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000136",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 742.25,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000138",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 778.08,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000139",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000140",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000141",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000142",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 2632.32,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000143",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 1,
+    "txn_amount_window_bdt": 133.16,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000149",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 948.19,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000151",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000152",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 1397.38,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000154",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000158",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000160",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 3,
+    "txn_amount_window_bdt": 3753.36,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000163",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000165",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 1748.59,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000167",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 3120.43,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000168",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000170",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000176",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 1,
+    "txn_amount_window_bdt": 617.85,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000178",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 1972.84,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000179",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 1238.84,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000181",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000182",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 1,
+    "txn_amount_window_bdt": 895.09,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000183",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 2,
+    "txn_amount_window_bdt": 452.36,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000184",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 1,
+    "txn_amount_window_bdt": 746.42,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000186",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000190",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000191",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 1,
+    "txn_count_window": 4,
+    "txn_amount_window_bdt": 1772.64,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  },
+  {
+    "customer_id": "C00000193",
+    "campaign_id": "CMP2024_QR01",
+    "y_transacted": 0,
+    "txn_count_window": 0,
+    "txn_amount_window_bdt": 0.0,
+    "window_start": "2024-02-01T00:00:00Z",
+    "window_end": "2024-02-15T00:00:00Z"
+  }
+]

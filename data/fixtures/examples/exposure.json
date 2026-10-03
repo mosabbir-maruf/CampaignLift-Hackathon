@@ -1,0 +1,9 @@
+{
+  "exposure_id": "EXP2024_00000001",
+  "customer_id": "C00012345",
+  "campaign_id": "CMP2024_QR01",
+  "eligible": true,
+  "treatment": 1,
+  "assignment_probability": 0.5,
+  "assigned_at": "2024-02-01T00:00:00Z"
+}

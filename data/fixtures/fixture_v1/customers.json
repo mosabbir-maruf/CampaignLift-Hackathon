@@ -1,0 +1,1602 @@
+[
+  {
+    "customer_id": "C00000001",
+    "signup_date": "2023-08-23",
+    "age_band": "25-34",
+    "region_code": "KHU",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000002",
+    "signup_date": "2023-06-14",
+    "age_band": "55+",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000003",
+    "signup_date": "2022-07-27",
+    "age_band": "45-54",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000004",
+    "signup_date": "2023-08-20",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000005",
+    "signup_date": "2022-11-11",
+    "age_band": "25-34",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000006",
+    "signup_date": "2022-08-16",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000007",
+    "signup_date": "2024-01-11",
+    "age_band": "18-24",
+    "region_code": "SYL",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000008",
+    "signup_date": "2024-01-26",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000009",
+    "signup_date": "2024-01-20",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000010",
+    "signup_date": "2022-05-01",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000011",
+    "signup_date": "2023-04-18",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000012",
+    "signup_date": "2024-01-29",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000013",
+    "signup_date": "2024-01-23",
+    "age_band": "35-44",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000014",
+    "signup_date": "2022-06-04",
+    "age_band": "25-34",
+    "region_code": "SYL",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000015",
+    "signup_date": "2023-06-19",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000016",
+    "signup_date": "2023-11-10",
+    "age_band": "18-24",
+    "region_code": "BAR",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000017",
+    "signup_date": "2022-10-15",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "limited",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000018",
+    "signup_date": "2022-08-07",
+    "age_band": "35-44",
+    "region_code": "RAJ",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000019",
+    "signup_date": "2022-11-27",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000020",
+    "signup_date": "2023-03-16",
+    "age_band": "45-54",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000021",
+    "signup_date": "2022-11-03",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000022",
+    "signup_date": "2023-10-26",
+    "age_band": "45-54",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000023",
+    "signup_date": "2022-11-28",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000024",
+    "signup_date": "2022-03-19",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000025",
+    "signup_date": "2024-01-03",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000026",
+    "signup_date": "2023-02-06",
+    "age_band": "55+",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000027",
+    "signup_date": "2024-01-06",
+    "age_band": "55+",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000028",
+    "signup_date": "2022-04-23",
+    "age_band": "45-54",
+    "region_code": "BAR",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000029",
+    "signup_date": "2023-01-09",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000030",
+    "signup_date": "2023-03-19",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000031",
+    "signup_date": "2023-09-07",
+    "age_band": "25-34",
+    "region_code": "RAN",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000032",
+    "signup_date": "2024-01-10",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000033",
+    "signup_date": "2023-01-29",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000034",
+    "signup_date": "2023-06-03",
+    "age_band": "55+",
+    "region_code": "BAR",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000035",
+    "signup_date": "2022-08-26",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000036",
+    "signup_date": "2022-08-12",
+    "age_band": "25-34",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000037",
+    "signup_date": "2023-08-10",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000038",
+    "signup_date": "2024-01-23",
+    "age_band": "55+",
+    "region_code": "BAR",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000039",
+    "signup_date": "2024-01-08",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000040",
+    "signup_date": "2023-09-21",
+    "age_band": "25-34",
+    "region_code": "SYL",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000041",
+    "signup_date": "2023-08-01",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000042",
+    "signup_date": "2023-11-10",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000043",
+    "signup_date": "2022-04-18",
+    "age_band": "35-44",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000044",
+    "signup_date": "2022-04-11",
+    "age_band": "25-34",
+    "region_code": "SYL",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000045",
+    "signup_date": "2024-01-23",
+    "age_band": "25-34",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000046",
+    "signup_date": "2023-10-05",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000047",
+    "signup_date": "2024-01-13",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000048",
+    "signup_date": "2022-06-01",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000049",
+    "signup_date": "2023-07-01",
+    "age_band": "35-44",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000050",
+    "signup_date": "2023-05-21",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000051",
+    "signup_date": "2023-04-11",
+    "age_band": "35-44",
+    "region_code": "BAR",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000052",
+    "signup_date": "2022-12-06",
+    "age_band": "35-44",
+    "region_code": "BAR",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000053",
+    "signup_date": "2022-09-12",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000054",
+    "signup_date": "2022-11-26",
+    "age_band": "25-34",
+    "region_code": "BAR",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000055",
+    "signup_date": "2023-07-06",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000056",
+    "signup_date": "2022-08-15",
+    "age_band": "25-34",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000057",
+    "signup_date": "2023-02-03",
+    "age_band": "45-54",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000058",
+    "signup_date": "2022-05-05",
+    "age_band": "45-54",
+    "region_code": "MYM",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000059",
+    "signup_date": "2024-01-16",
+    "age_band": "55+",
+    "region_code": "RAN",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000060",
+    "signup_date": "2023-11-09",
+    "age_band": "25-34",
+    "region_code": "SYL",
+    "kyc_level": "limited",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000061",
+    "signup_date": "2022-10-18",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000062",
+    "signup_date": "2024-01-11",
+    "age_band": "35-44",
+    "region_code": "MYM",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000063",
+    "signup_date": "2023-03-13",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000064",
+    "signup_date": "2022-10-23",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000065",
+    "signup_date": "2023-10-20",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000066",
+    "signup_date": "2023-07-13",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000067",
+    "signup_date": "2023-10-12",
+    "age_band": "55+",
+    "region_code": "BAR",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000068",
+    "signup_date": "2022-03-23",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000069",
+    "signup_date": "2024-01-18",
+    "age_band": "45-54",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000070",
+    "signup_date": "2024-01-21",
+    "age_band": "18-24",
+    "region_code": "RAN",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000071",
+    "signup_date": "2023-04-21",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000072",
+    "signup_date": "2023-01-26",
+    "age_band": "25-34",
+    "region_code": "SYL",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000073",
+    "signup_date": "2022-04-16",
+    "age_band": "45-54",
+    "region_code": "BAR",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000074",
+    "signup_date": "2023-10-25",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000075",
+    "signup_date": "2023-10-30",
+    "age_band": "45-54",
+    "region_code": "SYL",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000076",
+    "signup_date": "2024-01-28",
+    "age_band": "35-44",
+    "region_code": "CTG",
+    "kyc_level": "limited",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000077",
+    "signup_date": "2023-02-27",
+    "age_band": "55+",
+    "region_code": "KHU",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000078",
+    "signup_date": "2023-02-07",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000079",
+    "signup_date": "2024-01-31",
+    "age_band": "35-44",
+    "region_code": "CTG",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000080",
+    "signup_date": "2022-10-20",
+    "age_band": "55+",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000081",
+    "signup_date": "2022-09-07",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000082",
+    "signup_date": "2022-12-27",
+    "age_band": "18-24",
+    "region_code": "RAN",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000083",
+    "signup_date": "2022-02-27",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000084",
+    "signup_date": "2023-05-27",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000085",
+    "signup_date": "2024-01-13",
+    "age_band": "18-24",
+    "region_code": "BAR",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000086",
+    "signup_date": "2023-11-22",
+    "age_band": "55+",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000087",
+    "signup_date": "2023-09-07",
+    "age_band": "25-34",
+    "region_code": "SYL",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000088",
+    "signup_date": "2024-01-31",
+    "age_band": "45-54",
+    "region_code": "KHU",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000089",
+    "signup_date": "2022-11-05",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000090",
+    "signup_date": "2024-01-30",
+    "age_band": "45-54",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000091",
+    "signup_date": "2022-02-19",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000092",
+    "signup_date": "2023-02-17",
+    "age_band": "25-34",
+    "region_code": "KHU",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000093",
+    "signup_date": "2023-09-12",
+    "age_band": "25-34",
+    "region_code": "RAN",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000094",
+    "signup_date": "2024-01-22",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000095",
+    "signup_date": "2022-12-31",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000096",
+    "signup_date": "2023-10-08",
+    "age_band": "18-24",
+    "region_code": "BAR",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000097",
+    "signup_date": "2023-11-09",
+    "age_band": "35-44",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000098",
+    "signup_date": "2023-07-19",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000099",
+    "signup_date": "2022-04-20",
+    "age_band": "35-44",
+    "region_code": "SYL",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000100",
+    "signup_date": "2022-06-11",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000101",
+    "signup_date": "2022-05-15",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000102",
+    "signup_date": "2023-04-26",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000103",
+    "signup_date": "2024-01-17",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000104",
+    "signup_date": "2023-09-25",
+    "age_band": "18-24",
+    "region_code": "RAN",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000105",
+    "signup_date": "2022-04-27",
+    "age_band": "35-44",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000106",
+    "signup_date": "2023-01-29",
+    "age_band": "35-44",
+    "region_code": "MYM",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000107",
+    "signup_date": "2023-03-13",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000108",
+    "signup_date": "2023-04-21",
+    "age_band": "35-44",
+    "region_code": "KHU",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000109",
+    "signup_date": "2023-05-23",
+    "age_band": "55+",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000110",
+    "signup_date": "2023-04-23",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000111",
+    "signup_date": "2022-09-11",
+    "age_band": "55+",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000112",
+    "signup_date": "2022-03-08",
+    "age_band": "35-44",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000113",
+    "signup_date": "2023-09-27",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000114",
+    "signup_date": "2022-05-04",
+    "age_band": "18-24",
+    "region_code": "KHU",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000115",
+    "signup_date": "2023-06-13",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000116",
+    "signup_date": "2022-05-19",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000117",
+    "signup_date": "2024-01-16",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000118",
+    "signup_date": "2022-02-17",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000119",
+    "signup_date": "2022-12-02",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000120",
+    "signup_date": "2023-08-21",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000121",
+    "signup_date": "2023-11-14",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000122",
+    "signup_date": "2023-11-02",
+    "age_band": "35-44",
+    "region_code": "CTG",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000123",
+    "signup_date": "2022-10-15",
+    "age_band": "25-34",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000124",
+    "signup_date": "2022-12-22",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000125",
+    "signup_date": "2022-04-09",
+    "age_band": "25-34",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000126",
+    "signup_date": "2023-07-27",
+    "age_band": "35-44",
+    "region_code": "SYL",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000127",
+    "signup_date": "2023-09-06",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000128",
+    "signup_date": "2023-11-02",
+    "age_band": "18-24",
+    "region_code": "MYM",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000129",
+    "signup_date": "2022-11-14",
+    "age_band": "18-24",
+    "region_code": "KHU",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000130",
+    "signup_date": "2023-01-16",
+    "age_band": "18-24",
+    "region_code": "KHU",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000131",
+    "signup_date": "2023-01-08",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000132",
+    "signup_date": "2022-04-11",
+    "age_band": "55+",
+    "region_code": "BAR",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000133",
+    "signup_date": "2022-09-16",
+    "age_band": "35-44",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000134",
+    "signup_date": "2022-05-23",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000135",
+    "signup_date": "2024-01-21",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000136",
+    "signup_date": "2022-08-18",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000137",
+    "signup_date": "2023-01-04",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000138",
+    "signup_date": "2023-07-31",
+    "age_band": "18-24",
+    "region_code": "SYL",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000139",
+    "signup_date": "2022-06-10",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000140",
+    "signup_date": "2023-09-06",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000141",
+    "signup_date": "2023-05-14",
+    "age_band": "35-44",
+    "region_code": "KHU",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000142",
+    "signup_date": "2022-03-28",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000143",
+    "signup_date": "2023-04-10",
+    "age_band": "45-54",
+    "region_code": "RAN",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000144",
+    "signup_date": "2023-07-29",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000145",
+    "signup_date": "2022-03-12",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000146",
+    "signup_date": "2022-04-05",
+    "age_band": "55+",
+    "region_code": "SYL",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000147",
+    "signup_date": "2024-01-18",
+    "age_band": "45-54",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000148",
+    "signup_date": "2023-09-13",
+    "age_band": "25-34",
+    "region_code": "KHU",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000149",
+    "signup_date": "2023-07-08",
+    "age_band": "45-54",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000150",
+    "signup_date": "2023-10-12",
+    "age_band": "18-24",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000151",
+    "signup_date": "2023-03-19",
+    "age_band": "45-54",
+    "region_code": "SYL",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000152",
+    "signup_date": "2024-01-06",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000153",
+    "signup_date": "2022-08-09",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000154",
+    "signup_date": "2022-10-25",
+    "age_band": "35-44",
+    "region_code": "MYM",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000155",
+    "signup_date": "2023-11-28",
+    "age_band": "55+",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000156",
+    "signup_date": "2023-09-07",
+    "age_band": "25-34",
+    "region_code": "BAR",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000157",
+    "signup_date": "2023-10-25",
+    "age_band": "25-34",
+    "region_code": "SYL",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000158",
+    "signup_date": "2024-01-12",
+    "age_band": "25-34",
+    "region_code": "RAJ",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000159",
+    "signup_date": "2023-06-10",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000160",
+    "signup_date": "2024-01-10",
+    "age_band": "18-24",
+    "region_code": "SYL",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000161",
+    "signup_date": "2022-04-09",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000162",
+    "signup_date": "2023-03-31",
+    "age_band": "35-44",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000163",
+    "signup_date": "2023-03-03",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000164",
+    "signup_date": "2023-02-12",
+    "age_band": "25-34",
+    "region_code": "KHU",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000165",
+    "signup_date": "2023-10-07",
+    "age_band": "25-34",
+    "region_code": "KHU",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000166",
+    "signup_date": "2023-08-05",
+    "age_band": "18-24",
+    "region_code": "RAJ",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000167",
+    "signup_date": "2023-08-18",
+    "age_band": "18-24",
+    "region_code": "SYL",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000168",
+    "signup_date": "2023-04-20",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000169",
+    "signup_date": "2022-02-06",
+    "age_band": "18-24",
+    "region_code": "SYL",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000170",
+    "signup_date": "2022-03-08",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000171",
+    "signup_date": "2023-01-26",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000172",
+    "signup_date": "2023-05-30",
+    "age_band": "18-24",
+    "region_code": "SYL",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000173",
+    "signup_date": "2024-01-05",
+    "age_band": "45-54",
+    "region_code": "MYM",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000174",
+    "signup_date": "2022-03-19",
+    "age_band": "25-34",
+    "region_code": "MYM",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000175",
+    "signup_date": "2022-12-21",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000176",
+    "signup_date": "2022-05-09",
+    "age_band": "18-24",
+    "region_code": "KHU",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000177",
+    "signup_date": "2023-02-16",
+    "age_band": "25-34",
+    "region_code": "SYL",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000178",
+    "signup_date": "2022-09-04",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000179",
+    "signup_date": "2024-01-05",
+    "age_band": "35-44",
+    "region_code": "CTG",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000180",
+    "signup_date": "2023-03-21",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000181",
+    "signup_date": "2023-09-20",
+    "age_band": "35-44",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000182",
+    "signup_date": "2022-10-30",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000183",
+    "signup_date": "2023-10-13",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000184",
+    "signup_date": "2022-04-13",
+    "age_band": "18-24",
+    "region_code": "SYL",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000185",
+    "signup_date": "2022-09-17",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000186",
+    "signup_date": "2023-06-13",
+    "age_band": "18-24",
+    "region_code": "CTG",
+    "kyc_level": "limited",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000187",
+    "signup_date": "2022-05-17",
+    "age_band": "45-54",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000188",
+    "signup_date": "2023-09-18",
+    "age_band": "25-34",
+    "region_code": "RAJ",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000189",
+    "signup_date": "2024-01-10",
+    "age_band": "18-24",
+    "region_code": "KHU",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000190",
+    "signup_date": "2022-04-23",
+    "age_band": "25-34",
+    "region_code": "RAN",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000191",
+    "signup_date": "2023-08-11",
+    "age_band": "25-34",
+    "region_code": "CTG",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000192",
+    "signup_date": "2024-01-21",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "referral"
+  },
+  {
+    "customer_id": "C00000193",
+    "signup_date": "2022-07-15",
+    "age_band": "35-44",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000194",
+    "signup_date": "2022-02-27",
+    "age_band": "18-24",
+    "region_code": "KHU",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000195",
+    "signup_date": "2024-01-30",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "limited",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000196",
+    "signup_date": "2022-09-12",
+    "age_band": "25-34",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000197",
+    "signup_date": "2023-03-31",
+    "age_band": "18-24",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  },
+  {
+    "customer_id": "C00000198",
+    "signup_date": "2022-04-02",
+    "age_band": "45-54",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000199",
+    "signup_date": "2022-02-08",
+    "age_band": "35-44",
+    "region_code": "BAR",
+    "kyc_level": "verified",
+    "acquisition_channel": "app"
+  },
+  {
+    "customer_id": "C00000200",
+    "signup_date": "2022-02-17",
+    "age_band": "55+",
+    "region_code": "DHK",
+    "kyc_level": "verified",
+    "acquisition_channel": "agent"
+  }
+]

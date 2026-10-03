@@ -1,0 +1,929 @@
+[
+  {
+    "exposure_id": "EXP00000001",
+    "customer_id": "C00000001",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000002",
+    "customer_id": "C00000004",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000003",
+    "customer_id": "C00000005",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000004",
+    "customer_id": "C00000006",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000005",
+    "customer_id": "C00000008",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000006",
+    "customer_id": "C00000010",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000007",
+    "customer_id": "C00000011",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000008",
+    "customer_id": "C00000013",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000009",
+    "customer_id": "C00000014",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000010",
+    "customer_id": "C00000015",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000011",
+    "customer_id": "C00000017",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000012",
+    "customer_id": "C00000019",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000013",
+    "customer_id": "C00000020",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000014",
+    "customer_id": "C00000022",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000015",
+    "customer_id": "C00000023",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000016",
+    "customer_id": "C00000024",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000017",
+    "customer_id": "C00000026",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000018",
+    "customer_id": "C00000027",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000019",
+    "customer_id": "C00000029",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000020",
+    "customer_id": "C00000030",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000021",
+    "customer_id": "C00000035",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000022",
+    "customer_id": "C00000036",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000023",
+    "customer_id": "C00000037",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000024",
+    "customer_id": "C00000040",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000025",
+    "customer_id": "C00000041",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000026",
+    "customer_id": "C00000042",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000027",
+    "customer_id": "C00000043",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000028",
+    "customer_id": "C00000044",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000029",
+    "customer_id": "C00000045",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000030",
+    "customer_id": "C00000046",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000031",
+    "customer_id": "C00000047",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000032",
+    "customer_id": "C00000049",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000033",
+    "customer_id": "C00000050",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000034",
+    "customer_id": "C00000051",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000035",
+    "customer_id": "C00000052",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000036",
+    "customer_id": "C00000053",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000037",
+    "customer_id": "C00000054",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000038",
+    "customer_id": "C00000057",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000039",
+    "customer_id": "C00000058",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000040",
+    "customer_id": "C00000062",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000041",
+    "customer_id": "C00000063",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000042",
+    "customer_id": "C00000064",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000043",
+    "customer_id": "C00000065",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000044",
+    "customer_id": "C00000066",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000045",
+    "customer_id": "C00000068",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000046",
+    "customer_id": "C00000070",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000047",
+    "customer_id": "C00000075",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000048",
+    "customer_id": "C00000077",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000049",
+    "customer_id": "C00000078",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000050",
+    "customer_id": "C00000080",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000051",
+    "customer_id": "C00000081",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000052",
+    "customer_id": "C00000083",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000053",
+    "customer_id": "C00000084",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000054",
+    "customer_id": "C00000085",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000055",
+    "customer_id": "C00000086",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000056",
+    "customer_id": "C00000087",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000057",
+    "customer_id": "C00000095",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000058",
+    "customer_id": "C00000097",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000059",
+    "customer_id": "C00000100",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000060",
+    "customer_id": "C00000102",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000061",
+    "customer_id": "C00000104",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000062",
+    "customer_id": "C00000105",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000063",
+    "customer_id": "C00000106",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000064",
+    "customer_id": "C00000115",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000065",
+    "customer_id": "C00000116",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000066",
+    "customer_id": "C00000117",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000067",
+    "customer_id": "C00000118",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000068",
+    "customer_id": "C00000119",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000069",
+    "customer_id": "C00000122",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000070",
+    "customer_id": "C00000127",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000071",
+    "customer_id": "C00000129",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000072",
+    "customer_id": "C00000133",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000073",
+    "customer_id": "C00000134",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000074",
+    "customer_id": "C00000135",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000075",
+    "customer_id": "C00000136",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000076",
+    "customer_id": "C00000138",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000077",
+    "customer_id": "C00000139",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000078",
+    "customer_id": "C00000140",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000079",
+    "customer_id": "C00000141",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000080",
+    "customer_id": "C00000142",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000081",
+    "customer_id": "C00000143",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000082",
+    "customer_id": "C00000149",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000083",
+    "customer_id": "C00000151",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000084",
+    "customer_id": "C00000152",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000085",
+    "customer_id": "C00000154",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000086",
+    "customer_id": "C00000158",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000087",
+    "customer_id": "C00000160",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000088",
+    "customer_id": "C00000163",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000089",
+    "customer_id": "C00000165",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000090",
+    "customer_id": "C00000167",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000091",
+    "customer_id": "C00000168",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000092",
+    "customer_id": "C00000170",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000093",
+    "customer_id": "C00000176",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000094",
+    "customer_id": "C00000178",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000095",
+    "customer_id": "C00000179",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000096",
+    "customer_id": "C00000181",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000097",
+    "customer_id": "C00000182",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000098",
+    "customer_id": "C00000183",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000099",
+    "customer_id": "C00000184",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000100",
+    "customer_id": "C00000186",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000101",
+    "customer_id": "C00000190",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000102",
+    "customer_id": "C00000191",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 1,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  },
+  {
+    "exposure_id": "EXP00000103",
+    "customer_id": "C00000193",
+    "campaign_id": "CMP2024_QR01",
+    "eligible": true,
+    "treatment": 0,
+    "assignment_probability": 0.5,
+    "assigned_at": "2024-02-01T00:00:00Z"
+  }
+]

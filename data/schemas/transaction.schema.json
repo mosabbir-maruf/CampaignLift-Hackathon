@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://campaignlift.internal/schemas/transaction.schema.json",
+  "title": "Transaction",
+  "description": "Canonical transaction record schema for CampaignLift synthetic 90-day history.",
+  "type": "object",
+  "properties": {
+    "transaction_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique transaction identifier."
+    },
+    "customer_id": {
+      "type": "string",
+      "pattern": "^C[0-9]{8}$",
+      "description": "Foreign key referencing a valid customer_id."
+    },
+    "event_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp strictly within the 90-day history window and prior to campaign assignment."
+    },
+    "txn_type": {
+      "type": "string",
+      "enum": [
+        "cash_in",
+        "cash_out",
+        "p2p_send",
+        "p2p_receive",
+        "merchant_pay",
+        "qr_pay",
+        "recharge",
+        "bill_pay"
+      ],
+      "description": "Transaction category."
+    },
+    "amount_bdt": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 100000,
+      "description": "Transaction amount in BDT: strictly positive (> 0) and capped at 100,000."
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "app",
+        "ussd",
+        "agent"
+      ],
+      "description": "Channel used to execute transaction."
+    },
+    "merchant_category": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "grocery",
+        "transport",
+        "food",
+        "telecom",
+        "other",
+        null
+      ],
+      "description": "Merchant category. Required for merchant_pay and qr_pay; otherwise must be null."
+    },
+    "direction": {
+      "type": "string",
+      "enum": [
+        "in",
+        "out"
+      ],
+      "description": "Transaction direction: 'in' for inflow (cash_in, p2p_receive), 'out' for outflow."
+    }
+  },
+  "required": [
+    "transaction_id",
+    "customer_id",
+    "event_time",
+    "txn_type",
+    "amount_bdt",
+    "channel",
+    "merchant_category",
+    "direction"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "txn_type": {
+            "enum": [
+              "merchant_pay",
+              "qr_pay"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "merchant_category": {
+            "type": "string",
+            "enum": [
+              "grocery",
+              "transport",
+              "food",
+              "telecom",
+              "other"
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "merchant_category": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "txn_type": {
+            "enum": [
+              "cash_in",
+              "p2p_receive"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "direction": {
+            "const": "in"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "direction": {
+            "const": "out"
+          }
+        }
+      }
+    }
+  ]
+}

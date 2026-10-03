@@ -1,0 +1,5 @@
+# CampaignLift Synthetic Data Package Requirements
+# Verified with working local environment
+pyyaml>=6.0.3
+jsonschema>=4.26.0
+pytest>=8.0.0

@@ -1,0 +1,29 @@
+{
+  "dataset_version": "cl-synth-dev-20261006-117fec8",
+  "config_name": "dev",
+  "global_seed": 20261006,
+  "generator_git_sha": "117fec84a2c877933aacc0e451c25b35e147dbd9",
+  "row_counts": {
+    "customers": 5000,
+    "transactions": 101640,
+    "campaign": 1,
+    "exposures": 2518,
+    "outcomes": 2518,
+    "features": 2518,
+    "splits": 5000,
+    "hidden_uplift": 5000
+  },
+  "treatment_rate": 0.5032,
+  "file_checksums": {
+    "customers.json": "a2225791a87d281d7fb79811209b7924299064b1f96dd2ce7b7d1e942b655dc9",
+    "transactions.json": "d5682cb62ac93adc0712505a7e92870a27f8af7de1136978f5f82a26b3019cf7",
+    "campaign.json": "edea734944af427da06d17d4aa194a23779ba561ab94285fb61f3458f7b0274b",
+    "exposures.json": "9422d3fc6031531c6294974f900373fc152bd70fc0578b361c18e6b05b7c9a72",
+    "outcomes.json": "e6d439257aeba3384396fa9d183bd72c972e1e3a9c9630a57f2a40f16924150a",
+    "features.json": "87d1a3c0bf0ec777a92dc980811e33e17baf5e3cf4d302a0467f9918642bf8d3",
+    "splits.json": "d8de6a39ff6a711edd3f28e7f9973d8332e4c953d43b0c2c7f367f2239dbc208",
+    "hidden_uplift.json": "c5452fd9ce6be5e6560e345dc54ddc215661295bc7a06a6d7116eb8613ff8e7d"
+  },
+  "validation_status": "passed",
+  "created_at": "2026-10-02T23:09:53.314046+00:00"
+}

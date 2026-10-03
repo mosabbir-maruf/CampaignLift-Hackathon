@@ -1,0 +1,123 @@
+{
+  "model_version": "cl-model-ml_dev_20261006-lgbm_s_learner-r01",
+  "model_family": "lightgbm_s_learner",
+  "candidate_id": "U2",
+  "dataset_version": "cl-synth-ml_dev-20261006-8ad556a",
+  "global_seed": 20261006,
+  "training_config": {
+    "n_estimators": 100,
+    "learning_rate": 0.05,
+    "num_leaves": 15,
+    "max_depth": 4,
+    "min_child_samples": 5,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "objective": "binary",
+    "verbosity": -1
+  },
+  "feature_names": [
+    "age_band",
+    "region_code",
+    "kyc_level",
+    "acquisition_channel",
+    "objective",
+    "offer_type",
+    "tenure_days",
+    "txn_count_30d",
+    "txn_count_90d",
+    "txn_amount_30d_bdt",
+    "txn_amount_90d_bdt",
+    "qr_txn_share_90d",
+    "cashout_share_90d",
+    "merchant_pay_share_90d",
+    "days_since_last_txn",
+    "avg_ticket_90d_bdt",
+    "app_channel_share_90d",
+    "campaign_exposures_prior_30d",
+    "campaign_exposures_prior_90d",
+    "days_since_last_campaign",
+    "incentive_value",
+    "incentive_cost_bdt"
+  ],
+  "categorical_encoding": "OneHotEncoder(handle_unknown='ignore', sparse_output=False)",
+  "categorical_features": [
+    "age_band",
+    "region_code",
+    "kyc_level",
+    "acquisition_channel",
+    "objective",
+    "offer_type"
+  ],
+  "numeric_features": [
+    "tenure_days",
+    "txn_count_30d",
+    "txn_count_90d",
+    "txn_amount_30d_bdt",
+    "txn_amount_90d_bdt",
+    "qr_txn_share_90d",
+    "cashout_share_90d",
+    "merchant_pay_share_90d",
+    "days_since_last_txn",
+    "avg_ticket_90d_bdt",
+    "app_channel_share_90d",
+    "campaign_exposures_prior_30d",
+    "campaign_exposures_prior_90d",
+    "days_since_last_campaign",
+    "incentive_value",
+    "incentive_cost_bdt"
+  ],
+  "library_versions": {
+    "python": "3.11.9",
+    "lightgbm": "4.7.0",
+    "scikit-learn": "1.9.0",
+    "numpy": "2.4.2",
+    "pandas": "3.0.0",
+    "joblib": "1.5.3"
+  },
+  "git_sha": "4386f2da7094ac4da0888a63d7b15f68d35b6f95",
+  "metrics": {
+    "validation": {
+      "candidate_id": "U2",
+      "model_name": "LightGBM S-Learner",
+      "role": "uplift_candidate",
+      "fit_time_seconds": 0.057,
+      "validation_qini_score": 48.457804,
+      "validation_normalized_qini": 0.134195,
+      "validation_top10_incremental_rate": 0.186313,
+      "mean_uplift": 0.005366,
+      "std_uplift": 0.063089,
+      "qini_endpoint": -23.335389,
+      "ate": -0.019826,
+      "passes_constraints": true
+    },
+    "test": {
+      "candidate_id": "U2",
+      "model_name": "LightGBM S-Learner",
+      "test_qini_score": 65.22574,
+      "test_normalized_qini": 0.175499,
+      "test_top10_incremental_rate": 0.187328,
+      "test_ate": -0.007641,
+      "mean_predicted_uplift": -0.004565,
+      "std_predicted_uplift": 0.07675,
+      "n_test": 2530
+    }
+  },
+  "selection_rule": "Rank candidates by validation Qini. If the highest Qini model is LightGBM, the simpler Logistic T-Learner (U0) wins if the difference in Qini is less than 0.01. Faster training breaks further ties.",
+  "fixture_smoke_score": {
+    "n_fixture_rows": 103,
+    "mean_p_treat": 0.583032,
+    "mean_p_control": 0.588191,
+    "mean_uplift": -0.005159,
+    "std_uplift": 0.076144,
+    "min_uplift": -0.279092,
+    "max_uplift": 0.102312,
+    "sample_uplifts": [
+      -0.055576,
+      0.064226,
+      0.007097,
+      0.089037,
+      -0.007674
+    ]
+  },
+  "created_at": "2026-10-03T11:26:28Z"
+}

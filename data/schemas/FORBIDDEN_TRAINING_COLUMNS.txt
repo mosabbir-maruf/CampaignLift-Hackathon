@@ -1,0 +1,9 @@
+natural_transaction_propensity
+qr_affinity
+price_sensitivity
+campaign_sensitivity
+digital_maturity
+offer_fatigue
+p_y_control
+p_y_treat
+true_uplift

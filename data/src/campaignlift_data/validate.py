@@ -1,0 +1,557 @@
+"""Dataset validation module for CampaignLift causal world.
+
+Performs rigorous automated gatekeeping on generated datasets and fixtures:
+1. Validates every table against its canonical JSON schema.
+2. Checks for duplicate primary keys across tables.
+3. Checks for orphan foreign keys referencing missing parents.
+4. Validates required fields, enum domains, and value bounds.
+5. Writes detailed audit results to data/reports/validation_report.json.
+6. Exits with code 1 if any blocker check fails.
+"""
+
+from datetime import date, datetime, timezone
+import json
+from pathlib import Path
+import sys
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
+import jsonschema
+
+
+def load_json_file(path: Path) -> Any:
+    """Load JSON content from disk."""
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+class DatasetValidator:
+    """Automated schema, key integrity, and boundary validator for dataset releases."""
+
+    def __init__(
+        self,
+        dataset_dir: Union[str, Path],
+        schemas_dir: Optional[Union[str, Path]] = None,
+        report_path: Optional[Union[str, Path]] = None,
+    ):
+        self.dataset_dir = Path(dataset_dir).resolve()
+        if schemas_dir is None:
+            # Default to data/schemas relative to package (parents[2] is data/)
+            self.schemas_dir = (
+                Path(__file__).resolve().parents[2] / "schemas"
+            ).resolve()
+        else:
+            self.schemas_dir = Path(schemas_dir).resolve()
+
+        if report_path is None:
+            self.report_path = (
+                Path(__file__).resolve().parents[2] / "reports" / "validation_report.json"
+            ).resolve()
+        else:
+            self.report_path = Path(report_path).resolve()
+
+        self.checks: List[Dict[str, Any]] = []
+        self.blockers: List[str] = []
+        self.warnings: List[str] = []
+
+    def _add_check(
+        self,
+        name: str,
+        passed: bool,
+        description: str,
+        observed: Any,
+        expected: str,
+        is_blocker: bool = True,
+    ) -> None:
+        status = "passed" if passed else "failed"
+        self.checks.append({
+            "name": name,
+            "status": status,
+            "description": description,
+            "observed": str(observed),
+            "expected": expected,
+        })
+        if not passed:
+            msg = f"[{name}] {description} (Observed: {observed}, Expected: {expected})"
+            if is_blocker:
+                self.blockers.append(msg)
+            else:
+                self.warnings.append(msg)
+
+    def validate_all(self) -> Tuple[bool, Dict[str, Any]]:
+        """Execute full validation suite across all tables in dataset_dir."""
+        # 1. Check existence of expected files
+        expected_files = [
+            "customers.json",
+            "transactions.json",
+            "campaign.json",
+            "exposures.json",
+            "outcomes.json",
+            "features.json",
+            "splits.json",
+            "manifest.json",
+        ]
+        missing_files = [f for f in expected_files if not (self.dataset_dir / f).exists()]
+        self._add_check(
+            name="file_existence",
+            passed=len(missing_files) == 0,
+            description="Verify all expected dataset files exist",
+            observed=f"Missing: {missing_files}" if missing_files else "All files present",
+            expected="All expected files present",
+        )
+        if missing_files:
+            return False, self._build_report()
+
+        # Load schemas
+        schemas = {
+            "customer": load_json_file(self.schemas_dir / "customer.schema.json"),
+            "transaction": load_json_file(self.schemas_dir / "transaction.schema.json"),
+            "campaign": load_json_file(self.schemas_dir / "campaign.schema.json"),
+            "exposure": load_json_file(self.schemas_dir / "exposure.schema.json"),
+            "outcome": load_json_file(self.schemas_dir / "outcome.schema.json"),
+            "feature_table": load_json_file(self.schemas_dir / "feature_table.schema.json"),
+            "manifest": load_json_file(self.schemas_dir / "manifest.schema.json"),
+        }
+        if (self.schemas_dir / "hidden_uplift.schema.json").exists():
+            schemas["hidden_uplift"] = load_json_file(self.schemas_dir / "hidden_uplift.schema.json")
+
+        # Load data tables
+        customers = load_json_file(self.dataset_dir / "customers.json")
+        transactions = load_json_file(self.dataset_dir / "transactions.json")
+        campaign = load_json_file(self.dataset_dir / "campaign.json")
+        exposures = load_json_file(self.dataset_dir / "exposures.json")
+        outcomes = load_json_file(self.dataset_dir / "outcomes.json")
+        features = load_json_file(self.dataset_dir / "features.json")
+        splits = load_json_file(self.dataset_dir / "splits.json")
+        manifest = load_json_file(self.dataset_dir / "manifest.json")
+
+        hidden_path = self.dataset_dir / "hidden_uplift.json"
+        hidden_uplift = load_json_file(hidden_path) if hidden_path.exists() else None
+
+        # 2. Schema Validations
+        self._validate_rows_against_schema("schema_customers", customers, schemas["customer"])
+        self._validate_rows_against_schema("schema_transactions", transactions, schemas["transaction"])
+
+        # Campaign can be a single dict or a list of 1 dict
+        camp_to_check = campaign[0] if isinstance(campaign, list) else campaign
+        self._validate_single_against_schema("schema_campaign", camp_to_check, schemas["campaign"])
+
+        self._validate_rows_against_schema("schema_exposures", exposures, schemas["exposure"])
+        self._validate_rows_against_schema("schema_outcomes", outcomes, schemas["outcome"])
+        self._validate_rows_against_schema("schema_features", features, schemas["feature_table"])
+        self._validate_single_against_schema("schema_manifest", manifest, schemas["manifest"])
+
+        if hidden_uplift is not None and "hidden_uplift" in schemas:
+            self._validate_rows_against_schema("schema_hidden_uplift", hidden_uplift, schemas["hidden_uplift"])
+
+        # 3. Primary Key Uniqueness
+        self._check_uniqueness("pk_customers", [c["customer_id"] for c in customers], "customer_id")
+        self._check_uniqueness("pk_transactions", [t["transaction_id"] for t in transactions], "transaction_id")
+        self._check_uniqueness("pk_exposures", [e["exposure_id"] for e in exposures], "exposure_id")
+        self._check_uniqueness("pk_exposures_customer", [e["customer_id"] for e in exposures], "customer_id in exposures")
+        self._check_uniqueness("pk_outcomes_customer", [o["customer_id"] for o in outcomes], "customer_id in outcomes")
+        self._check_uniqueness("pk_features_customer", [f["customer_id"] for f in features], "customer_id in features")
+        self._check_uniqueness("pk_splits_customer", [s["customer_id"] for s in splits], "customer_id in splits")
+
+        # 4. Foreign Key Integrity
+        valid_cust_ids = {c["customer_id"] for c in customers}
+        valid_camp_id = camp_to_check["campaign_id"]
+        valid_exp_cust_ids = {e["customer_id"] for e in exposures}
+
+        # Transactions -> Customers
+        orphan_txn_cust = [t["customer_id"] for t in transactions if t["customer_id"] not in valid_cust_ids]
+        self._add_check(
+            name="fk_transactions_customers",
+            passed=len(orphan_txn_cust) == 0,
+            description="Verify all transactions reference valid customers",
+            observed=f"{len(orphan_txn_cust)} orphan references",
+            expected="0 orphan references",
+        )
+
+        # Exposures -> Customers & Campaign
+        orphan_exp_cust = [e["customer_id"] for e in exposures if e["customer_id"] not in valid_cust_ids]
+        orphan_exp_camp = [e["campaign_id"] for e in exposures if e["campaign_id"] != valid_camp_id]
+        self._add_check(
+            name="fk_exposures_customers",
+            passed=len(orphan_exp_cust) == 0 and len(orphan_exp_camp) == 0,
+            description="Verify all exposures reference valid customers and campaign",
+            observed=f"{len(orphan_exp_cust)} orphan cust, {len(orphan_exp_camp)} invalid camp",
+            expected="0 orphan references",
+        )
+
+        # Outcomes -> Exposures & Campaign
+        orphan_out_cust = [o["customer_id"] for o in outcomes if o["customer_id"] not in valid_exp_cust_ids]
+        orphan_out_camp = [o["campaign_id"] for o in outcomes if o["campaign_id"] != valid_camp_id]
+        self._add_check(
+            name="fk_outcomes_exposures",
+            passed=len(orphan_out_cust) == 0 and len(orphan_out_camp) == 0,
+            description="Verify all outcomes reference valid exposed customers and campaign",
+            observed=f"{len(orphan_out_cust)} orphan cust, {len(orphan_out_camp)} invalid camp",
+            expected="0 orphan references",
+        )
+
+        # Features -> Exposures
+        orphan_feat_cust = [f["customer_id"] for f in features if f["customer_id"] not in valid_exp_cust_ids]
+        self._add_check(
+            name="fk_features_exposures",
+            passed=len(orphan_feat_cust) == 0 and len(features) == len(exposures),
+            description="Verify feature table exactly matches exposure cohort",
+            observed=f"{len(orphan_feat_cust)} orphan cust, total {len(features)} vs {len(exposures)} exposures",
+            expected="Row count equals exposure count and 0 orphans",
+        )
+
+        # 5. Treatment and Outcome Boundaries
+        invalid_treatments = [e["treatment"] for e in exposures if e["treatment"] not in (0, 1)]
+        self._add_check(
+            name="treatment_domain",
+            passed=len(invalid_treatments) == 0,
+            description="Verify treatment assignment flags are strictly in {0, 1}",
+            observed=f"{len(invalid_treatments)} invalid values",
+            expected="All in {0, 1}",
+        )
+
+        invalid_outcomes = [o["y_transacted"] for o in outcomes if o["y_transacted"] not in (0, 1)]
+        self._add_check(
+            name="outcome_domain",
+            passed=len(invalid_outcomes) == 0,
+            description="Verify conversion labels are strictly in {0, 1}",
+            observed=f"{len(invalid_outcomes)} invalid values",
+            expected="All in {0, 1}",
+        )
+
+        # 6. Treatment Rate Sanity
+        if len(exposures) > 0:
+            n_treat = sum(1 for e in exposures if e["treatment"] == 1)
+            t_rate = n_treat / len(exposures)
+            min_tr, max_tr = (0.45, 0.55) if len(exposures) >= 500 else (0.40, 0.60)
+            self._add_check(
+                name="treatment_rate_bounds",
+                passed=min_tr <= t_rate <= max_tr,
+                description="Verify empirical treatment rate is balanced around 0.50",
+                observed=f"{t_rate:.4f} ({n_treat}/{len(exposures)})",
+                expected=f"Within [{min_tr:.2f}, {max_tr:.2f}]",
+                is_blocker=True,
+            )
+
+        # 7. Leakage Validations (Step 10.2)
+        # 7a. Intersect feature columns with FORBIDDEN_TRAINING_COLUMNS.txt
+        forbidden_file = self.schemas_dir / "FORBIDDEN_TRAINING_COLUMNS.txt"
+        if forbidden_file.exists():
+            with open(forbidden_file, "r", encoding="utf-8") as f:
+                forbidden_cols = {line.strip() for line in f if line.strip() and not line.startswith("#")}
+        else:
+            forbidden_cols = {
+                "natural_transaction_propensity",
+                "qr_affinity",
+                "price_sensitivity",
+                "campaign_sensitivity",
+                "digital_maturity",
+                "offer_fatigue",
+                "p_y_control",
+                "p_y_treat",
+                "true_uplift",
+            }
+
+        leaked_cols = set()
+        for row in features:
+            leaked_cols.update(set(row.keys()) & forbidden_cols)
+
+        self._add_check(
+            name="leakage_forbidden_columns",
+            passed=len(leaked_cols) == 0,
+            description="Verify training feature table contains zero forbidden columns",
+            observed=f"Leaked columns: {list(leaked_cols)}" if leaked_cols else "0 forbidden columns",
+            expected="0 forbidden columns in features",
+            is_blocker=True,
+        )
+
+        # 7b. Assert max transaction time < min assigned_at for each customer used in features
+        assigned_dt = datetime.combine(
+            date.fromisoformat(camp_to_check["start_date"]),
+            datetime.min.time(),
+            tzinfo=timezone.utc,
+        )
+
+        txns_by_cust: Dict[str, List[datetime]] = {}
+        for t in transactions:
+            dt = datetime.fromisoformat(t["event_time"].replace("Z", "+00:00"))
+            txns_by_cust.setdefault(t["customer_id"], []).append(dt)
+
+        future_events = []
+        for f in features:
+            cid = f["customer_id"]
+            cust_txns = txns_by_cust.get(cid, [])
+            if cust_txns:
+                max_txn_dt = max(cust_txns)
+                if max_txn_dt >= assigned_dt:
+                    future_events.append((cid, max_txn_dt.isoformat(), assigned_dt.isoformat()))
+
+        self._add_check(
+            name="leakage_future_events",
+            passed=len(future_events) == 0,
+            description="Assert max transaction time < assigned_at for each customer used in features",
+            observed=f"{len(future_events)} customers with transactions >= assigned_at ({future_events[:2]})"
+            if future_events else "All customer transactions strictly < assigned_at",
+            expected="All historical transactions occur strictly before assigned_at",
+            is_blocker=True,
+        )
+
+        # 7c. Assert the hidden file is not inside the features directory or feature records
+        features_dir = self.dataset_dir / "features"
+        leaked_in_dir = False
+        if features_dir.is_dir():
+            hidden_matches = list(features_dir.glob("*hidden*")) + list(features_dir.glob("*uplift*"))
+            if hidden_matches:
+                leaked_in_dir = True
+
+        leaked_in_features_file = any("true_uplift" in row for row in features)
+
+        self._add_check(
+            name="leakage_hidden_file_placement",
+            passed=(not leaked_in_dir) and (not leaked_in_features_file),
+            description="Assert the hidden oracle file is not inside the features directory or records",
+            observed="Hidden oracle data found in features" if (leaked_in_dir or leaked_in_features_file) else "Hidden file cleanly separated",
+            expected="No hidden oracle data in features directory or records",
+            is_blocker=True,
+        )
+
+        # 8. Statistical Sanity Checks (Step 10.3)
+        # 8a. Both signs of true uplift in hidden oracle (negative uplift blocker)
+        if hidden_uplift is not None:
+            neg_uplift_count = sum(1 for row in hidden_uplift if row.get("true_uplift", 0) < 0)
+            self._add_check(
+                name="uplift_negative_contrast",
+                passed=neg_uplift_count > 0,
+                description="Verify hidden oracle produces negative-uplift customers (true_uplift < 0)",
+                observed=f"{neg_uplift_count} customers ({neg_uplift_count / len(hidden_uplift):.2%})" if len(hidden_uplift) > 0 else "0 customers",
+                expected="At least 1 customer with true_uplift < 0",
+                is_blocker=True,
+            )
+
+            pos_uplift_count = sum(1 for row in hidden_uplift if row.get("true_uplift", 0) > 0.02)
+            self._add_check(
+                name="uplift_positive_contrast",
+                passed=pos_uplift_count > 0,
+                description="Verify hidden oracle produces positive-uplift contrast (true_uplift > 0.02)",
+                observed=f"{pos_uplift_count} customers ({pos_uplift_count / len(hidden_uplift):.2%})" if len(hidden_uplift) > 0 else "0 customers",
+                expected="At least 1 customer with true_uplift > 0.02",
+                is_blocker=True,
+            )
+
+        # 8b. Outcome consistency
+        outcome_inconsistencies = []
+        camp_start_iso = camp_to_check["start_date"]
+        for idx, o in enumerate(outcomes):
+            y = o.get("y_transacted")
+            cnt = o.get("txn_count_window", 0)
+            amt = o.get("txn_amount_window_bdt", 0.0)
+            w_start = o.get("window_start")
+            w_end = o.get("window_end")
+
+            if y == 0 and (cnt != 0 or amt > 0):
+                outcome_inconsistencies.append(f"Row {idx} (cust {o.get('customer_id')}): y=0 but cnt={cnt}, amt={amt}")
+            elif y == 1 and (cnt < 1 or amt <= 0):
+                outcome_inconsistencies.append(f"Row {idx} (cust {o.get('customer_id')}): y=1 but cnt={cnt}, amt={amt}")
+
+            if w_start and w_end and w_start >= w_end:
+                outcome_inconsistencies.append(f"Row {idx}: window_start >= window_end ({w_start} >= {w_end})")
+            if w_start and w_start < camp_start_iso:
+                outcome_inconsistencies.append(f"Row {idx}: window_start before campaign start ({w_start} < {camp_start_iso})")
+
+        self._add_check(
+            name="outcome_consistency",
+            passed=len(outcome_inconsistencies) == 0,
+            description="Verify outcome labels, transaction window totals, and intervals are consistent",
+            observed=f"{len(outcome_inconsistencies)} inconsistent rows ({outcome_inconsistencies[:2]})" if outcome_inconsistencies else "All outcome rows consistent",
+            expected="0 inconsistent outcome rows",
+            is_blocker=True,
+        )
+
+        # 8c. Real transaction amounts positive
+        non_pos_txns = [t["transaction_id"] for t in transactions if t.get("amount_bdt", 0) <= 0]
+        self._add_check(
+            name="transaction_amount_positive",
+            passed=len(non_pos_txns) == 0,
+            description="Verify all transaction amounts are strictly positive (amount_bdt > 0)",
+            observed=f"{len(non_pos_txns)} transactions <= 0 ({non_pos_txns[:2]})" if non_pos_txns else "All transaction amounts > 0",
+            expected="0 transactions with amount_bdt <= 0",
+            is_blocker=True,
+        )
+
+        # 8d. Null checks on required fields
+        null_errors = []
+        table_reqs = [
+            ("customers", customers, schemas["customer"].get("required", [])),
+            ("transactions", transactions, [k for k in schemas["transaction"].get("required", []) if k != "merchant_category"]),
+            ("campaign", [camp_to_check], schemas["campaign"].get("required", [])),
+            ("exposures", exposures, schemas["exposure"].get("required", [])),
+            ("outcomes", outcomes, schemas["outcome"].get("required", [])),
+            ("features", features, schemas["feature_table"].get("required", [])),
+            ("splits", splits, ["customer_id", "split"]),
+        ]
+        for tbl_name, rows, req_keys in table_reqs:
+            for r_idx, r in enumerate(rows):
+                for k in req_keys:
+                    if r.get(k) is None:
+                        null_errors.append(f"{tbl_name}[{r_idx}].{k} is null")
+                        if len(null_errors) >= 10:
+                            break
+                if len(null_errors) >= 10:
+                    break
+            if len(null_errors) >= 10:
+                break
+
+        self._add_check(
+            name="null_checks_required",
+            passed=len(null_errors) == 0,
+            description="Verify no required fields contain null values",
+            observed=f"{len(null_errors)} null values in required fields ({null_errors[:2]})" if null_errors else "0 nulls in required fields",
+            expected="0 null values in required fields",
+            is_blocker=True,
+        )
+
+        # 8e. Warnings for extreme base rates and distributions (do not flip exit code)
+        if len(outcomes) > 0:
+            outcome_base_rate = sum(o["y_transacted"] for o in outcomes) / len(outcomes)
+            self._add_check(
+                name="warning_outcome_base_rate",
+                passed=0.02 <= outcome_base_rate <= 0.80,
+                description="Warn if outcome base rate is extreme (<2% or >80%)",
+                observed=f"{outcome_base_rate:.4f} ({sum(o['y_transacted'] for o in outcomes)}/{len(outcomes)})",
+                expected="Base rate between 0.02 and 0.80",
+                is_blocker=False,
+            )
+
+        if len(customers) > 0:
+            elig_rate = len(exposures) / len(customers)
+            self._add_check(
+                name="warning_eligibility_rate",
+                passed=0.10 <= elig_rate <= 0.95,
+                description="Warn if eligibility rate is extreme (<10% or >95%)",
+                observed=f"{elig_rate:.4f} ({len(exposures)}/{len(customers)})",
+                expected="Eligibility rate between 0.10 and 0.95",
+                is_blocker=False,
+            )
+
+        if len(features) > 0:
+            sparse_features = []
+            for col in features[0].keys():
+                if col in ("customer_id", "campaign_id", "objective", "offer_type", "age_band", "region_code", "kyc_level", "acquisition_channel"):
+                    continue
+                vals = [r.get(col) for r in features]
+                if all(isinstance(v, (int, float)) for v in vals):
+                    zero_ratio = sum(1 for v in vals if v == 0) / len(vals)
+                    if zero_ratio > 0.95:
+                        sparse_features.append((col, f"{zero_ratio:.2%}"))
+
+            self._add_check(
+                name="warning_feature_sparsity",
+                passed=len(sparse_features) == 0,
+                description="Warn if any numeric feature has >95% zero values",
+                observed=f"{len(sparse_features)} sparse features: {sparse_features}" if sparse_features else "All features have <=95% zeros",
+                expected="No features with >95% zeros",
+                is_blocker=False,
+            )
+
+        report = self._build_report()
+        self._save_report(report)
+
+        is_valid = len(self.blockers) == 0
+        return is_valid, report
+
+
+    def _validate_rows_against_schema(self, check_name: str, rows: List[Dict[str, Any]], schema: Dict[str, Any]) -> None:
+        errors = []
+        for i, row in enumerate(rows):
+            try:
+                jsonschema.validate(instance=row, schema=schema)
+            except jsonschema.exceptions.ValidationError as e:
+                errors.append(f"Row {i}: {e.message}")
+                if len(errors) >= 5:  # Limit error messages
+                    break
+        self._add_check(
+            name=check_name,
+            passed=len(errors) == 0,
+            description=f"Validate rows against {schema.get('title', 'schema')}",
+            observed=f"{len(errors)} schema errors ({errors[:2]})" if errors else f"{len(rows)} rows valid",
+            expected="0 schema errors",
+        )
+
+    def _validate_single_against_schema(self, check_name: str, obj: Dict[str, Any], schema: Dict[str, Any]) -> None:
+        try:
+            jsonschema.validate(instance=obj, schema=schema)
+            passed = True
+            msg = "Valid object"
+        except jsonschema.exceptions.ValidationError as e:
+            passed = False
+            msg = f"Schema error: {e.message}"
+        self._add_check(
+            name=check_name,
+            passed=passed,
+            description=f"Validate object against {schema.get('title', 'schema')}",
+            observed=msg,
+            expected="Valid against schema",
+        )
+
+    def _check_uniqueness(self, check_name: str, keys: List[str], field_name: str) -> None:
+        seen = set()
+        duplicates = set()
+        for k in keys:
+            if k in seen:
+                duplicates.add(k)
+            seen.add(k)
+        self._add_check(
+            name=check_name,
+            passed=len(duplicates) == 0,
+            description=f"Verify uniqueness of {field_name}",
+            observed=f"{len(duplicates)} duplicate keys: {list(duplicates)[:3]}" if duplicates else f"{len(keys)} unique keys",
+            expected="0 duplicate keys",
+        )
+
+    def _build_report(self) -> Dict[str, Any]:
+        passed_count = sum(1 for c in self.checks if c["status"] == "passed")
+        failed_count = sum(1 for c in self.checks if c["status"] == "failed")
+        status = "passed" if len(self.blockers) == 0 else "failed"
+
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "dataset_dir": str(self.dataset_dir),
+            "validation_status": status,
+            "total_checks": len(self.checks),
+            "passed_checks": passed_count,
+            "failed_checks": failed_count,
+            "blockers": self.blockers,
+            "warnings": self.warnings,
+            "checks": self.checks,
+        }
+
+    def _save_report(self, report: Dict[str, Any]) -> None:
+        self.report_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.report_path, "w", encoding="utf-8") as f:
+            json.dump(report, f, indent=2)
+
+
+def main():
+    """CLI entry point for schema and dataset validation."""
+    dataset_dir = sys.argv[1] if len(sys.argv) > 1 else Path(__file__).resolve().parents[2] / "fixtures" / "fixture_v1"
+    validator = DatasetValidator(dataset_dir)
+    is_valid, report = validator.validate_all()
+
+    print(f"\n=======================================================")
+    print(f"Validation Report for: {dataset_dir}")
+    print(f"Status: {report['validation_status'].upper()}")
+    print(f"Checks: {report['passed_checks']}/{report['total_checks']} passed")
+    if report["warnings"]:
+        print("\nWARNINGS ENCOUNTERED:")
+        for w in report["warnings"]:
+            print(f"  - {w}")
+    if report["blockers"]:
+        print("\nBLOCKERS ENCOUNTERED:")
+        for b in report["blockers"]:
+            print(f"  - {b}")
+    print(f"Report saved to: {validator.report_path}")
+    print(f"=======================================================\n")
+
+    sys.exit(0 if is_valid else 1)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,209 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://campaignlift.internal/schemas/feature_table.schema.json",
+  "title": "FeatureTable",
+  "description": "Canonical pre-assignment feature table schema for model training, validation, and testing. Excludes all latent variables, potential outcomes, and outcome window aggregates.",
+  "type": "object",
+  "properties": {
+    "customer_id": {
+      "type": "string",
+      "pattern": "^C[0-9]{8}$",
+      "description": "Foreign key referencing the customer."
+    },
+    "campaign_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier of the modeled campaign."
+    },
+    "tenure_days": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Customer account age in days from signup to campaign assignment."
+    },
+    "age_band": {
+      "type": "string",
+      "enum": [
+        "18-24",
+        "25-34",
+        "35-44",
+        "45-54",
+        "55+"
+      ],
+      "description": "Customer age band."
+    },
+    "region_code": {
+      "type": "string",
+      "enum": [
+        "DHK",
+        "CTG",
+        "SYL",
+        "RAJ",
+        "KHU",
+        "BAR",
+        "RAN",
+        "MYM"
+      ],
+      "description": "Customer geographic region code."
+    },
+    "kyc_level": {
+      "type": "string",
+      "enum": [
+        "limited",
+        "verified"
+      ],
+      "description": "KYC verification tier."
+    },
+    "acquisition_channel": {
+      "type": "string",
+      "enum": [
+        "app",
+        "agent",
+        "referral"
+      ],
+      "description": "Channel through which customer joined."
+    },
+    "txn_count_30d": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total transaction count in the 30 days prior to assignment."
+    },
+    "txn_count_90d": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total transaction count in the 90 days prior to assignment."
+    },
+    "txn_amount_30d_bdt": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Total transaction volume in BDT across prior 30 days."
+    },
+    "txn_amount_90d_bdt": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Total transaction volume in BDT across prior 90 days."
+    },
+    "qr_txn_share_90d": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Share of QR transactions over past 90 days: QR count / max(txn count, 1)."
+    },
+    "cashout_share_90d": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Share of cash-out transactions over past 90 days."
+    },
+    "merchant_pay_share_90d": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Share of merchant-pay transactions over past 90 days."
+    },
+    "days_since_last_txn": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Days since last pre-assignment transaction. Defaults to 999 if no prior transaction."
+    },
+    "avg_ticket_90d_bdt": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Average transaction ticket size over past 90 days: amount / max(count, 1)."
+    },
+    "app_channel_share_90d": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Share of transactions performed via app channel over past 90 days."
+    },
+    "campaign_exposures_prior_30d": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Count of marketing campaign exposures received in prior 30 days."
+    },
+    "campaign_exposures_prior_90d": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Count of marketing campaign exposures received in prior 90 days."
+    },
+    "days_since_last_campaign": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Days elapsed since the previous campaign exposure. Defaults to 999 if none."
+    },
+    "objective": {
+      "type": "string",
+      "enum": [
+        "activation",
+        "qr_adoption",
+        "reactivation",
+        "retention"
+      ],
+      "description": "Marketing campaign objective known at decision time."
+    },
+    "offer_type": {
+      "type": "string",
+      "enum": [
+        "flat_cashback",
+        "pct_cashback",
+        "fee_waiver"
+      ],
+      "description": "Incentive structure offered by the campaign."
+    },
+    "incentive_value": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Incentive magnitude in BDT or percentage."
+    },
+    "incentive_cost_bdt": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Expected unit cost in BDT for targeting this customer."
+    },
+    "treatment": {
+      "type": "integer",
+      "enum": [
+        0,
+        1
+      ],
+      "description": "Randomized treatment flag (1 for treated, 0 for control)."
+    },
+    "y_transacted": {
+      "type": "integer",
+      "enum": [
+        0,
+        1
+      ],
+      "description": "Factual conversion label observed in the 14-day outcome window."
+    }
+  },
+  "required": [
+    "customer_id",
+    "campaign_id",
+    "tenure_days",
+    "age_band",
+    "region_code",
+    "kyc_level",
+    "acquisition_channel",
+    "txn_count_30d",
+    "txn_count_90d",
+    "txn_amount_30d_bdt",
+    "txn_amount_90d_bdt",
+    "qr_txn_share_90d",
+    "cashout_share_90d",
+    "merchant_pay_share_90d",
+    "days_since_last_txn",
+    "avg_ticket_90d_bdt",
+    "app_channel_share_90d",
+    "campaign_exposures_prior_30d",
+    "campaign_exposures_prior_90d",
+    "days_since_last_campaign",
+    "objective",
+    "offer_type",
+    "incentive_value",
+    "incentive_cost_bdt",
+    "treatment",
+    "y_transacted"
+  ],
+  "additionalProperties": false
+}
