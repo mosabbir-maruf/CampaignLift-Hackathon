@@ -36,10 +36,13 @@ export interface ScoredCustomer {
 
 export interface UpliftDecile {
   decile: number
-  customers: number
-  mean_p_treat: number
-  mean_p_control: number
+  customers?: number
+  customer_count?: number
+  mean_p_treat?: number
+  mean_p_control?: number
   mean_uplift: number
+  min_uplift?: number
+  max_uplift?: number
 }
 
 export interface AudienceSummary {
