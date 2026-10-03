@@ -16,6 +16,7 @@ import {
   SectionHeader,
   inputCls,
   Badge,
+  SelectDropdown,
 } from "../components/ui"
 import { Link, navigate } from "../lib/router"
 import { bdt } from "../lib/format"
@@ -72,6 +73,11 @@ const OFFER_TYPES: {
     unitHint: "Full or partial transaction fee waiver (value is 0).",
   },
 ]
+
+const OFFER_TYPE_OPTIONS = OFFER_TYPES.map((o) => ({
+  value: o.value,
+  label: o.label,
+}))
 
 const CHANNELS: {
   value: CampaignChannel
@@ -407,20 +413,15 @@ export default function CampaignSetup() {
                   OFFER_TYPES.find((o) => o.value === form.offer_type)?.unitHint
                 }
               >
-                <select
+                <SelectDropdown
                   id="offer_type"
-                  className={inputCls(!!errors.offer_type)}
                   value={form.offer_type}
-                  onChange={(e) =>
-                    setField("offer_type", e.target.value as CampaignOfferType)
+                  onChange={(val) =>
+                    setField("offer_type", val as CampaignOfferType)
                   }
-                >
-                  {OFFER_TYPES.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
+                  options={OFFER_TYPE_OPTIONS}
+                  triggerClassName="w-full"
+                />
               </FormField>
 
               <FormField
