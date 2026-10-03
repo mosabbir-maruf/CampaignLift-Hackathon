@@ -10,3 +10,12 @@ node_modules
 dist
 build
 .cache
+
+# Non-runtime documentation, tests, CI and tooling
+**/tests
+.github
+docs
+infra
+scripts
+*.md
+pytest.ini

@@ -4,3 +4,5 @@ build
 .cache
 .env*
 .git
+.github
+*.md
