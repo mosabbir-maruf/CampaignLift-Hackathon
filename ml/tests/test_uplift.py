@@ -18,9 +18,15 @@ from campaignlift_ml.uplift import (
     LogisticTLearner,
     train_logistic_t_learner,
     run_smoke_logistic_t_learner,
+    LogisticSLearner,
+    train_logistic_s_learner,
+    run_smoke_logistic_s_learner,
     LightGBMTLearner,
     train_lightgbm_t_learner,
     run_smoke_lightgbm_t_learner,
+    LightGBMSLearner,
+    train_lightgbm_s_learner,
+    run_smoke_lightgbm_s_learner,
     LIGHTGBM_AVAILABLE,
 )
 
@@ -207,4 +213,157 @@ def test_lightgbm_t_learner_hyperparams_from_yaml():
     assert learner.learning_rate == 0.05
     assert learner.max_depth == 4
     assert learner.min_child_samples == 5
+
+
+# =============================================================================
+# Logistic S-Learner Tests (Candidate B1)
+# =============================================================================
+
+def test_logistic_s_learner_fit_and_predict_fixture():
+    """Logistic S-Learner fits with treatment feature and yields finite, non-zero uplift."""
+    train_df, val_df = load_train_val(FIXTURE_DIR, verify_hashes=True)
+
+    learner = train_logistic_s_learner(train_df, random_state=20261006)
+    assert learner.is_fitted
+    assert learner.n_train == len(train_df)
+
+    preds = learner.predict_uplift(val_df)
+
+    # 1. Finite checks
+    assert np.all(np.isfinite(preds.p_treat))
+    assert np.all(np.isfinite(preds.p_control))
+    assert np.all(np.isfinite(preds.uplift))
+
+    # 2. Probability bounds [0, 1]
+    assert np.all(preds.p_treat >= 0.0) and np.all(preds.p_treat <= 1.0)
+    assert np.all(preds.p_control >= 0.0) and np.all(preds.p_control <= 1.0)
+
+    # 3. Exact formula match: uplift = p_treat - p_control
+    np.testing.assert_allclose(preds.uplift, preds.p_treat - preds.p_control, atol=1e-7)
+
+    # 4. Acceptance criteria: Non-zero mean absolute uplift
+    mean_abs_uplift = float(np.mean(np.abs(preds.uplift)))
+    assert mean_abs_uplift > 0.001, f"Mean absolute uplift must be non-zero, got {mean_abs_uplift}"
+
+
+def test_logistic_s_learner_evaluate_smoke():
+    """evaluate returns summary metrics tagged with 'smoke' for candidate B1."""
+    train_df, val_df = load_train_val(FIXTURE_DIR, verify_hashes=True)
+    learner = train_logistic_s_learner(train_df)
+
+    result = learner.evaluate(val_df, eval_type="smoke")
+    res_dict = result.to_dict()
+
+    assert res_dict["candidate_id"] == "B1"
+    assert res_dict["model_name"] == "logistic_s_learner"
+    assert res_dict["eval_type"] == "smoke"
+    assert res_dict["mean_abs_uplift"] > 0.0
+    assert res_dict["n_eval"] == len(val_df)
+
+
+def test_logistic_s_learner_refuses_true_uplift_leakage():
+    """Attempting to train Logistic S-Learner on data containing true_uplift raises ForbiddenColumnError."""
+    train_df, _ = load_train_val(FIXTURE_DIR, verify_hashes=True)
+    corrupted_df = train_df.copy()
+    corrupted_df["true_uplift"] = 0.05
+
+    learner = LogisticSLearner()
+    with pytest.raises(ForbiddenColumnError, match="CRITICAL CAUSAL LEAKAGE"):
+        learner.fit(corrupted_df)
+
+
+def test_run_smoke_logistic_s_learner_runner():
+    """run_smoke_logistic_s_learner CLI entry point executes cleanly on fixture."""
+    metrics = run_smoke_logistic_s_learner(FIXTURE_DIR)
+    assert isinstance(metrics, dict)
+    assert metrics["candidate_id"] == "B1"
+    assert metrics["eval_type"] == "smoke"
+    assert metrics["mean_abs_uplift"] > 0.0
+
+
+# =============================================================================
+# LightGBM S-Learner Tests (Candidate U2)
+# =============================================================================
+
+@pytest.mark.skipif(not LIGHTGBM_AVAILABLE, reason="LightGBM not installed")
+def test_lightgbm_s_learner_fit_and_predict_fixture():
+    """LightGBM S-Learner fits with treatment feature and yields finite, non-zero uplift."""
+    train_df, val_df = load_train_val(FIXTURE_DIR, verify_hashes=True)
+
+    learner = train_lightgbm_s_learner(train_df, random_state=20261006)
+    assert learner.is_fitted
+    assert learner.n_train == len(train_df)
+
+    preds = learner.predict_uplift(val_df)
+
+    # 1. Finite checks
+    assert np.all(np.isfinite(preds.p_treat))
+    assert np.all(np.isfinite(preds.p_control))
+    assert np.all(np.isfinite(preds.uplift))
+
+    # 2. Probability bounds [0, 1]
+    assert np.all(preds.p_treat >= 0.0) and np.all(preds.p_treat <= 1.0)
+    assert np.all(preds.p_control >= 0.0) and np.all(preds.p_control <= 1.0)
+
+    # 3. Exact formula match: uplift = p_treat - p_control
+    np.testing.assert_allclose(preds.uplift, preds.p_treat - preds.p_control, atol=1e-7)
+
+    # 4. Acceptance criteria: Non-zero mean absolute uplift
+    mean_abs_uplift = float(np.mean(np.abs(preds.uplift)))
+    assert mean_abs_uplift > 0.001, f"Mean absolute uplift must be non-zero, got {mean_abs_uplift}"
+
+
+@pytest.mark.skipif(not LIGHTGBM_AVAILABLE, reason="LightGBM not installed")
+def test_lightgbm_s_learner_evaluate_smoke():
+    """evaluate returns summary metrics tagged with 'smoke' for candidate U2."""
+    train_df, val_df = load_train_val(FIXTURE_DIR, verify_hashes=True)
+    learner = train_lightgbm_s_learner(train_df)
+
+    result = learner.evaluate(val_df, eval_type="smoke")
+    res_dict = result.to_dict()
+
+    assert res_dict["candidate_id"] == "U2"
+    assert res_dict["model_name"] == "lightgbm_s_learner"
+    assert res_dict["eval_type"] == "smoke"
+    assert res_dict["mean_abs_uplift"] > 0.0
+    assert res_dict["n_eval"] == len(val_df)
+
+
+@pytest.mark.skipif(not LIGHTGBM_AVAILABLE, reason="LightGBM not installed")
+def test_lightgbm_s_learner_refuses_true_uplift_leakage():
+    """Attempting to train LightGBM S-Learner on data containing true_uplift raises ForbiddenColumnError."""
+    train_df, _ = load_train_val(FIXTURE_DIR, verify_hashes=True)
+    corrupted_df = train_df.copy()
+    corrupted_df["true_uplift"] = 0.05
+
+    learner = LightGBMSLearner()
+    with pytest.raises(ForbiddenColumnError, match="CRITICAL CAUSAL LEAKAGE"):
+        learner.fit(corrupted_df)
+
+
+@pytest.mark.skipif(not LIGHTGBM_AVAILABLE, reason="LightGBM not installed")
+def test_run_smoke_lightgbm_s_learner_runner(tmp_path):
+    """run_smoke_lightgbm_s_learner CLI entry point executes cleanly and saves json if requested."""
+    out_file = tmp_path / "lightgbm_s_smoke.json"
+    metrics = run_smoke_lightgbm_s_learner(FIXTURE_DIR, output_metrics_path=out_file)
+    assert isinstance(metrics, dict)
+    assert metrics["candidate_id"] == "U2"
+    assert metrics["eval_type"] == "smoke"
+    assert metrics["mean_abs_uplift"] > 0.0
+    assert out_file.exists()
+
+
+def test_lightgbm_s_learner_hyperparams_from_yaml():
+    """LightGBMSLearner properly reads parameters from train.yaml."""
+    if not LIGHTGBM_AVAILABLE:
+        pytest.skip("LightGBM not installed")
+    config_file = REPO_ROOT / "ml" / "config" / "train.yaml"
+    assert config_file.exists(), "train.yaml must exist"
+
+    learner = LightGBMSLearner(config_path=config_file)
+    assert learner.n_estimators == 100
+    assert learner.learning_rate == 0.05
+    assert learner.max_depth == 4
+    assert learner.min_child_samples == 5
+
 
