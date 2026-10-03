@@ -22,6 +22,13 @@ from .data import (
     IDENTIFIER_COLUMNS,
 )
 
+from .baseline import (
+    ResponseBaselineModel,
+    BaselineEvaluationResult,
+    train_response_baseline,
+    run_smoke_baseline,
+)
+
 __all__ = [
     "DatasetSplits",
     "ForbiddenColumnError",
@@ -38,4 +45,8 @@ __all__ = [
     "TARGET_COLUMN",
     "TREATMENT_COLUMN",
     "IDENTIFIER_COLUMNS",
+    "ResponseBaselineModel",
+    "BaselineEvaluationResult",
+    "train_response_baseline",
+    "run_smoke_baseline",
 ]
