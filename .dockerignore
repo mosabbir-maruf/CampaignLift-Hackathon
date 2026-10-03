@@ -19,3 +19,7 @@ infra
 scripts
 *.md
 pytest.ini
+certs
+*.pem
+*.key
+*.crt
