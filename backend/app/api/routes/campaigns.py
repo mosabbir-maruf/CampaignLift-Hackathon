@@ -21,6 +21,7 @@ from backend.app.db import get_db
 from backend.app.schemas import (
     CampaignCreateRequest,
     CampaignResponse,
+    CustomerExplanationResponse,
     ErrorResponse,
     ExperimentSummaryResponse,
     OptimizeRequest,
@@ -39,6 +40,11 @@ from backend.app.services.experiment import (
     ExperimentDataNotReadyError,
     ensure_experiment_db_schema,
     get_or_create_experiment_summary,
+)
+from backend.app.services.explain import (
+    CustomerNotFoundError,
+    ensure_explain_db_schema,
+    explain_customer,
 )
 from backend.app.services.optimizer import (
     ensure_optimizer_db_schema,
@@ -545,4 +551,96 @@ def get_experiment_summary(
                 detail=str(exc),
             ).model_dump(),
         )
+
+
+@router.get(
+    "/{id}/customers/{customer_id}/explanation",
+    response_model=CustomerExplanationResponse,
+    responses={
+        404: {"model": ErrorResponse, "description": "Campaign or customer not found"},
+        503: {"model": ErrorResponse, "description": "Model or feature data not ready"},
+    },
+    summary="Get customer-level explanation",
+    description="Provides grounded reasoning, feature contributions, probabilities, and reason code for an individual customer recommendation.",
+)
+def get_customer_explanation(
+    id: str,
+    customer_id: str,
+    settings: Settings = Depends(get_settings),
+    conn: sqlite3.Connection = Depends(get_db),
+) -> Any:
+    """Retrieve grounded reasoning and feature contributions for one customer."""
+    ensure_db_schema(conn)
+    ensure_explain_db_schema(conn)
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM campaigns WHERE id = ?", (id,))
+    camp_row = cursor.fetchone()
+
+    if not camp_row:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=ErrorResponse(
+                error="campaign_not_found",
+                message=f"Campaign '{id}' not found.",
+                detail=f"Cannot retrieve explanation for nonexistent campaign {id}",
+            ).model_dump(),
+        )
+
+    campaign_data = dict(camp_row)
+
+    try:
+        explanation = explain_customer(
+            campaign=campaign_data,
+            customer_id=customer_id,
+            settings=settings,
+            conn=conn,
+        )
+        return explanation
+    except CustomerNotFoundError as err:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=ErrorResponse(
+                error="customer_not_found",
+                message=f"Customer '{customer_id}' not found in campaign population.",
+                detail=str(err),
+            ).model_dump(),
+        )
+    except ModelNotReadyError as err:
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content=ErrorResponse(
+                error="not_ready",
+                message="Model artifact not ready for explanation.",
+                detail=str(err),
+            ).model_dump(),
+        )
+    except FeatureTableNotReadyError as err:
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content=ErrorResponse(
+                error="not_ready",
+                message="Feature table not ready for explanation.",
+                detail=str(err),
+            ).model_dump(),
+        )
+    except FeatureMismatchError as err:
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content=ErrorResponse(
+                error="feature_mismatch",
+                message="Feature schema mismatch. Refusing to explain.",
+                detail=str(err),
+            ).model_dump(),
+        )
+    except Exception as exc:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=ErrorResponse(
+                error="explanation_failed",
+                message="Unexpected error computing customer explanation.",
+                detail=str(exc),
+            ).model_dump(),
+        )
+
 

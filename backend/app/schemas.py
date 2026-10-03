@@ -198,3 +198,32 @@ class ExperimentSummaryResponse(BaseModel):
         default_factory=list, description="Performance broken down by slices"
     )
 
+
+class FeatureContribution(BaseModel):
+    """Grounded contribution of a single customer feature to predicted treatment effect."""
+
+    model_config = ConfigDict(extra="forbid")
+    name: str = Field(..., description="Feature column name")
+    value: str = Field(..., description="Customer's observed feature value formatted as string")
+    contribution: float = Field(..., description="Attributed signed contribution value")
+
+
+class CustomerExplanationResponse(BaseModel):
+    """Reasoning, probabilities, reason code, and feature contributions for a single customer."""
+
+    model_config = ConfigDict(extra="forbid")
+    customer_id: str
+    p_treat: float = Field(..., ge=0.0, le=1.0, description="Estimated response probability under treatment")
+    p_control: float = Field(..., ge=0.0, le=1.0, description="Estimated response probability under control")
+    uplift: float = Field(..., description="Estimated incremental uplift (p_treat - p_control)")
+    reason_code: Literal[
+        "likely_without_offer",
+        "incremental_candidate",
+        "weak_response",
+        "negative_uplift",
+    ]
+    feature_contributions: List[FeatureContribution] = Field(
+        default_factory=list, description="Top feature contributions ranked by magnitude"
+    )
+    template_text: str = Field(..., description="Grounded template explanation text")
+
