@@ -158,3 +158,43 @@ class OptimizeResponse(BaseModel):
     selected_customer_ids: List[str] = Field(default_factory=list)
     comparison: StrategyComparisonResponse
 
+
+class ExperimentSliceItem(BaseModel):
+    """Performance outcome for one audience slice."""
+
+    model_config = ConfigDict(extra="forbid")
+    slice_name: str = Field(..., description="Name of the slice dimension e.g. region_code, age_band")
+    slice_value: str = Field(..., description="Value of the slice dimension e.g. DHK, 25-34")
+    treated_count: int = Field(..., ge=0, description="Total treated customers in this slice")
+    control_count: int = Field(..., ge=0, description="Total control customers in this slice")
+    support: Literal["sufficient", "insufficient"] = Field(
+        ..., description="Whether randomized sample size satisfies minimum support rule (>= 30 per arm)"
+    )
+    treated_outcome_rate: Optional[float] = Field(
+        None, ge=0.0, le=1.0, description="Treated conversion rate, null if insufficient support"
+    )
+    control_outcome_rate: Optional[float] = Field(
+        None, ge=0.0, le=1.0, description="Control conversion rate, null if insufficient support"
+    )
+    incremental_outcome: Optional[float] = Field(
+        None, description="Incremental outcome (treated - control), null if insufficient support"
+    )
+
+
+class ExperimentSummaryResponse(BaseModel):
+    """Treatment versus control simulated trial outcomes and slices."""
+
+    model_config = ConfigDict(extra="forbid")
+    campaign_id: str
+    run_id: Optional[str] = None
+    total_treated: int = Field(..., ge=0, description="Total customers in treated arm")
+    total_control: int = Field(..., ge=0, description="Total customers in control arm")
+    treated_outcome_rate: float = Field(..., ge=0.0, le=1.0, description="Overall treated outcome rate")
+    control_outcome_rate: float = Field(..., ge=0.0, le=1.0, description="Overall control outcome rate")
+    overall_incremental_outcome: float = Field(
+        ..., description="Overall incremental outcome rate (treated - control)"
+    )
+    slices: List[ExperimentSliceItem] = Field(
+        default_factory=list, description="Performance broken down by slices"
+    )
+

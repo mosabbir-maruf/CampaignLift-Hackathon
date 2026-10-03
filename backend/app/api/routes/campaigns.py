@@ -22,6 +22,7 @@ from backend.app.schemas import (
     CampaignCreateRequest,
     CampaignResponse,
     ErrorResponse,
+    ExperimentSummaryResponse,
     OptimizeRequest,
     OptimizeResponse,
     ScoreRunResponse,
@@ -33,6 +34,11 @@ from backend.app.services.inference import (
     ModelNotReadyError,
     ensure_db_schema,
     score_campaign_population,
+)
+from backend.app.services.experiment import (
+    ExperimentDataNotReadyError,
+    ensure_experiment_db_schema,
+    get_or_create_experiment_summary,
 )
 from backend.app.services.optimizer import (
     ensure_optimizer_db_schema,
@@ -469,3 +475,74 @@ def get_strategy_comparison(
         )
 
     return json.loads(row["comparison_json"])
+
+
+@router.get(
+    "/{id}/experiment",
+    response_model=ExperimentSummaryResponse,
+    responses={
+        404: {"model": ErrorResponse, "description": "Campaign or experiment run not found"},
+        503: {"model": ErrorResponse, "description": "Experiment data not ready"},
+    },
+    summary="Treatment vs control experiment summary",
+    description="Summarizes randomized trial outcomes and slice-level performance from simulated treatment versus control arms.",
+)
+def get_experiment_summary(
+    id: str,
+    split: Optional[str] = Query(None, description="Optional split filter: 'test', 'fixture', 'all'"),
+    settings: Settings = Depends(get_settings),
+    conn: sqlite3.Connection = Depends(get_db),
+) -> Any:
+    """Retrieve treatment vs control experiment summary and slice metrics."""
+    ensure_db_schema(conn)
+    ensure_experiment_db_schema(conn)
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM campaigns WHERE id = ?", (id,))
+    camp_row = cursor.fetchone()
+
+    if not camp_row:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=ErrorResponse(
+                error="campaign_not_found",
+                message=f"Campaign '{id}' not found.",
+                detail=f"Cannot retrieve experiment summary for nonexistent campaign {id}",
+            ).model_dump(),
+        )
+
+    try:
+        summary = get_or_create_experiment_summary(
+            campaign_id=id,
+            split=split,
+            settings=settings,
+            conn=conn,
+        )
+        return summary
+    except ExperimentDataNotReadyError as err:
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content=ErrorResponse(
+                error="not_ready",
+                message="Experiment data not ready.",
+                detail=str(err),
+            ).model_dump(),
+        )
+    except ValueError as val_err:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=ErrorResponse(
+                error="invalid_experiment_data",
+                message=str(val_err),
+            ).model_dump(),
+        )
+    except Exception as exc:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=ErrorResponse(
+                error="experiment_summary_failed",
+                message="Unexpected error computing experiment summary.",
+                detail=str(exc),
+            ).model_dump(),
+        )
+
