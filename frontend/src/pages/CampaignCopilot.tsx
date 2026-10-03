@@ -15,7 +15,7 @@ import {
 } from "../components/ui"
 import { DEMO_CAMPAIGN } from "../api/demo"
 
-type Turn = { q: string a: CopilotResponse | null failed?: boolean }
+type Turn = { q: string; a: CopilotResponse | null; failed?: boolean }
 
 export default function CampaignCopilot() {
   const { state } = usePreview()

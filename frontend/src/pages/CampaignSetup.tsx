@@ -26,7 +26,7 @@ const INITIAL: CampaignConfig = {
   targeting_strategy: "uplift",
 }
 
-const STRATEGIES: { key: StrategyKey label: string desc: string }[] = [
+const STRATEGIES: { key: StrategyKey; label: string; desc: string }[] = [
   {
     key: "uplift",
     label: "Uplift targeting",

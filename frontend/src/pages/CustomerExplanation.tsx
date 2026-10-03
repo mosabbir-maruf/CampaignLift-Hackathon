@@ -19,7 +19,7 @@ import {
 import { navigate, useRoute } from "../lib/router"
 import { pct, pp, type Tone } from "../lib/format"
 
-const DECISION: Record<string, { label: string tone: Tone }> = {
+const DECISION: Record<string, { label: string; tone: Tone }> = {
   prioritize: { label: "Prioritize", tone: "pos" },
   do_not_prioritize: { label: "Do not prioritize", tone: "neg" },
   review: { label: "Review", tone: "warn" },
@@ -197,7 +197,7 @@ export default function CustomerExplanation() {
 function ContributionChart({
   items,
 }: {
-  items: { feature: string label: string value: string contribution: number }[]
+  items: { feature: string; label: string; value: string; contribution: number }[]
 }) {
   const max = Math.max(...items.map((i) => Math.abs(i.contribution)), 0.01)
   return (
