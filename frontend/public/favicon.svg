@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Container background: modern dark ink-teal squircle -->
+  <rect width="32" height="32" rx="8" fill="#0D2D30"/>
+  <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" stroke="#1B4D52" stroke-width="1"/>
+  <!-- Ascending uplift response bars -->
+  <rect x="6" y="18" width="4" height="8" rx="1.5" fill="#38A3A5"/>
+  <rect x="12" y="13" width="4" height="13" rx="1.5" fill="#2EC4B6"/>
+  <rect x="18" y="8" width="4" height="18" rx="1.5" fill="#10B981"/>
+  <!-- Dynamic upward delta trend arrow -->
+  <path d="M18 7L26 7L26 15" stroke="#F6F5F1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12 18L25 7" stroke="#F6F5F1" stroke-width="2.5" stroke-linecap="round"/>
+</svg>
