@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-paper: #f3f3f0;
+  --color-surface: #ffffff;
+  --color-sunken: #ebebe7;
+  --color-line: #dcdcd6;
+  --color-line-strong: #b9b9b2;
+  --color-ink: #111315;
+  --color-ink-2: #3a3d42;
+  --color-mute: #676b71;
+  --color-rail: #15181b;
+  --color-rail-2: #22262a;
+  --color-rail-text: #a4a9ae;
+
+  --color-primary: #0e4c5a;
+  --color-primary-hover: #0a3b46;
+  --color-primary-soft: #e2edef;
+
+  --color-pos: #17703f;
+  --color-pos-soft: #e2f0e7;
+  --color-neg: #b93a0e;
+  --color-neg-soft: #f8e6dd;
+  --color-warn: #8f5a00;
+  --color-warn-soft: #f8eed6;
+  --color-neu: #59616b;
+  --color-neu-soft: #e9eaec;
+
+  --animate-fade: fade 160ms ease-out;
+  --animate-slide: slide 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-pulse-soft: pulse-soft 1.4s ease-in-out infinite;
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes slide {
+    from { transform: translateX(100%); }
+    to { transform: none; }
+  }
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--color-primary-soft); color: var(--color-ink); }
+  :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+  .tnum { font-variant-numeric: tabular-nums; }
+  .scroll-quiet { scrollbar-width: thin; scrollbar-color: var(--color-line-strong) transparent; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+  }
+}
