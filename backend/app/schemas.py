@@ -107,3 +107,54 @@ class ScoreRunResponse(BaseModel):
     limit: int
     offset: int
     total_count: int
+
+
+class OptimizeRequest(BaseModel):
+    """Audience optimization and budget allocation request."""
+
+    model_config = ConfigDict(extra="forbid")
+    budget_bdt: Optional[float] = Field(None, gt=0.0, description="Optional budget override; defaults to campaign budget")
+    exclude_negative_uplift: bool = Field(True, description="Whether to exclude customers with predicted uplift < 0")
+    max_customers: Optional[int] = Field(None, ge=1, description="Optional maximum number of customers to target")
+    value_per_incremental_transaction_bdt: Optional[float] = Field(
+        None, ge=0.0, description="Assumed value per incremental transaction in BDT supplied by manager"
+    )
+
+
+class StrategyMetricItem(BaseModel):
+    """Performance metrics for one targeting strategy."""
+
+    model_config = ConfigDict(extra="forbid")
+    strategy: Literal["random", "response", "uplift"]
+    selected_count: int
+    spend_bdt: float
+    expected_incremental_value: float
+    support: Literal["sufficient", "insufficient"]
+    measured_incremental_response: Optional[float] = None
+    cost_per_incremental_txn_bdt: Optional[float] = None
+    negative_uplift_selected_share: float
+
+
+class StrategyComparisonResponse(BaseModel):
+    """Side-by-side strategy comparison across identical budget constraints."""
+
+    model_config = ConfigDict(extra="forbid")
+    campaign_id: str
+    run_id: Optional[str] = None
+    evaluation_split: Optional[str] = "fixture"
+    strategies: List[StrategyMetricItem] = Field(default_factory=list)
+
+
+class OptimizeResponse(BaseModel):
+    """Audience allocation and strategy comparison result."""
+
+    model_config = ConfigDict(extra="forbid")
+    strategy: str = "uplift"
+    selected_count: int
+    budget_bdt: float
+    spend_bdt: float
+    expected_incremental_value: float
+    customers_excluded_negative: int
+    selected_customer_ids: List[str] = Field(default_factory=list)
+    comparison: StrategyComparisonResponse
+

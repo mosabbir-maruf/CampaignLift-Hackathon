@@ -22,7 +22,10 @@ from backend.app.schemas import (
     CampaignCreateRequest,
     CampaignResponse,
     ErrorResponse,
+    OptimizeRequest,
+    OptimizeResponse,
     ScoreRunResponse,
+    StrategyComparisonResponse,
 )
 from backend.app.services.inference import (
     FeatureMismatchError,
@@ -30,6 +33,10 @@ from backend.app.services.inference import (
     ModelNotReadyError,
     ensure_db_schema,
     score_campaign_population,
+)
+from backend.app.services.optimizer import (
+    ensure_optimizer_db_schema,
+    optimize_campaign_budget,
 )
 from backend.app.settings import Settings, get_settings
 
@@ -287,3 +294,178 @@ async def score_campaign(
                 detail=str(exc),
             ).model_dump(),
         )
+
+
+@router.post(
+    "/{id}/optimize",
+    response_model=OptimizeResponse,
+    responses={
+        400: {"model": ErrorResponse, "description": "Invalid budget or optimization parameters"},
+        404: {"model": ErrorResponse, "description": "Campaign not found"},
+        503: {"model": ErrorResponse, "description": "Scored population or model not ready"},
+    },
+    summary="Allocate campaign budget",
+    description="Greedy knapsack audience selection under budget constraints maximizing incremental value.",
+)
+async def optimize_budget(
+    id: str,
+    request: Request,
+    settings: Settings = Depends(get_settings),
+    conn: sqlite3.Connection = Depends(get_db),
+) -> Any:
+    """Execute greedy knapsack budget allocation for campaign."""
+    ensure_db_schema(conn)
+    ensure_optimizer_db_schema(conn)
+
+    # 1. Fetch campaign
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM campaigns WHERE id = ?", (id,))
+    camp_row = cursor.fetchone()
+
+    if not camp_row:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=ErrorResponse(
+                error="campaign_not_found",
+                message=f"Campaign '{id}' not found.",
+                detail=f"Cannot optimize nonexistent campaign {id}",
+            ).model_dump(),
+        )
+
+    campaign_data = dict(camp_row)
+
+    # Parse and validate request body if provided
+    try:
+        body = await request.body()
+        if body:
+            raw_json = json.loads(body)
+            payload = OptimizeRequest(**raw_json)
+        else:
+            payload = OptimizeRequest()
+    except Exception as exc:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=ErrorResponse(
+                error="invalid_budget",
+                message="Invalid budget or optimization parameters.",
+                detail=str(exc),
+            ).model_dump(),
+        )
+
+    # 2. Fetch scored customers or score on-the-fly
+    cursor.execute("SELECT * FROM customer_scores WHERE campaign_id = ?", (id,))
+    scored_rows = [dict(r) for r in cursor.fetchall()]
+
+    if not scored_rows:
+        try:
+            score_campaign_population(
+                campaign=campaign_data,
+                limit=200,
+                offset=0,
+                settings=settings,
+                conn=conn,
+            )
+            cursor.execute("SELECT * FROM customer_scores WHERE campaign_id = ?", (id,))
+            scored_rows = [dict(r) for r in cursor.fetchall()]
+        except ModelNotReadyError as err:
+            return JSONResponse(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                content=ErrorResponse(
+                    error="not_ready",
+                    message="Model artifact not ready for scoring.",
+                    detail=str(err),
+                ).model_dump(),
+            )
+        except FeatureTableNotReadyError as err:
+            return JSONResponse(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                content=ErrorResponse(
+                    error="not_ready",
+                    message="Feature table not ready for scoring.",
+                    detail=str(err),
+                ).model_dump(),
+            )
+        except FeatureMismatchError as err:
+            return JSONResponse(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                content=ErrorResponse(
+                    error="feature_mismatch",
+                    message="Feature schema mismatch. Refusing to optimize.",
+                    detail=str(err),
+                ).model_dump(),
+            )
+
+    # 3. Optimize budget
+    try:
+        opt_response = optimize_campaign_budget(
+            campaign=campaign_data,
+            scored_customers=scored_rows,
+            request=payload,
+            conn=conn,
+        )
+        return opt_response
+    except ValueError as val_err:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=ErrorResponse(
+                error="invalid_budget",
+                message=str(val_err),
+            ).model_dump(),
+        )
+    except Exception as exc:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=ErrorResponse(
+                error="optimization_failed",
+                message="Unexpected error during budget optimization.",
+                detail=str(exc),
+            ).model_dump(),
+        )
+
+
+@router.get(
+    "/{id}/comparison",
+    response_model=StrategyComparisonResponse,
+    responses={
+        404: {"model": ErrorResponse, "description": "Campaign or comparison not found"},
+    },
+    summary="Compare targeting strategies",
+    description="Retrieves side-by-side strategy comparison for Random, Response, and Uplift targeting.",
+)
+def get_strategy_comparison(
+    id: str,
+    conn: sqlite3.Connection = Depends(get_db),
+) -> Any:
+    """Retrieve saved strategy comparison for campaign."""
+    ensure_db_schema(conn)
+    ensure_optimizer_db_schema(conn)
+
+    cursor = conn.cursor()
+    # Check campaign exists
+    cursor.execute("SELECT id FROM campaigns WHERE id = ?", (id,))
+    if not cursor.fetchone():
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=ErrorResponse(
+                error="campaign_not_found",
+                message=f"Campaign '{id}' not found.",
+            ).model_dump(),
+        )
+
+    # Check comparison
+    cursor.execute(
+        "SELECT comparison_json FROM strategy_comparisons WHERE campaign_id = ? ORDER BY id DESC LIMIT 1",
+        (id,),
+    )
+    row = cursor.fetchone()
+
+    if not row:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=ErrorResponse(
+                error="comparison_not_found",
+                message=f"No strategy comparison available for campaign '{id}'. Run optimization first.",
+            ).model_dump(),
+        )
+
+    return json.loads(row["comparison_json"])
