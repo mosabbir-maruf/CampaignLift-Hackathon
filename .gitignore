@@ -6,6 +6,10 @@
 *.key
 credentials.json
 secrets.yaml
+# Databases
+*.db
+*.sqlite
+*.sqlite3
 
 # Python
 __pycache__/
