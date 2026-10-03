@@ -151,6 +151,10 @@ def clean_package(
     to_delete: List[Dict[str, Any]] = []
     for v in candidate_deletions:
         tags = v.get("metadata", {}).get("container", {}).get("tags", [])
+        # Critical multi-arch safety: never delete untagged versions (these are platform sub-manifests)
+        if not tags:
+            print(f"  ✓ PRESERVE: ID {v.get('id')} has no tags (multi-arch child manifest). Skipping deletion.")
+            continue
         # Safety guarantee: never delete if tagged with 'latest'
         if "latest" in tags:
             print(f"  ✓ PRESERVE: ID {v.get('id')} has 'latest' tag. Skipping deletion.")
