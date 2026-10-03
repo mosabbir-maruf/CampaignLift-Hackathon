@@ -453,8 +453,8 @@ export function Resource<T>({
     return (
       <>
         {empty ?? (
-          <EmptyState title="Nothing here yet">
-            No data has been returned for this campaign.
+          <EmptyState title="Data not loaded">
+            Data is not loaded. Connect the backend service or select a preview state.
           </EmptyState>
         )}
       </>

@@ -48,7 +48,7 @@ function Arm({
   )
 }
 
-function SegmentRow({ s, max }: { s: ExperimentSegment max: number }) {
+function SegmentRow({ s, max }: { s: ExperimentSegment; max: number }) {
   const t = s.treatment.response_rate,
     c = s.control.response_rate
   return (

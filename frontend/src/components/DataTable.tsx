@@ -19,7 +19,7 @@ interface Props<T> {
   pageSize?: number
   mobileCard: (row: T) => ReactNode
   caption: string
-  initialSort?: { key: string dir: "asc" | "desc" }
+  initialSort?: { key: string; dir: "asc" | "desc" }
 }
 
 export default function DataTable<T>({

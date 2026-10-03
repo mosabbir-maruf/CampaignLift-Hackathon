@@ -2,7 +2,6 @@ import { useState, type ReactNode } from "react"
 import { Link, useRoute } from "../lib/router"
 import { usePreview, type ResourceStatus } from "../hooks/useResource"
 import { hasBackend } from "../api/client"
-import { DEMO_CAMPAIGN } from "../api/demo"
 
 export const NAV = [
   {
@@ -212,12 +211,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
             Menu
           </button>
           <div className="flex min-w-0 items-center gap-2 text-[13px]">
-            <span className="hidden font-mono text-[11px] text-mute sm:inline">
-              {DEMO_CAMPAIGN.campaign_id}
-            </span>
-            <span className="truncate font-medium">{DEMO_CAMPAIGN.name}</span>
-            <span className="hidden rounded-[3px] bg-primary-soft px-1.5 py-px text-[11px] font-medium text-primary sm:inline">
-              Scored
+            <span className="font-semibold tracking-tight text-ink">
+              Decision support
             </span>
           </div>
           <div className="ml-auto flex items-center gap-3">

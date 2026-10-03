@@ -78,7 +78,7 @@ export interface OptimizationResult {
   expected_incremental_conversions: number
   expected_incremental_value: number
   excluded_negative: number
-  constraints: { label: string value: string binding: boolean }[]
+  constraints: { label: string; value: string; binding: boolean }[]
   message?: string
 }
 

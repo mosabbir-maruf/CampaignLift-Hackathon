@@ -175,9 +175,8 @@ export default function BudgetOptimization() {
 
         <Panel>
           {run.status === "idle" && (
-            <EmptyState title="No allocation yet">
-              Set a budget and run the optimizer. The backend will return the
-              selected audience, expected spend and expected incremental value.
+            <EmptyState title="Data not loaded">
+              Data is not loaded. Set a budget and run the optimizer to calculate the selected audience and expected spend.
             </EmptyState>
           )}
           {run.status === "running" && (

@@ -15,12 +15,12 @@ const PreviewCtx = createContext<{
   state: ResourceStatus
   setState: (s: ResourceStatus) => void
 }>({
-  state: "ready",
+  state: "empty",
   setState: () => {},
 })
 
 export function PreviewProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<ResourceStatus>("ready")
+  const [state, setState] = useState<ResourceStatus>("empty")
   return (
     <PreviewCtx.Provider value={{ state, setState }}>
       {children}
