@@ -1,5 +1,13 @@
 import { useState } from "react"
-import type { CampaignConfig, StrategyKey } from "../api/types"
+import {
+  apiClient,
+  ApiError,
+  type CampaignCreateRequest,
+  type CampaignResponse,
+  type CampaignObjective,
+  type CampaignOfferType,
+  type CampaignChannel,
+} from "../api/client"
 import {
   Button,
   FormField,
@@ -7,380 +15,639 @@ import {
   Panel,
   SectionHeader,
   inputCls,
+  Badge,
 } from "../components/ui"
-import { usePreview } from "../hooks/useResource"
+import { Link, navigate } from "../lib/router"
 import { bdt } from "../lib/format"
+import { setActiveCampaignId } from "../lib/campaign"
 
-type Errors = Partial<Record<keyof CampaignConfig, string>>
+type Errors = Partial<Record<keyof CampaignCreateRequest, string>>
 type Phase = "idle" | "saving" | "success" | "error"
 
-const INITIAL: CampaignConfig = {
-  name: "",
-  objective: "",
-  offer_type: "Cashback",
-  offer_value: 0,
-  start_date: "",
-  end_date: "",
-  budget: 0,
-  eligibility_context: "",
-  targeting_strategy: "uplift",
-}
-
-const STRATEGIES: { key: StrategyKey; label: string; desc: string }[] = [
+const OBJECTIVES: {
+  value: CampaignObjective
+  label: string
+  desc: string
+}[] = [
   {
-    key: "uplift",
-    label: "Uplift targeting",
-    desc: "Rank by expected incremental effect. Recommended.",
+    value: "reactivation",
+    label: "Dormant Reactivation",
+    desc: "Re-engage dormant wallet users who have not transacted recently.",
   },
   {
-    key: "response",
-    label: "Response-based",
-    desc: "Rank by likelihood to respond when offered.",
+    value: "activation",
+    label: "User Activation",
+    desc: "Drive first-time transactions among newly onboarded users.",
   },
   {
-    key: "random",
-    label: "Random",
-    desc: "Uniform sample. Useful as a baseline.",
+    value: "qr_adoption",
+    label: "Merchant QR Adoption",
+    desc: "Accelerate merchant QR payments and merchant acceptance.",
+  },
+  {
+    value: "retention",
+    label: "Churn Retention",
+    desc: "Retain high-value customers exhibiting churn risk indicators.",
   },
 ]
 
-function validate(c: CampaignConfig): Errors {
+const OFFER_TYPES: {
+  value: CampaignOfferType
+  label: string
+  unitHint: string
+}[] = [
+  {
+    value: "flat_cashback",
+    label: "Flat Cashback (৳)",
+    unitHint: "Cashback amount in BDT per qualifying transaction.",
+  },
+  {
+    value: "pct_cashback",
+    label: "Percentage Cashback (%)",
+    unitHint: "Percentage of transaction value granted as incentive.",
+  },
+  {
+    value: "fee_waiver",
+    label: "Fee Waiver",
+    unitHint: "Full or partial transaction fee waiver (value is 0).",
+  },
+]
+
+const CHANNELS: {
+  value: CampaignChannel
+  label: string
+  desc: string
+}[] = [
+  {
+    value: "push",
+    label: "Push Notification",
+    desc: "Direct push message with in-app routing.",
+  },
+  {
+    value: "sms",
+    label: "SMS",
+    desc: "Direct telco SMS text message for wide reach.",
+  },
+  {
+    value: "in_app",
+    label: "In-App Banner",
+    desc: "Targeted card banner within wallet transaction flow.",
+  },
+]
+
+const INITIAL_FORM: CampaignCreateRequest = {
+  name: "",
+  objective: "reactivation",
+  offer_type: "flat_cashback",
+  incentive_value: 50,
+  incentive_cost_bdt: 50,
+  budget_bdt: 500000,
+  channel: "push",
+}
+
+function validate(req: CampaignCreateRequest): Errors {
   const e: Errors = {}
-  if (!c.name.trim()) e.name = "Enter a campaign name."
-  if (!c.objective.trim())
-    e.objective = "Describe what the campaign should change."
-  if (!(c.offer_value > 0))
-    e.offer_value = "Offer value must be greater than 0."
-  if (!c.start_date) e.start_date = "Choose a start date."
-  if (!c.end_date) e.end_date = "Choose an end date."
-  else if (c.start_date && c.end_date <= c.start_date)
-    e.end_date = "End date must be after the start date."
-  if (!(c.budget > 0)) e.budget = "Budget must be greater than 0."
-  else if (c.offer_value > 0 && c.budget < c.offer_value)
-    e.budget = "Budget is smaller than a single offer."
-  if (!c.eligibility_context.trim())
-    e.eligibility_context =
-      "Describe the eligibility rule the backend should apply."
+  if (!req.name.trim()) {
+    e.name = "Campaign name is required."
+  } else if (req.name.length > 255) {
+    e.name = "Campaign name cannot exceed 255 characters."
+  }
+  if (!req.objective) {
+    e.objective = "Select a campaign objective."
+  }
+  if (!req.offer_type) {
+    e.offer_type = "Select an offer type."
+  }
+  if (req.incentive_value < 0) {
+    e.incentive_value = "Incentive value cannot be negative."
+  }
+  if (req.offer_type === "flat_cashback" && req.incentive_value <= 0) {
+    e.incentive_value = "Flat cashback value must be greater than 0."
+  }
+  if (req.incentive_cost_bdt < 0) {
+    e.incentive_cost_bdt = "Unit incentive cost cannot be negative."
+  }
+  if (req.budget_bdt <= 0) {
+    e.budget_bdt = "Total budget must be greater than 0 BDT."
+  } else if (
+    req.incentive_cost_bdt > 0 &&
+    req.budget_bdt < req.incentive_cost_bdt
+  ) {
+    e.budget_bdt = "Budget cannot be smaller than the unit incentive cost."
+  }
+  if (!req.channel) {
+    e.channel = "Select a delivery channel."
+  }
   return e
 }
 
 export default function CampaignSetup() {
-  const [c, setC] = useState(INITIAL)
+  const [form, setForm] = useState<CampaignCreateRequest>(INITIAL_FORM)
   const [errors, setErrors] = useState<Errors>({})
   const [phase, setPhase] = useState<Phase>("idle")
-  const { state } = usePreview()
+  const [generalError, setGeneralError] = useState<string | null>(null)
+  const [createdCampaign, setCreatedCampaign] =
+    useState<CampaignResponse | null>(null)
 
-  const set = <K extends keyof CampaignConfig>(k: K, v: CampaignConfig[K]) => {
-    setC((p) => ({ ...p, [k]: v }))
-    if (errors[k]) setErrors((p) => ({ ...p, [k]: undefined }))
-    if (phase !== "idle" && phase !== "saving") setPhase("idle")
+  const setField = <K extends keyof CampaignCreateRequest,>(
+    key: K,
+    val: CampaignCreateRequest[K],
+  ) => {
+    setForm((prev) => {
+      const next = { ...prev, [key]: val }
+      // Auto-sync incentive cost for flat cashback when incentive value changes
+      if (
+        key === "incentive_value" &&
+        prev.offer_type === "flat_cashback" &&
+        typeof val === "number"
+      ) {
+        next.incentive_cost_bdt = val
+      }
+      if (key === "offer_type") {
+        if (val === "fee_waiver") {
+          next.incentive_value = 0
+        } else if (val === "flat_cashback") {
+          next.incentive_cost_bdt = next.incentive_value || 50
+        }
+      }
+      return next
+    })
+    if (errors[key]) {
+      setErrors((prev) => ({ ...prev, [key]: undefined }))
+    }
+    if (phase !== "idle" && phase !== "saving") {
+      setPhase("idle")
+      setGeneralError(null)
+    }
   }
 
-  const submit = (ev: React.FormEvent) => {
+  const submit = async (ev: React.FormEvent) => {
     ev.preventDefault()
-    const e = validate(c)
-    setErrors(e)
-    if (Object.keys(e).length) {
-      document.getElementById(Object.keys(e)[0])?.focus()
+    setGeneralError(null)
+    const clientErrors = validate(form)
+    setErrors(clientErrors)
+
+    if (Object.keys(clientErrors).length > 0) {
+      const firstField = Object.keys(clientErrors)[0]
+      document.getElementById(firstField)?.focus()
       return
     }
+
     setPhase("saving")
-    // TODO(integration): POST the CampaignConfig to the backend campaign-creation endpoint.
-    setTimeout(() => setPhase(state === "error" ? "error" : "success"), 900)
+    try {
+      // POST the exact typed CampaignCreateRequest payload to the backend
+      const res = await apiClient.createCampaign(form)
+      setCreatedCampaign(res)
+      setActiveCampaignId(res.id)
+      setPhase("success")
+    } catch (err: unknown) {
+      setPhase("error")
+      if (err instanceof ApiError) {
+        const errorResp = err.errorResponse
+        const message = errorResp?.message || err.message
+        const detail = errorResp?.detail
+        setGeneralError(detail ? `${message}: ${detail}` : message)
+
+        // Parse field-level errors if backend detail contains field names
+        if (detail) {
+          const fieldErrors: Errors = {}
+          const fields: (keyof CampaignCreateRequest)[] = [
+            "name",
+            "objective",
+            "offer_type",
+            "incentive_value",
+            "incentive_cost_bdt",
+            "budget_bdt",
+            "channel",
+          ]
+          for (const f of fields) {
+            if (detail.toLowerCase().includes(f.toLowerCase())) {
+              fieldErrors[f] = detail
+            }
+          }
+          if (Object.keys(fieldErrors).length > 0) {
+            setErrors((prev) => ({ ...prev, ...fieldErrors }))
+          }
+        }
+      } else if (err instanceof Error) {
+        setGeneralError(err.message)
+      } else {
+        setGeneralError(
+          "An unexpected error occurred while communicating with the backend API.",
+        )
+      }
+    }
   }
 
-  const field = (id: keyof CampaignConfig) => ({
-    id,
-    "aria-invalid": !!errors[id],
-    "aria-describedby": errors[id] ? `${id}-err` : `${id}-hint`,
-  })
+  const handleReset = () => {
+    setForm(INITIAL_FORM)
+    setErrors({})
+    setPhase("idle")
+    setGeneralError(null)
+    setCreatedCampaign(null)
+  }
 
   return (
     <div className="space-y-6">
       <PageHeader
         step="02"
         title="Campaign Setup"
-        lede="Define the campaign. Eligible customers are resolved by the backend from the eligibility context — no customer upload is needed."
+        lede="Define the campaign scenario and incentive budget. Eligible populations are evaluated by backend inference on the active dataset version — customer list uploads are not required or accepted."
+        actions={
+          createdCampaign ? (
+            <Badge tone="pos" dot={false}>
+              <span className="font-mono">{createdCampaign.id}</span>
+            </Badge>
+          ) : undefined
+        }
       />
 
       <form
         onSubmit={submit}
         noValidate
-        className="grid gap-6 lg:grid-cols-[1fr_320px]"
+        className="grid gap-6 lg:grid-cols-[1fr_340px]"
       >
         <div className="space-y-6">
+          {/* General Error State */}
           {phase === "error" && (
             <div
               role="alert"
-              className="border-l-2 border-neg bg-neg-soft px-4 py-3 text-[13px] text-neg"
+              className="border-l-2 border-neg bg-neg-soft p-4 text-[13px] text-neg"
             >
-              <p className="font-semibold">Campaign was not created</p>
-              <p className="mt-0.5 text-ink-2">
-                The backend rejected the request (preview error state). Your
-                inputs are preserved — retry when the service is available.
+              <p className="font-semibold text-neg">Campaign Creation Failed</p>
+              <p className="mt-1 text-ink-2">
+                {generalError ||
+                  "The backend rejected the request. Please verify connection to the API service."}
+              </p>
+              <p className="mt-2 text-[12px] text-mute">
+                Form inputs are preserved. Correct any highlighted fields and
+                resubmit.
               </p>
             </div>
           )}
-          {phase === "success" && (
+
+          {/* Success State */}
+          {phase === "success" && createdCampaign && (
             <div
               role="status"
-              className="border-l-2 border-pos bg-pos-soft px-4 py-3 text-[13px]"
+              className="border-l-2 border-pos bg-pos-soft p-5 text-[13px]"
             >
-              <p className="font-semibold text-pos">
-                Campaign configuration ready
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-[15px] font-semibold text-pos">
+                  Campaign Created Successfully
+                </p>
+                <Badge tone="pos">Saved in Backend</Badge>
+              </div>
+              <p className="mt-1.5 text-ink-2">
+                Identifier:{" "}
+                <span className="font-mono font-semibold text-ink">
+                  {createdCampaign.id}
+                </span>
+                . The campaign scenario is stored and available for audience
+                scoring.
               </p>
-              <p className="mt-0.5 text-ink-2">
-                In preview mode nothing was sent. Once connected, the backend
-                will create the campaign and begin scoring eligible customers.
-              </p>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={() =>
+                    navigate(`/?campaign_id=${createdCampaign.id}`)
+                  }
+                >
+                  View in Overview →
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() =>
+                    navigate(`/audience?campaign_id=${createdCampaign.id}`)
+                  }
+                >
+                  Proceed to Audience Scoring →
+                </Button>
+                <Button type="button" onClick={handleReset}>
+                  Create Another
+                </Button>
+              </div>
             </div>
           )}
 
+          {/* Panel 1: Campaign Identity */}
           <Panel className="p-5">
-            <SectionHeader title="Campaign" />
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="md:col-span-2">
-                <FormField
+            <SectionHeader title="Campaign Identity" />
+            <div className="space-y-4">
+              <FormField
+                id="name"
+                label="Campaign name"
+                required
+                error={errors.name}
+                hint="Descriptive name shown across reports and decision views (max 255 characters)."
+              >
+                <input
                   id="name"
-                  label="Campaign name"
-                  required
-                  error={errors.name}
-                  hint="Shown to analysts across CampaignLift."
-                >
-                  <input
-                    {...field("name")}
-                    className={inputCls(!!errors.name)}
-                    value={c.name}
-                    onChange={(e) => set("name", e.target.value)}
-                    placeholder="e.g. Q4 Cash-Out Reactivation"
-                  />
-                </FormField>
-              </div>
-              <div className="md:col-span-2">
-                <FormField
-                  id="objective"
-                  label="Campaign objective"
-                  required
-                  error={errors.objective}
-                  hint="The behaviour the offer is meant to change."
-                >
-                  <input
-                    {...field("objective")}
-                    className={inputCls(!!errors.objective)}
-                    value={c.objective}
-                    onChange={(e) => set("objective", e.target.value)}
-                    placeholder="e.g. Reactivate dormant cash-out users"
-                  />
-                </FormField>
-              </div>
-              <FormField
-                id="start_date"
-                label="Start date"
-                required
-                error={errors.start_date}
-              >
-                <input
-                  type="date"
-                  {...field("start_date")}
-                  className={inputCls(!!errors.start_date)}
-                  value={c.start_date}
-                  onChange={(e) => set("start_date", e.target.value)}
+                  className={inputCls(!!errors.name)}
+                  value={form.name}
+                  onChange={(e) => setField("name", e.target.value)}
+                  placeholder="e.g. Q4 Merchant QR Adoption Drive"
+                  maxLength={255}
                 />
               </FormField>
-              <FormField
-                id="end_date"
-                label="End date"
-                required
-                error={errors.end_date}
-              >
-                <input
-                  type="date"
-                  {...field("end_date")}
-                  className={inputCls(!!errors.end_date)}
-                  value={c.end_date}
-                  onChange={(e) => set("end_date", e.target.value)}
-                />
-              </FormField>
-            </div>
-          </Panel>
 
-          <Panel className="p-5">
-            <SectionHeader title="Offer & budget" />
-            <div className="grid gap-4 md:grid-cols-3">
-              <FormField id="offer_type" label="Offer type" required>
-                <select
-                  id="offer_type"
-                  className={inputCls()}
-                  value={c.offer_type}
-                  onChange={(e) => set("offer_type", e.target.value)}
-                >
-                  <option>Cashback</option>
-                  <option>Fee waiver</option>
-                  <option>Bonus airtime</option>
-                  <option>Merchant discount</option>
-                </select>
-              </FormField>
-              <FormField
-                id="offer_value"
-                label="Offer value (৳)"
-                required
-                error={errors.offer_value}
-                hint="Per customer."
-              >
-                <input
-                  type="number"
-                  min={0}
-                  inputMode="decimal"
-                  {...field("offer_value")}
-                  className={`${inputCls(!!errors.offer_value)} tnum font-mono`}
-                  value={c.offer_value || ""}
-                  onChange={(e) => set("offer_value", Number(e.target.value))}
-                  placeholder="50"
-                />
-              </FormField>
-              <FormField
-                id="budget"
-                label="Total budget (৳)"
-                required
-                error={errors.budget}
-                hint="Upper bound for optimization."
-              >
-                <input
-                  type="number"
-                  min={0}
-                  inputMode="decimal"
-                  {...field("budget")}
-                  className={`${inputCls(!!errors.budget)} tnum font-mono`}
-                  value={c.budget || ""}
-                  onChange={(e) => set("budget", Number(e.target.value))}
-                  placeholder="500000"
-                />
-              </FormField>
-            </div>
-          </Panel>
-
-          <Panel className="p-5">
-            <SectionHeader title="Audience & targeting" />
-            <div className="space-y-5">
-              <FormField
-                id="eligibility_context"
-                label="Eligibility context"
-                required
-                error={errors.eligibility_context}
-                hint="Passed to the backend, which resolves the eligible customer set."
-              >
-                <textarea
-                  {...field("eligibility_context")}
-                  rows={3}
-                  className={`${inputCls(!!errors.eligibility_context)} h-auto py-2`}
-                  value={c.eligibility_context}
-                  onChange={(e) => set("eligibility_context", e.target.value)}
-                  placeholder="e.g. No cash-out in last 60 days, active wallet, KYC verified"
-                />
-              </FormField>
-              <fieldset>
-                <legend className="mb-2 text-[12.5px] font-medium">
-                  Targeting strategy{" "}
-                  <span className="text-neg" aria-hidden>
-                    *
-                  </span>
-                </legend>
-                <div className="grid gap-2 md:grid-cols-3">
-                  {STRATEGIES.map((s) => (
+              <div>
+                <label className="mb-2 block text-[12.5px] font-medium text-ink">
+                  Campaign objective <span className="text-neg">*</span>
+                </label>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {OBJECTIVES.map((obj) => (
                     <label
-                      key={s.key}
-                      className={`flex cursor-pointer gap-2.5 rounded-[4px] border p-3 transition-colors has-focus-visible:outline-2 has-focus-visible:outline-primary ${
-                        c.targeting_strategy === s.key
+                      key={obj.value}
+                      className={`flex cursor-pointer gap-2.5 rounded-[4px] border p-3 transition-colors ${
+                        form.objective === obj.value
                           ? "border-primary bg-primary-soft"
                           : "border-line-strong hover:bg-paper"
                       }`}
                     >
                       <input
                         type="radio"
-                        name="strategy"
+                        name="objective"
+                        value={obj.value}
+                        checked={form.objective === obj.value}
+                        onChange={() => setField("objective", obj.value)}
                         className="mt-0.5 accent-[var(--color-primary)]"
-                        checked={c.targeting_strategy === s.key}
-                        onChange={() => set("targeting_strategy", s.key)}
                       />
                       <span>
-                        <span className="block text-[13px] font-medium">
-                          {s.label}
+                        <span className="block text-[13px] font-medium text-ink">
+                          {obj.label}
                         </span>
                         <span className="mt-0.5 block text-[12px] text-mute">
-                          {s.desc}
+                          {obj.desc}
                         </span>
                       </span>
                     </label>
                   ))}
                 </div>
-              </fieldset>
+                {errors.objective && (
+                  <p className="mt-1.5 text-[12px] text-neg">
+                    {errors.objective}
+                  </p>
+                )}
+              </div>
             </div>
           </Panel>
+
+          {/* Panel 2: Offer & Budget Structure */}
+          <Panel className="p-5">
+            <SectionHeader title="Offer & Incentive Budget" />
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                id="offer_type"
+                label="Offer type"
+                required
+                error={errors.offer_type}
+                hint={
+                  OFFER_TYPES.find((o) => o.value === form.offer_type)?.unitHint
+                }
+              >
+                <select
+                  id="offer_type"
+                  className={inputCls(!!errors.offer_type)}
+                  value={form.offer_type}
+                  onChange={(e) =>
+                    setField("offer_type", e.target.value as CampaignOfferType)
+                  }
+                >
+                  {OFFER_TYPES.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+
+              <FormField
+                id="incentive_value"
+                label={
+                  form.offer_type === "pct_cashback"
+                    ? "Incentive percentage (%)"
+                    : form.offer_type === "fee_waiver"
+                      ? "Incentive value (0 for waiver)"
+                      : "Cashback amount (৳)"
+                }
+                required
+                error={errors.incentive_value}
+                hint={
+                  form.offer_type === "pct_cashback"
+                    ? "Cashback percentage granted per transaction."
+                    : form.offer_type === "fee_waiver"
+                      ? "Standard waiver value is 0."
+                      : "Flat BDT amount credited per conversion."
+                }
+              >
+                <input
+                  id="incentive_value"
+                  type="number"
+                  min={0}
+                  step={form.offer_type === "pct_cashback" ? "0.5" : "1"}
+                  className={`${inputCls(!!errors.incentive_value)} font-mono`}
+                  value={form.incentive_value}
+                  onChange={(e) =>
+                    setField("incentive_value", Number(e.target.value))
+                  }
+                  disabled={form.offer_type === "fee_waiver"}
+                />
+              </FormField>
+
+              <FormField
+                id="incentive_cost_bdt"
+                label="Unit incentive cost (৳)"
+                required
+                error={errors.incentive_cost_bdt}
+                hint="Expected unit cost in BDT charged against campaign budget."
+              >
+                <input
+                  id="incentive_cost_bdt"
+                  type="number"
+                  min={0}
+                  step="1"
+                  className={`${inputCls(!!errors.incentive_cost_bdt)} font-mono`}
+                  value={form.incentive_cost_bdt}
+                  onChange={(e) =>
+                    setField("incentive_cost_bdt", Number(e.target.value))
+                  }
+                />
+              </FormField>
+
+              <FormField
+                id="budget_bdt"
+                label="Total campaign budget (৳)"
+                required
+                error={errors.budget_bdt}
+                hint="Upper bound in BDT allocated for incentive optimization."
+              >
+                <input
+                  id="budget_bdt"
+                  type="number"
+                  min={1}
+                  step="1000"
+                  className={`${inputCls(!!errors.budget_bdt)} font-mono`}
+                  value={form.budget_bdt}
+                  onChange={(e) =>
+                    setField("budget_bdt", Number(e.target.value))
+                  }
+                />
+              </FormField>
+            </div>
+          </Panel>
+
+          {/* Panel 3: Delivery Channel */}
+          <Panel className="p-5">
+            <SectionHeader title="Delivery Channel" />
+            <div className="space-y-4">
+              <div className="grid gap-2 sm:grid-cols-3">
+                {CHANNELS.map((ch) => (
+                  <label
+                    key={ch.value}
+                    className={`flex cursor-pointer gap-2.5 rounded-[4px] border p-3 transition-colors ${
+                      form.channel === ch.value
+                        ? "border-primary bg-primary-soft"
+                        : "border-line-strong hover:bg-paper"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="channel"
+                      value={ch.value}
+                      checked={form.channel === ch.value}
+                      onChange={() => setField("channel", ch.value)}
+                      className="mt-0.5 accent-[var(--color-primary)]"
+                    />
+                    <span>
+                      <span className="block text-[13px] font-medium text-ink">
+                        {ch.label}
+                      </span>
+                      <span className="mt-0.5 block text-[11.5px] text-mute">
+                        {ch.desc}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+              {errors.channel && (
+                <p className="text-[12px] text-neg">{errors.channel}</p>
+              )}
+            </div>
+          </Panel>
+
+          {/* Data Integrity & Compliance Notice */}
+          <div className="rounded-[4px] border border-line bg-paper p-4 text-[12px] leading-relaxed text-mute">
+            <span className="font-semibold text-ink">
+              Population Evaluation Notice:
+            </span>{" "}
+            In accordance with CampaignLift integrity constraints, manual
+            customer CSV uploads are neither accepted nor allowed. The backend
+            scores the eligible population for the active dataset version
+            directly through causal inference models.
+          </div>
         </div>
 
+        {/* Sidebar Summary & Actions */}
         <aside className="lg:sticky lg:top-18 lg:self-start">
           <Panel className="p-5">
-            <SectionHeader title="Request summary" />
-            <dl className="space-y-2 text-[12.5px]">
-              {[
-                ["Name", c.name || "—"],
-                [
-                  "Offer",
-                  c.offer_value
-                    ? `${c.offer_type} · ${bdt(c.offer_value)}`
-                    : "—",
-                ],
-                ["Budget", c.budget ? bdt(c.budget) : "—"],
-                [
-                  "Max offers",
-                  c.budget && c.offer_value
-                    ? `${Math.floor(c.budget / c.offer_value).toLocaleString()} (budget ÷ value)`
-                    : "—",
-                ],
-                [
-                  "Window",
-                  c.start_date && c.end_date
-                    ? `${c.start_date} → ${c.end_date}`
-                    : "—",
-                ],
-                [
-                  "Strategy",
-                  STRATEGIES.find((s) => s.key === c.targeting_strategy)!.label,
-                ],
-              ].map(([k, v]) => (
-                <div
-                  key={k}
-                  className="flex justify-between gap-3 border-b border-line/70 pb-2"
-                >
-                  <dt className="text-mute">{k}</dt>
-                  <dd className="tnum text-right font-mono text-[12px]">{v}</dd>
+            <SectionHeader title="Scenario Summary" />
+            <dl className="space-y-2.5 text-[12.5px]">
+              <div className="flex justify-between gap-3 border-b border-line/70 pb-2">
+                <dt className="text-mute">Campaign</dt>
+                <dd className="max-w-[170px] truncate text-right font-medium text-ink">
+                  {form.name || "—"}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-3 border-b border-line/70 pb-2">
+                <dt className="text-mute">Objective</dt>
+                <dd className="text-right text-ink">
+                  {OBJECTIVES.find((o) => o.value === form.objective)?.label}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-3 border-b border-line/70 pb-2">
+                <dt className="text-mute">Offer</dt>
+                <dd className="text-right font-mono text-[12px] text-ink">
+                  {form.offer_type === "fee_waiver"
+                    ? "Fee waiver"
+                    : form.offer_type === "pct_cashback"
+                      ? `${form.incentive_value}% cashback`
+                      : bdt(form.incentive_value)}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-3 border-b border-line/70 pb-2">
+                <dt className="text-mute">Unit cost</dt>
+                <dd className="text-right font-mono text-[12px] text-ink">
+                  {form.incentive_cost_bdt ? bdt(form.incentive_cost_bdt) : "—"}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-3 border-b border-line/70 pb-2">
+                <dt className="text-mute">Total budget</dt>
+                <dd className="text-right font-mono text-[12px] font-semibold text-ink">
+                  {form.budget_bdt ? bdt(form.budget_bdt) : "—"}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-3 border-b border-line/70 pb-2">
+                <dt className="text-mute">Max capacity</dt>
+                <dd className="text-right font-mono text-[12px] text-ink">
+                  {form.budget_bdt && form.incentive_cost_bdt > 0
+                    ? `${Math.floor(form.budget_bdt / form.incentive_cost_bdt).toLocaleString()} offers`
+                    : "—"}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-3 border-b border-line/70 pb-2">
+                <dt className="text-mute">Channel</dt>
+                <dd className="text-right text-ink uppercase">
+                  {form.channel}
+                </dd>
+              </div>
+              {createdCampaign && (
+                <div className="flex justify-between gap-3 border-b border-line/70 pb-2">
+                  <dt className="text-mute">Campaign ID</dt>
+                  <dd className="font-mono text-[11.5px] font-semibold text-pos">
+                    {createdCampaign.id}
+                  </dd>
                 </div>
-              ))}
+              )}
             </dl>
-            <p className="mt-4 text-[12px] leading-relaxed text-mute">
-              After creation the backend scores each eligible customer with
-              p_treat, p_control and uplift. Review them in Audience.
-            </p>
+
             <Button
               type="submit"
               variant="primary"
-              className="mt-4 w-full"
+              className="mt-5 w-full"
               disabled={phase === "saving"}
             >
               {phase === "saving" ? (
                 <>
                   <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                  Creating campaign…
+                  Creating Campaign…
                 </>
+              ) : createdCampaign ? (
+                "Update / Re-create"
               ) : (
-                "Create campaign"
+                "Create Campaign"
               )}
             </Button>
-            {Object.keys(errors).some((k) => errors[(k as keyof Errors)]) && (
+
+            {Object.keys(errors).some(
+              (k) => errors[(k as keyof CampaignCreateRequest)],
+            ) && (
               <p className="mt-2 text-[12px] text-neg" role="alert">
-                {Object.values(errors).filter(Boolean).length} field(s) need
+                {Object.values(errors).filter(Boolean).length} field(s) require
                 attention.
               </p>
+            )}
+
+            {createdCampaign && (
+              <div className="mt-4 border-t border-line/70 pt-3">
+                <Link
+                  to={`/?campaign_id=${createdCampaign.id}`}
+                  className="block text-center text-[12.5px] font-medium text-primary hover:underline"
+                >
+                  Open Campaign in Overview →
+                </Link>
+              </div>
             )}
           </Panel>
         </aside>
