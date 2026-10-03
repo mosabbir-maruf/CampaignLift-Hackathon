@@ -150,8 +150,16 @@ def ensure_db_schema(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 
+_MODEL_CACHE: Dict[Tuple[str, float, float], Tuple[Any, Dict[str, Any]]] = {}
+_FEATURE_CACHE: Dict[Tuple[str, float], pd.DataFrame] = {}
+
+
 def load_model_artifact(artifact_dir: Path) -> Tuple[Any, Dict[str, Any]]:
-    """Load serialized model binary and metadata JSON from artifact directory."""
+    """Load serialized model binary and metadata JSON from artifact directory.
+
+    Caches loaded model in memory keyed by path and file modification timestamps
+    to eliminate expensive repeated joblib deserialization on every inference request.
+    """
     if not artifact_dir.is_dir():
         raise ModelNotReadyError(f"Model artifact directory not found at: {artifact_dir}")
 
@@ -163,17 +171,38 @@ def load_model_artifact(artifact_dir: Path) -> Tuple[Any, Dict[str, Any]]:
     if not binary_path.is_file():
         raise ModelNotReadyError(f"Missing model binary model.joblib in artifact directory: {artifact_dir}")
 
+    cache_key = (
+        str(artifact_dir.resolve()),
+        metadata_path.stat().st_mtime,
+        binary_path.stat().st_mtime,
+    )
+    if cache_key in _MODEL_CACHE:
+        return _MODEL_CACHE[cache_key]
+
     with open(metadata_path, "r", encoding="utf-8") as f:
         metadata = json.load(f)
 
     model = joblib.load(binary_path)
+    _MODEL_CACHE[cache_key] = (model, metadata)
     return model, metadata
 
 
 def load_feature_table(feature_table_path: Path) -> pd.DataFrame:
-    """Load customer feature records from disk (JSON or Parquet)."""
+    """Load customer feature records from disk (JSON or Parquet).
+
+    Caches loaded dataframe in memory keyed by path and file modification timestamp
+    to eliminate repeated JSON parsing on every scoring run. Returns a copy so
+    callers cannot mutate cached data.
+    """
     if not feature_table_path.is_file():
         raise FeatureTableNotReadyError(f"Feature table file not found at: {feature_table_path}")
+
+    cache_key = (
+        str(feature_table_path.resolve()),
+        feature_table_path.stat().st_mtime,
+    )
+    if cache_key in _FEATURE_CACHE:
+        return _FEATURE_CACHE[cache_key].copy()
 
     try:
         if feature_table_path.suffix == ".parquet":
@@ -186,7 +215,8 @@ def load_feature_table(feature_table_path: Path) -> pd.DataFrame:
         raise FeatureTableNotReadyError(f"Failed to read feature table: {str(exc)}")
 
     assert_no_forbidden_columns(df)
-    return df
+    _FEATURE_CACHE[cache_key] = df
+    return df.copy()
 
 
 def compute_uplift_deciles(scores: List[Dict[str, Any]]) -> List[UpliftDecile]:
