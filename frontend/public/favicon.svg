@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="cl-bar" x1="8.2" y1="23.8" x2="23.8" y2="8.2" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0D5C45"/>
+      <stop offset="100%" stop-color="#23B286"/>
+    </linearGradient>
+    <radialGradient id="cl-bl" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#168061"/>
+      <stop offset="70%" stop-color="#0D5C45"/>
+      <stop offset="100%" stop-color="#084433"/>
+    </radialGradient>
+    <radialGradient id="cl-tr" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#34E0A8"/>
+      <stop offset="65%" stop-color="#23B286"/>
+      <stop offset="100%" stop-color="#178C67"/>
+    </radialGradient>
+  </defs>
+  <!-- Connecting Bar -->
+  <line x1="8.2" y1="23.8" x2="23.8" y2="8.2" stroke="url(#cl-bar)" stroke-width="3.4" stroke-linecap="round"/>
+  <!-- Bottom-left Circle -->
+  <circle cx="8.2" cy="23.8" r="6.7" fill="url(#cl-bl)"/>
+  <!-- Top-right Circle -->
+  <circle cx="23.8" cy="8.2" r="6.7" fill="url(#cl-tr)"/>
+</svg>

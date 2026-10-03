@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react"
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react"
 import type { ResourceStatus } from "../hooks/useResource"
 import { pct, pp, upliftDirection, STATUS_META, type Tone } from "../lib/format"
 import type { TargetingStatus } from "../api/types"
@@ -344,6 +344,149 @@ export const inputCls = (invalid?: boolean) =>
   `h-9 w-full rounded-[4px] border bg-surface px-2.5 text-[13.5px] text-ink placeholder:text-mute/70 focus:outline-2 focus:outline-primary focus:-outline-offset-1 ${
     invalid ? "border-neg" : "border-line-strong"
   }`
+
+export interface SelectOption<T extends string = string> {
+  value: T
+  label: string
+  dot?: string
+}
+
+export function SelectDropdown<T extends string>({
+  value,
+  onChange,
+  options,
+  id,
+  className = "",
+  triggerClassName = "",
+  size = "md",
+}: {
+  value: T
+  onChange: (val: T) => void
+  options: (SelectOption<T> | T)[]
+  id?: string
+  className?: string
+  triggerClassName?: string
+  size?: "sm" | "md"
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const onDocClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false)
+    }
+    document.addEventListener("mousedown", onDocClick)
+    document.addEventListener("keydown", onKey)
+    return () => {
+      document.removeEventListener("mousedown", onDocClick)
+      document.removeEventListener("keydown", onKey)
+    }
+  }, [open])
+
+  const normalizedOptions: SelectOption<T>[] = useMemo(
+    () =>
+      options.map((opt) =>
+        typeof opt === "string" ? { value: opt, label: opt } : opt,
+      ),
+    [options],
+  )
+  const selected = useMemo(
+    () => normalizedOptions.find((o) => o.value === value),
+    [normalizedOptions, value],
+  )
+  const isSm = size === "sm"
+
+  return (
+    <div ref={ref} className={`relative inline-block ${className}`}>
+      <button
+        id={id}
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className={`flex w-full items-center justify-between gap-2 rounded-[4px] border border-line-strong bg-surface text-ink transition-colors hover:border-line hover:bg-sunken focus:outline-2 focus:outline-primary focus:-outline-offset-1 ${
+          isSm ? "h-7 px-2 font-mono text-[11px]" : "h-9 px-2.5 text-[13.5px]"
+        } ${triggerClassName}`}
+      >
+        <span className="flex min-w-0 items-center gap-1.5 truncate">
+          {selected?.dot && (
+            <span
+              className={`size-1.5 shrink-0 rounded-full ${selected.dot}`}
+            />
+          )}
+          <span className="truncate">{selected?.label ?? value}</span>
+        </span>
+        <svg
+          aria-hidden
+          width={isSm ? 10 : 12}
+          height={isSm ? 10 : 12}
+          viewBox="0 0 12 12"
+          className={`shrink-0 text-mute transition-transform duration-150 ${
+            open ? "rotate-180" : ""
+          }`}
+        >
+          <path
+            d="M3 4.5 L6 7.5 L9 4.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      {open && (
+        <ul
+          role="listbox"
+          className={`absolute top-full right-0 z-50 mt-1 min-w-full overflow-hidden rounded-[5px] border border-line bg-surface py-1 shadow-md ${
+            isSm ? "text-[11px] font-mono" : "text-[13px]"
+          }`}
+        >
+          {normalizedOptions.map((opt) => {
+            const active = opt.value === value
+            return (
+              <li key={opt.value} role="option" aria-selected={active}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange(opt.value)
+                    setOpen(false)
+                  }}
+                  className={`flex w-full items-center justify-between gap-3 px-2.5 py-1.5 text-left transition-colors ${
+                    active
+                      ? "bg-sunken font-medium text-ink"
+                      : "text-ink-2 hover:bg-paper hover:text-ink"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    {opt.dot && (
+                      <span
+                        className={`size-1.5 shrink-0 rounded-full ${opt.dot}`}
+                      />
+                    )}
+                    <span>{opt.label}</span>
+                  </span>
+                  {active && (
+                    <span className="text-[11px] text-primary" aria-hidden>
+                      ✓
+                    </span>
+                  )}
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </div>
+  )
+}
 
 /* ---------- States ---------- */
 

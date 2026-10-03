@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import AppShell from "./components/AppShell"
 import { RouterProvider, useRoute } from "./lib/router"
 import { PreviewProvider } from "./hooks/useResource"
@@ -10,6 +11,18 @@ import BudgetOptimization from "./pages/BudgetOptimization"
 import CustomerExplanation from "./pages/CustomerExplanation"
 import ExperimentIntelligence from "./pages/ExperimentIntelligence"
 import CampaignCopilot from "./pages/CampaignCopilot"
+
+const ROUTE_TITLES: Record<string, string> = {
+  "/": "CampaignLift — Campaign Intelligence",
+  "/setup": "Campaign Setup — CampaignLift",
+  "/audience": "Audience Targeting — CampaignLift",
+  "/uplift": "Uplift Analysis — CampaignLift",
+  "/strategy": "Strategy Comparison — CampaignLift",
+  "/budget": "Budget Optimization — CampaignLift",
+  "/explain": "Customer Explanation — CampaignLift",
+  "/experiment": "Experiment Intelligence — CampaignLift",
+  "/copilot": "Campaign Copilot — CampaignLift",
+}
 
 const ROUTES: Record<string, () => React.JSX.Element> = {
   "/": Overview,
@@ -25,6 +38,11 @@ const ROUTES: Record<string, () => React.JSX.Element> = {
 
 function Routes() {
   const { path } = useRoute()
+
+  useEffect(() => {
+    document.title = ROUTE_TITLES[path] ?? "CampaignLift"
+  }, [path])
+
   const Page = ROUTES[path] ?? Overview
   return <Page />
 }

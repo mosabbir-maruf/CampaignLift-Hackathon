@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react"
 import { Link, useRoute } from "../lib/router"
 import { usePreview, type ResourceStatus } from "../hooks/useResource"
 import { hasBackend } from "../api/client"
+import { SelectDropdown, type SelectOption } from "./ui"
 
 export const NAV = [
   {
@@ -100,17 +101,25 @@ function NavList({
 function Wordmark({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <svg aria-hidden width="20" height="20" viewBox="0 0 20 20">
-        <circle
-          cx="5"
-          cy="14"
-          r="3"
-          fill="none"
-          stroke="#a4a9ae"
-          strokeWidth="1.6"
+      <svg
+        aria-hidden
+        width="20"
+        height="20"
+        viewBox="0 0 20 20"
+        fill="none"
+        className="shrink-0"
+      >
+        <line
+          x1="5"
+          y1="15"
+          x2="15"
+          y2="5"
+          stroke="#2ED8A3"
+          strokeWidth="2.2"
+          strokeLinecap="round"
         />
-        <circle cx="15" cy="6" r="3" fill="#7cc4d1" />
-        <path d="M7.2 12 L12.8 8" stroke="#7cc4d1" strokeWidth="1.6" />
+        <circle cx="5" cy="15" r="4.2" fill="#1DB584" />
+        <circle cx="15" cy="5" r="4.2" fill="#4EEDB9" />
       </svg>
       {!compact && (
         <div className="leading-none">
@@ -126,12 +135,12 @@ function Wordmark({ compact = false }: { compact?: boolean }) {
   )
 }
 
-const STATES: ResourceStatus[] = [
-  "ready",
-  "loading",
-  "empty",
-  "error",
-  "insufficient",
+const STATE_OPTIONS: SelectOption<ResourceStatus>[] = [
+  { value: "ready", label: "ready", dot: "bg-pos" },
+  { value: "loading", label: "loading", dot: "bg-primary animate-pulse" },
+  { value: "empty", label: "empty", dot: "bg-mute" },
+  { value: "error", label: "error", dot: "bg-neg" },
+  { value: "insufficient", label: "insufficient", dot: "bg-warn" },
 ]
 
 export default function AppShell({ children }: { children: ReactNode }) {
@@ -162,8 +171,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <NavList rail />
         </div>
         <div className="mt-4 hidden border-t border-rail-2 px-2 pt-3 text-[11px] leading-relaxed text-rail-text/70 xl:block">
-          Target where the offer changes behaviour — not where response is
-          already likely.
+          Treat the persuadables. Sure things sell themselves.
         </div>
       </aside>
 
@@ -217,21 +225,19 @@ export default function AppShell({ children }: { children: ReactNode }) {
           </div>
           <div className="ml-auto flex items-center gap-3">
             {!hasBackend && (
-              <label className="hidden items-center gap-2 text-[11.5px] text-mute lg:flex">
+              <div className="hidden items-center gap-2 text-[11.5px] text-mute lg:flex">
                 <span className="flex items-center gap-1.5">
                   <span className="size-1.5 rounded-full bg-warn" />
                   Preview data · state
                 </span>
-                <select
+                <SelectDropdown
+                  size="sm"
                   value={state}
-                  onChange={(e) => setState(e.target.value as ResourceStatus)}
-                  className="h-7 rounded-[3px] border border-line-strong bg-surface px-1.5 font-mono text-[11px] text-ink"
-                >
-                  {STATES.map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
-                </select>
-              </label>
+                  onChange={(s) => setState(s as ResourceStatus)}
+                  options={STATE_OPTIONS}
+                  triggerClassName="w-32"
+                />
+              </div>
             )}
             {hasBackend && (
               <span className="flex items-center gap-1.5 text-[11.5px] text-mute">
