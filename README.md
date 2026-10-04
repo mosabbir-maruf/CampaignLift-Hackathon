@@ -13,10 +13,22 @@
 </p>
 
 <p align="center">
+  <strong>Live Demo:</strong> <a href="https://devtree.online/">https://devtree.online/</a>
+</p>
+
+<p align="center">
+  <a href="https://devtree.online/">
+    <img src="https://img.shields.io/badge/Live_Demo-devtree.online-2ea44f.svg?logo=cloudflare&logoColor=white" alt="Live Demo" />
+  </a>
   <a href="https://github.com/mosabbir-maruf/CampaignLift-Hackathon/actions/workflows/ci-cd.yml">
     <img src="https://github.com/mosabbir-maruf/CampaignLift-Hackathon/actions/workflows/ci-cd.yml/badge.svg" alt="CI/CD Pipeline" />
   </a>
-  <img src="https://img.shields.io/badge/Docker-Multi--Arch-2496ed.svg?logo=docker&logoColor=white" alt="Docker Multi-Arch" />
+  <a href="https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-backend">
+    <img src="https://img.shields.io/badge/Docker-backend--image-2496ed.svg?logo=docker&logoColor=white" alt="Docker Backend Image" />
+  </a>
+  <a href="https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-frontend">
+    <img src="https://img.shields.io/badge/Docker-frontend--image-2496ed.svg?logo=docker&logoColor=white" alt="Docker Frontend Image" />
+  </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" />
   </a>
@@ -146,9 +158,11 @@ Configuration is managed via `.env` (never commit real credentials to version co
 
 ## Production Deployment
 
+- **Live Deployment**: [https://devtree.online/](https://devtree.online/)
+
 CampaignLift is distributed as multi-architecture container images via GitHub Container Registry:
-- **Frontend**: `ghcr.io/mosabbir-maruf/campaignlift-frontend:latest` (`linux/amd64`, `linux/arm64`)
-- **Backend**: `ghcr.io/mosabbir-maruf/campaignlift-backend:latest` (`linux/amd64`, `linux/arm64`)
+- **Frontend Image**: [`ghcr.io/mosabbir-maruf/campaignlift-frontend:latest`](https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-frontend) (`linux/amd64`, `linux/arm64`)
+- **Backend Image**: [`ghcr.io/mosabbir-maruf/campaignlift-backend:latest`](https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-backend) (`linux/amd64`, `linux/arm64`)
 
 ### Production Ingress & TLS Termination
 - **Nginx Reverse Proxy**: Listens on port 80 and port 443. Normal HTTP requests receive a `301 Moved Permanently` redirect to HTTPS.
