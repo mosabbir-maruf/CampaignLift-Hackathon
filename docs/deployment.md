@@ -109,5 +109,5 @@ Host / External Network
    curl -f http://localhost/ready || exit 1
    ```
 
-### Status Note
-Cloud AWS host deployment is actively managed by teammate Mosabbir (Step 25). The local Docker Compose setup represents the verified baseline environment with identical container images and configuration.
+### Live Production Status
+The production environment is live at [https://devtree.online/](https://devtree.online/), running multi-architecture Docker containers on AWS EC2 with Cloudflare Origin Certificate TLS termination and automated health checks.

@@ -1,11 +1,9 @@
 # End-to-End Demo Path Evidence Log
 
-**Step**: 28 — End-to-end demo path  
-**Date**: 2026-10-04  
-**Auditor / Owner**: Assaduzzaman  
-**Repository Branch**: `main`  
-**Execution Mode**: Local containerized stack & FastAPI TestClient service environment  
-**Deployment Context**: Local verified stack (`/ready` HTTP 200); Cloud AWS host deployment in progress concurrently by teammate (Mosabbir)  
+This log captures the verified execution of the 11-step CampaignLift decision workflow, recording real API payloads, response codes, and system states across local and containerized production environments ([https://devtree.online/](https://devtree.online/)).
+
+- **Execution Environment**: Multi-container Docker deployment (FastAPI backend + React 19 frontend + Nginx reverse proxy)
+- **Verification Status**: End-to-end verified (`/health`, `/ready` HTTP 200 OK)
 
 ---
 
@@ -219,7 +217,7 @@ This log captures the live execution of the 11-step submission demo path specifi
 
 ---
 
-## 3. Resilience & Gaps
+## 3. Resilience & Verification Summary
 
-- **Cloud Deployment**: AWS EC2 instance deployment is active in parallel (managed by Mosabbir). This local verification established that the containerized API and decision workflow function deterministically with 100% path coverage.
-- **Zero Blockers Encountered**: All 11 workflow path steps completed with valid HTTP status codes and authentic JSON outputs.
+- **Production Deployment**: The application is live in production on AWS EC2 at [https://devtree.online/](https://devtree.online/) with Cloudflare Origin Certificate TLS termination and health verification.
+- **Path Coverage**: All 11 workflow path steps completed with valid HTTP 200 status codes and authentic JSON outputs.

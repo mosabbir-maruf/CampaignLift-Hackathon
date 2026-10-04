@@ -1,17 +1,16 @@
 # Automated Test Evidence & Verification Log
 
-**Step**: 27 — Automated test pass  
-**Date**: 2026-10-04  
-**Auditor / Owner**: Assaduzzaman  
-**Repository Branch**: `main`  
-**Execution Environment**: Python 3.11.9, pytest 9.1.1, Node.js v22, Vite 8.3.2  
+This document records automated test execution evidence and quality gate verification across all CampaignLift subsystems (synthetic data engine, ML pipelines, FastAPI backend services, and React frontend).
+
+- **Execution Environment**: Python 3.11.9, pytest 9.1.1, Node.js v22, Vite 8.3.2  
+- **Repository Branch**: `main`  
 
 ---
 
 ## 1. Executive Summary
 
 | Test Suite / Target | Command Executed | Total | Passed | Failed | Skipped / Gaps | Duration | Status |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Data Engine & Leakage** | `pytest data/tests -v` | 58 | **58** | 0 | 0 | 53.63s | **PASS** |
 | **Machine Learning & Uplift** | `pytest ml/tests -v -o pythonpath=". ml/src data/src"` | 75 | **74** | 1 | 0 | 9.32s | **FAIL (1 test)** |
 | **FastAPI Backend Services** | `pytest backend/tests -v` | 50 | **50** | 0 | 0 | 5.72s | **PASS** |
@@ -23,7 +22,7 @@
 
 ## 2. Data Engine & Leakage Test Suite
 
-- **Target**: `data/tests/` (Steps 06.1–10.7)
+- **Target**: `data/tests/` (Synthetic dataset generator & schema validator)
 - **Command**:
   ```bash
   pytest data/tests -v
@@ -101,7 +100,7 @@ data/tests/test_validate.py::test_extreme_base_rate_generates_warning_without_fa
 
 ## 3. Machine Learning & Uplift Modeling Test Suite
 
-- **Target**: `ml/tests/` (Steps 11–16)
+- **Target**: `ml/tests/` (Causal learners, uplift estimators, and model selection)
 - **Command**:
   ```bash
   pytest ml/tests -v -o pythonpath=". ml/src data/src"
@@ -124,14 +123,14 @@ data/tests/test_validate.py::test_extreme_base_rate_generates_warning_without_fa
     ```
   - **Root Cause & Rationale**:
     In commit `db6bdff` (*synchronize canonical optimized architecture, docker, ci-cd, and team onboarding*), `.gitignore` line 70 was intentionally amended with `!artifacts/models/**/model.joblib` to track the pre-trained winning baseline binary directly in version control. This allows Docker Compose containers and CI/CD pipelines to build and deploy immediately without requiring Kaggle GPU training at startup.
-    However, unit test `test_model_binary_is_gitignored` was previously authored in Step 16 under the initial assumption that binaries would never be committed to git.
-  - **Integrity Compliance**: Per the Execution Protocol (*"Do not mark a failed suite as passed. Record what actually ran without fabricating numbers"*), this suite is reported as **74 passed, 1 failed**.
+    However, unit test `test_model_binary_is_gitignored` was previously authored under the initial assumption that binaries would never be committed to git.
+  - **Integrity Compliance**: This suite is factually recorded as **74 passed, 1 failed** without fabricating test metrics.
 
 ---
 
 ## 4. Backend Service Test Suite
 
-- **Target**: `backend/tests/` (Steps 17–22)
+- **Target**: `backend/tests/` (FastAPI endpoints, services, and integration)
 - **Command**:
   ```bash
   pytest backend/tests -v
@@ -233,6 +232,6 @@ backend/tests/test_optimizer.py::test_get_strategy_comparison_endpoint PASSED   
   - Built cleanly in 416ms.
 
 ### Automated Test Runner Gap
-- **Requirement**: *"Run the frontend test or build. If a test runner was never added, record that gap."*
+- **Verification Target**: Automated frontend unit test execution.
 - **Observed Status**: **GAP RECORDED**
 - **Details**: `frontend/package.json` contains scripts for `dev`, `build`, `preview`, `format`, `typecheck`, and `lint`, but does not configure an automated client test runner (such as `vitest` or `jest`). UI correctness relies on TypeScript compile-time checking (`tsc --noEmit`), linter validation, and end-to-end integration with the FastAPI backend.
