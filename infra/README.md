@@ -12,9 +12,15 @@ Production container topology, Cloudflare TLS ingress, CI/CD automation, and AWS
   <a href="https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-frontend">
     <img src="https://img.shields.io/badge/Docker-frontend--image-2496ed.svg?logo=docker&logoColor=white" alt="Docker Frontend Image" />
   </a>
-  <img src="https://img.shields.io/badge/Docker_Compose-v2.20+-2496ed.svg?logo=docker&logoColor=white" alt="Docker Compose" />
-  <img src="https://img.shields.io/badge/AWS-EC2-FF9900.svg?logo=amazonec2&logoColor=white" alt="AWS EC2" />
-  <img src="https://img.shields.io/badge/Cloudflare-SSL%20Origin-F38020.svg?logo=cloudflare&logoColor=white" alt="Cloudflare SSL" />
+  <a href="../docker-compose.yml">
+    <img src="https://img.shields.io/badge/Docker_Compose-v2.20+-2496ed.svg?logo=docker&logoColor=white" alt="Docker Compose" />
+  </a>
+  <a href="https://docs.aws.amazon.com/ec2/">
+    <img src="https://img.shields.io/badge/AWS-EC2-FF9900.svg?logo=amazonec2&logoColor=white" alt="AWS EC2" />
+  </a>
+  <a href="https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/">
+    <img src="https://img.shields.io/badge/Cloudflare-SSL%20Origin-F38020.svg?logo=cloudflare&logoColor=white" alt="Cloudflare SSL" />
+  </a>
   <a href="../LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" />
   </a>
