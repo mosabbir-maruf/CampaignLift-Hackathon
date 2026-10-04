@@ -3,11 +3,24 @@
 Causal uplift modeling, counterfactual inference pipelines, Qini evaluation, and model artifact packaging.
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Python-3.11-blue.svg?logo=python&logoColor=white" alt="Python 3.11" />
-  <img src="https://img.shields.io/badge/ML-LightGBM-brightgreen.svg" alt="LightGBM" />
-  <img src="https://img.shields.io/badge/scikit--learn-1.3+-F7931E.svg?logo=scikitlearn&logoColor=white" alt="scikit-learn" />
-  <img src="https://img.shields.io/badge/pandas-2.1+-150458.svg?logo=pandas&logoColor=white" alt="pandas" />
-  <img src="https://img.shields.io/badge/Tests-pytest-0a9edc.svg?logo=pytest&logoColor=white" alt="pytest" />
+  <a href="https://github.com/mosabbir-maruf/CampaignLift-Hackathon/blob/main/ml/notebooks/kaggle_train.ipynb">
+    <img src="https://img.shields.io/badge/Kaggle-Notebook-20BEFF.svg?logo=kaggle&logoColor=white" alt="Kaggle Notebook" />
+  </a>
+  <a href="https://www.python.org/">
+    <img src="https://img.shields.io/badge/Python-3.11-blue.svg?logo=python&logoColor=white" alt="Python 3.11" />
+  </a>
+  <a href="https://lightgbm.readthedocs.io/">
+    <img src="https://img.shields.io/badge/ML-LightGBM-brightgreen.svg" alt="LightGBM" />
+  </a>
+  <a href="https://scikit-learn.org/">
+    <img src="https://img.shields.io/badge/scikit--learn-1.3+-F7931E.svg?logo=scikitlearn&logoColor=white" alt="scikit-learn" />
+  </a>
+  <a href="https://pandas.pydata.org/">
+    <img src="https://img.shields.io/badge/pandas-2.1+-150458.svg?logo=pandas&logoColor=white" alt="pandas" />
+  </a>
+  <a href="https://docs.pytest.org/">
+    <img src="https://img.shields.io/badge/Tests-pytest-0a9edc.svg?logo=pytest&logoColor=white" alt="pytest" />
+  </a>
   <a href="../LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" />
   </a>

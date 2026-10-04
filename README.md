@@ -32,10 +32,18 @@
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" />
   </a>
-  <img src="https://img.shields.io/badge/Python-3.11-blue.svg?logo=python&logoColor=white" alt="Python 3.11" />
-  <img src="https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi&logoColor=white" alt="FastAPI" />
-  <img src="https://img.shields.io/badge/React-19-61dafb.svg?logo=react&logoColor=black" alt="React 19" />
-  <img src="https://img.shields.io/badge/TypeScript-5.7-3178c6.svg?logo=typescript&logoColor=white" alt="TypeScript 5.7" />
+  <a href="https://www.python.org/">
+    <img src="https://img.shields.io/badge/Python-3.11-blue.svg?logo=python&logoColor=white" alt="Python 3.11" />
+  </a>
+  <a href="https://fastapi.tiangolo.com/">
+    <img src="https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi&logoColor=white" alt="FastAPI" />
+  </a>
+  <a href="https://react.dev/">
+    <img src="https://img.shields.io/badge/React-19-61dafb.svg?logo=react&logoColor=black" alt="React 19" />
+  </a>
+  <a href="https://www.typescriptlang.org/">
+    <img src="https://img.shields.io/badge/TypeScript-5.7-3178c6.svg?logo=typescript&logoColor=white" alt="TypeScript 5.7" />
+  </a>
 </p>
 
 <p align="center">
