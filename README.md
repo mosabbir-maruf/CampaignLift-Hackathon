@@ -218,8 +218,7 @@ Comprehensive project documentation is organized in [`docs/`](docs/):
 | [`docs/security_checklist.md`](docs/security_checklist.md) | Prompt injection hardening, secrets scanning, and audit verification |
 | [`docs/test_evidence.md`](docs/test_evidence.md) | Automated test execution evidence across test suites |
 | [`docs/demo_evidence.md`](docs/demo_evidence.md) | End-to-end verified demo path execution and API responses |
-| [`docs/report_draft.md`](docs/report_draft.md) | Full submission report draft |
-| [`docs/video_script.md`](docs/video_script.md) | Demonstration video storyboard and narration script |
+| [`docs/Project_Report.pdf`](docs/Project_Report.pdf) | Official hackathon submission project report (PDF) |
 
 ---
 
