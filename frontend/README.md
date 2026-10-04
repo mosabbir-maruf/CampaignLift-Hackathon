@@ -3,22 +3,22 @@
 React 19 decision support workstation for causal uplift modeling and campaign optimization.
 
 <p align="left">
-  <a href="https://devtree.online/">
+  <a href="https://devtree.online/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/Live_Demo-devtree.online-2ea44f.svg?logo=cloudflare&logoColor=white" alt="Live Demo" />
   </a>
   <a href="https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-frontend">
     <img src="https://img.shields.io/badge/Docker-frontend--image-2496ed.svg?logo=docker&logoColor=white" alt="Docker Frontend Image" />
   </a>
-  <a href="https://react.dev/">
+  <a href="https://react.dev/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/React-19-61dafb.svg?logo=react&logoColor=black" alt="React 19" />
   </a>
-  <a href="https://www.typescriptlang.org/">
+  <a href="https://www.typescriptlang.org/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/TypeScript-5.7-3178c6.svg?logo=typescript&logoColor=white" alt="TypeScript 5.7" />
   </a>
-  <a href="https://vite.dev/">
+  <a href="https://vite.dev/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/Vite-8-646cff.svg?logo=vite&logoColor=white" alt="Vite 8" />
   </a>
-  <a href="https://tailwindcss.com/">
+  <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8.svg?logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" />
   </a>
   <a href="../LICENSE">

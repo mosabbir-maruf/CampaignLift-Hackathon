@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <a href="https://devtree.online/">
+  <a href="https://devtree.online/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/Live_Demo-devtree.online-2ea44f.svg?logo=cloudflare&logoColor=white" alt="Live Demo" />
   </a>
   <a href="https://github.com/mosabbir-maruf/CampaignLift-Hackathon/actions/workflows/ci-cd.yml">
@@ -32,16 +32,16 @@
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" />
   </a>
-  <a href="https://www.python.org/">
+  <a href="https://www.python.org/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/Python-3.11-blue.svg?logo=python&logoColor=white" alt="Python 3.11" />
   </a>
-  <a href="https://fastapi.tiangolo.com/">
+  <a href="https://fastapi.tiangolo.com/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi&logoColor=white" alt="FastAPI" />
   </a>
-  <a href="https://react.dev/">
+  <a href="https://react.dev/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/React-19-61dafb.svg?logo=react&logoColor=black" alt="React 19" />
   </a>
-  <a href="https://www.typescriptlang.org/">
+  <a href="https://www.typescriptlang.org/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/TypeScript-5.7-3178c6.svg?logo=typescript&logoColor=white" alt="TypeScript 5.7" />
   </a>
 </p>

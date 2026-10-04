@@ -6,19 +6,19 @@ FastAPI causal inference, campaign optimization, and decision intelligence engin
   <a href="https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-backend">
     <img src="https://img.shields.io/badge/Docker-backend--image-2496ed.svg?logo=docker&logoColor=white" alt="Docker Backend Image" />
   </a>
-  <a href="https://www.python.org/">
+  <a href="https://www.python.org/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/Python-3.11-blue.svg?logo=python&logoColor=white" alt="Python 3.11" />
   </a>
-  <a href="https://fastapi.tiangolo.com/">
+  <a href="https://fastapi.tiangolo.com/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi&logoColor=white" alt="FastAPI" />
   </a>
-  <a href="https://lightgbm.readthedocs.io/">
+  <a href="https://lightgbm.readthedocs.io/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/ML-LightGBM-brightgreen.svg" alt="LightGBM" />
   </a>
-  <a href="https://www.sqlite.org/">
+  <a href="https://www.sqlite.org/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/Database-SQLite-003B57.svg?logo=sqlite&logoColor=white" alt="SQLite" />
   </a>
-  <a href="https://docs.pytest.org/">
+  <a href="https://docs.pytest.org/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/Tests-pytest-0a9edc.svg?logo=pytest&logoColor=white" alt="pytest" />
   </a>
   <a href="../LICENSE">

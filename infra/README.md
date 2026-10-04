@@ -3,7 +3,7 @@
 Production container topology, Cloudflare TLS ingress, CI/CD automation, and AWS EC2 operational runbook.
 
 <p align="left">
-  <a href="https://devtree.online/">
+  <a href="https://devtree.online/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/Live_Demo-devtree.online-2ea44f.svg?logo=cloudflare&logoColor=white" alt="Live Demo" />
   </a>
   <a href="https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-backend">
@@ -15,10 +15,10 @@ Production container topology, Cloudflare TLS ingress, CI/CD automation, and AWS
   <a href="../docker-compose.yml">
     <img src="https://img.shields.io/badge/Docker_Compose-v2.20+-2496ed.svg?logo=docker&logoColor=white" alt="Docker Compose" />
   </a>
-  <a href="https://docs.aws.amazon.com/ec2/">
+  <a href="https://docs.aws.amazon.com/ec2/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/AWS-EC2-FF9900.svg?logo=amazonec2&logoColor=white" alt="AWS EC2" />
   </a>
-  <a href="https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/">
+  <a href="https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/" target="_blank" rel="noopener noreferrer">
     <img src="https://img.shields.io/badge/Cloudflare-SSL%20Origin-F38020.svg?logo=cloudflare&logoColor=white" alt="Cloudflare SSL" />
   </a>
   <a href="../LICENSE">
