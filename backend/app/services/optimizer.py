@@ -8,13 +8,15 @@ import random
 import sqlite3
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 from backend.app.schemas import (
     OptimizeRequest,
     OptimizeResponse,
+    StrategyBusinessScorecard,
     StrategyComparisonResponse,
     StrategyMetricItem,
+    SyntheticExperimentBusinessScorecard,
 )
 from backend.app.settings import REPO_ROOT
 
@@ -102,6 +104,99 @@ def load_test_exposures_and_outcomes(
     return treatments, outcomes
 
 
+def load_customer_features(
+    fixture_dir: Optional[Path] = None,
+) -> Dict[str, Dict[str, Any]]:
+    """Load customer feature rows from fixture features.json if available.
+
+    Returns:
+        features_by_id mapping customer_id -> feature row dict
+    """
+    if fixture_dir is None:
+        fixture_dir = REPO_ROOT / "data" / "fixtures" / "fixture_v1"
+
+    features_file = fixture_dir / "features.json"
+    features_by_id: Dict[str, Dict[str, Any]] = {}
+    if features_file.is_file():
+        try:
+            with open(features_file, "r", encoding="utf-8") as f:
+                feat_data = json.load(f)
+            for row in feat_data:
+                features_by_id[str(row["customer_id"])] = row
+        except Exception:
+            pass
+    return features_by_id
+
+
+def compute_fatigue_rate(
+    selected: List[Dict[str, Any]],
+    features_by_id: Optional[Dict[str, Dict[str, Any]]] = None,
+) -> Optional[float]:
+    """Calculate share of selected customers in the highest prior exposure band ('3+').
+
+    Canonical exposure band definition from responsible AI framework:
+    bands: '0', '1-2', '3+' (highest).
+    Returns None if prior exposure information is unavailable or selected count is 0.
+    """
+    if not selected:
+        return None
+
+    if features_by_id is None:
+        features_by_id = {}
+
+    highest_count = 0
+    available_info_count = 0
+
+    for c in selected:
+        cid = str(c.get("customer_id", ""))
+        feat = features_by_id.get(cid, {})
+
+        band: Optional[str] = None
+        # Check explicit prior_exposure_band or exposure_band
+        if "prior_exposure_band" in c and c["prior_exposure_band"] is not None:
+            band = str(c["prior_exposure_band"])
+        elif "prior_exposure_band" in feat and feat["prior_exposure_band"] is not None:
+            band = str(feat["prior_exposure_band"])
+        elif "exposure_band" in c and c["exposure_band"] is not None:
+            band = str(c["exposure_band"])
+        elif "exposure_band" in feat and feat["exposure_band"] is not None:
+            band = str(feat["exposure_band"])
+        elif "campaign_exposures_prior_30d" in c and c["campaign_exposures_prior_30d"] is not None:
+            try:
+                cnt = int(c["campaign_exposures_prior_30d"])
+                band = "3+" if cnt >= 3 else ("1-2" if cnt >= 1 else "0")
+            except (ValueError, TypeError):
+                pass
+        elif "campaign_exposures_prior_30d" in feat and feat["campaign_exposures_prior_30d"] is not None:
+            try:
+                cnt = int(feat["campaign_exposures_prior_30d"])
+                band = "3+" if cnt >= 3 else ("1-2" if cnt >= 1 else "0")
+            except (ValueError, TypeError):
+                pass
+        elif "campaign_exposures_prior_90d" in c and c["campaign_exposures_prior_90d"] is not None:
+            try:
+                cnt = int(c["campaign_exposures_prior_90d"])
+                band = "3+" if cnt >= 3 else ("1-2" if cnt >= 1 else "0")
+            except (ValueError, TypeError):
+                pass
+        elif "campaign_exposures_prior_90d" in feat and feat["campaign_exposures_prior_90d"] is not None:
+            try:
+                cnt = int(feat["campaign_exposures_prior_90d"])
+                band = "3+" if cnt >= 3 else ("1-2" if cnt >= 1 else "0")
+            except (ValueError, TypeError):
+                pass
+
+        if band is not None:
+            available_info_count += 1
+            if band == "3+" or band.lower() in ("3+", "high", "highest"):
+                highest_count += 1
+
+    if available_info_count == 0:
+        return None
+
+    return round(highest_count / len(selected), 4)
+
+
 def evaluate_test_slice(
     selected_ids: List[str],
     spend_bdt: float,
@@ -185,7 +280,7 @@ def optimize_campaign_budget(
     # Assumed unit value per incremental transaction
     assumed_value = request.value_per_incremental_transaction_bdt
     if assumed_value is not None and assumed_value <= 0:
-        assumed_value = None  # Zero value treated as not provided
+        raise ValueError("Value per incremental transaction must be strictly positive (> 0).")
 
     # -------------------------------------------------------------------------
     # 1. Strategy: Pure Uplift
@@ -328,9 +423,10 @@ def optimize_campaign_budget(
     )
 
     # -------------------------------------------------------------------------
-    # Evaluation on Factual Test Outcomes
+    # Evaluation on Factual Test Outcomes & Scorecard Generation
     # -------------------------------------------------------------------------
     treatments, outcomes = load_test_exposures_and_outcomes(fixture_dir)
+    features_by_id = load_customer_features(fixture_dir)
 
     def build_metric_item(
         strat_name: str,
@@ -340,14 +436,55 @@ def optimize_campaign_budget(
     ) -> StrategyMetricItem:
         cids = [c["customer_id"] for c in selected]
         n_sel = len(cids)
-        neg_share = (
-            round(sum(1 for c in selected if float(c["uplift"]) < 0) / n_sel, 4)
-            if n_sel > 0
-            else 0.0
-        )
+
+        # 5. Cannibalization / Negative uplift share
+        has_uplift = any("uplift" in c for c in selected)
+        negative_uplift_share: Optional[float] = None
+        neg_selected_share: float = 0.0
+        if n_sel > 0 and has_uplift:
+            neg_count = sum(1 for c in selected if float(c.get("uplift", 0)) < 0)
+            neg_calc = round(neg_count / n_sel, 4)
+            negative_uplift_share = neg_calc
+            neg_selected_share = neg_calc
+
         supp, inc_rate, cost_per_inc = evaluate_test_slice(
             cids, spend, treatments, outcomes
         )
+
+        # 1. Expected incremental transactions: only when sufficient support & measured rate available
+        expected_inc_txns: Optional[float] = None
+        if supp == "sufficient" and inc_rate is not None:
+            expected_inc_txns = round(inc_rate * n_sel, 4)
+
+        # 2. Cost per incremental transaction (preserving FE-08 calculation)
+        cost_per_inc_txn = cost_per_inc
+
+        # 3. Net result & value assumption
+        net_res: Optional[float] = None
+        val_assumption: Literal["ASSUMED", "NOT_PROVIDED"] = "NOT_PROVIDED"
+        if assumed_value is not None and assumed_value > 0:
+            val_assumption = "ASSUMED"
+            if expected_inc_txns is not None:
+                net_res = round((expected_inc_txns * assumed_value) - spend, 2)
+
+        # 4. Fatigue rate: selected in highest prior exposure band / selected_count
+        fatigue = compute_fatigue_rate(selected, features_by_id)
+
+        # Build individual strategy business scorecard
+        scorecard_item = StrategyBusinessScorecard(
+            strategy=strat_name,  # type: ignore
+            selected_count=n_sel,
+            spend_bdt=round(spend, 2),
+            support=supp,  # type: ignore
+            measured_incremental_response=inc_rate,
+            expected_incremental_transactions=expected_inc_txns,
+            cost_per_incremental_transaction_bdt=cost_per_inc_txn,
+            value_assumption=val_assumption,
+            net_result=net_res,
+            fatigue_rate=fatigue,
+            negative_uplift_share=negative_uplift_share,
+        )
+
         return StrategyMetricItem(
             strategy=strat_name,  # type: ignore
             selected_count=n_sel,
@@ -356,7 +493,14 @@ def optimize_campaign_budget(
             support=supp,  # type: ignore
             measured_incremental_response=inc_rate,
             cost_per_incremental_txn_bdt=cost_per_inc,
-            negative_uplift_selected_share=neg_share,
+            cost_per_incremental_transaction_bdt=cost_per_inc_txn,
+            negative_uplift_selected_share=neg_selected_share,
+            expected_incremental_transactions=expected_inc_txns,
+            net_result=net_res,
+            value_assumption=val_assumption,
+            fatigue_rate=fatigue,
+            negative_uplift_share=negative_uplift_share,
+            scorecard=scorecard_item,
             campaign_id=campaign["id"],
             eligible_population_count=len(eligible_customers),
             budget_bdt=budget_bdt,
@@ -378,13 +522,29 @@ def optimize_campaign_budget(
         expected_inc_val_uplift_plus_budget,
     )
 
+    overall_scorecard = SyntheticExperimentBusinessScorecard(
+        scorecard_name="Synthetic Experiment Business Scorecard",
+        name="Synthetic Experiment Business Scorecard",
+        evidence_boundary="Synthetic randomized experiment; not a controlled commercial holdout.",
+        strategies=[
+            random_item.scorecard,  # type: ignore
+            response_item.scorecard,  # type: ignore
+            uplift_item.scorecard,  # type: ignore
+            uplift_plus_budget_item.scorecard,  # type: ignore
+        ],
+    )
+
     comparison_response = StrategyComparisonResponse(
         campaign_id=campaign["id"],
         run_id=scored_customers[0].get("run_id") if scored_customers else None,
         evaluation_split="fixture",
+        scorecard_name="Synthetic Experiment Business Scorecard",
+        name="Synthetic Experiment Business Scorecard",
+        evidence_boundary="Synthetic randomized experiment; not a controlled commercial holdout.",
         eligible_population_count=len(eligible_customers),
         budget_bdt=budget_bdt,
         strategies=[random_item, response_item, uplift_item, uplift_plus_budget_item],
+        scorecard=overall_scorecard,
     )
 
     # -------------------------------------------------------------------------

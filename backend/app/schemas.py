@@ -112,7 +112,69 @@ class OptimizeRequest(BaseModel):
     exclude_negative_uplift: bool = Field(default=True, description="Whether to exclude customers with predicted uplift < 0")
     max_customers: Optional[int] = Field(default=None, ge=1, description="Optional maximum number of customers to target")
     value_per_incremental_transaction_bdt: Optional[float] = Field(
-        default=None, ge=0.0, description="Assumed value per incremental transaction in BDT supplied by manager"
+        default=None, gt=0.0, description="Assumed value per incremental transaction in BDT supplied by manager (> 0)"
+    )
+
+
+class StrategyBusinessScorecard(BaseModel):
+    """Business scorecard metrics for one strategy under synthetic randomized experiment."""
+
+    model_config = ConfigDict(extra="forbid")
+    strategy: Literal["random", "response", "uplift", "uplift_plus_budget"] = Field(
+        ..., description="Strategy evaluated in synthetic randomized experiment"
+    )
+    selected_count: int = Field(..., ge=0, description="Number of customers targeted under budget")
+    spend_bdt: float = Field(..., ge=0.0, description="Total spend in BDT")
+    support: Literal["sufficient", "insufficient"] = Field(
+        ..., description="Whether randomized holdout meets minimum sample size rule (>= 5 per arm)"
+    )
+    measured_incremental_response: Optional[float] = Field(
+        default=None, description="Empirical treatment - control response rate on synthetic experiment slice"
+    )
+    expected_incremental_transactions: Optional[float] = Field(
+        default=None,
+        description="Measured incremental response * selected_count under sufficient support, else null",
+    )
+    cost_per_incremental_transaction_bdt: Optional[float] = Field(
+        default=None,
+        description="Spend divided by expected incremental transactions under sufficient support, else null",
+    )
+    value_assumption: Literal["ASSUMED", "NOT_PROVIDED"] = Field(
+        default="NOT_PROVIDED",
+        description="'ASSUMED' if transaction value was explicitly supplied, 'NOT_PROVIDED' if missing",
+    )
+    net_result: Optional[float] = Field(
+        default=None,
+        description="(expected_incremental_transactions * value_per_incremental_transaction_bdt) - spend, else null",
+    )
+    fatigue_rate: Optional[float] = Field(
+        default=None,
+        description="Selected customers in highest prior exposure band / selected_count, else null",
+    )
+    negative_uplift_share: Optional[float] = Field(
+        default=None,
+        description="Selected customers with predicted uplift < 0 / selected_count, else null",
+    )
+
+
+class SyntheticExperimentBusinessScorecard(BaseModel):
+    """Business scorecard payload for the synthetic randomized experiment."""
+
+    model_config = ConfigDict(extra="forbid")
+    scorecard_name: str = Field(
+        default="Synthetic Experiment Business Scorecard",
+        description="Exact scorecard payload name",
+    )
+    name: str = Field(
+        default="Synthetic Experiment Business Scorecard",
+        description="Exact scorecard payload name",
+    )
+    evidence_boundary: str = Field(
+        default="Synthetic randomized experiment; not a controlled commercial holdout.",
+        description="Explicit evidence boundary for synthetic experiment evidence",
+    )
+    strategies: List[StrategyBusinessScorecard] = Field(
+        default_factory=list, description="Scorecard metrics per strategy"
     )
 
 
@@ -138,7 +200,14 @@ class StrategyMetricItem(BaseModel):
     support: Literal["sufficient", "insufficient"]
     measured_incremental_response: Optional[float] = None
     cost_per_incremental_txn_bdt: Optional[float] = None
+    cost_per_incremental_transaction_bdt: Optional[float] = None
     negative_uplift_selected_share: float
+    expected_incremental_transactions: Optional[float] = None
+    net_result: Optional[float] = None
+    value_assumption: Literal["ASSUMED", "NOT_PROVIDED"] = "NOT_PROVIDED"
+    fatigue_rate: Optional[float] = None
+    negative_uplift_share: Optional[float] = None
+    scorecard: Optional[StrategyBusinessScorecard] = None
     campaign_id: Optional[str] = Field(default=None, description="Shared campaign ID")
     eligible_population_count: Optional[int] = Field(
         default=None, description="Shared eligible population count"
@@ -155,6 +224,18 @@ class StrategyComparisonResponse(BaseModel):
     campaign_id: str
     run_id: Optional[str] = None
     evaluation_split: Optional[str] = "fixture"
+    scorecard_name: str = Field(
+        default="Synthetic Experiment Business Scorecard",
+        description="Exact scorecard name",
+    )
+    name: str = Field(
+        default="Synthetic Experiment Business Scorecard",
+        description="Exact scorecard name",
+    )
+    evidence_boundary: str = Field(
+        default="Synthetic randomized experiment; not a controlled commercial holdout.",
+        description="Explicit evidence boundary for synthetic experiment evidence",
+    )
     eligible_population_count: Optional[int] = Field(
         default=None, description="Shared eligible population count across all strategies"
     )
@@ -162,6 +243,10 @@ class StrategyComparisonResponse(BaseModel):
         default=None, description="Shared budget constraint in BDT across all strategies"
     )
     strategies: List[StrategyMetricItem] = Field(default_factory=list)
+    scorecard: Optional[SyntheticExperimentBusinessScorecard] = Field(
+        default=None,
+        description="Structured business scorecard for synthetic randomized experiment",
+    )
 
 
 class OptimizeResponse(BaseModel):
