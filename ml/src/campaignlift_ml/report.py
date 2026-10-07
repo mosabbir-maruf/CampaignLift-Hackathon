@@ -303,6 +303,9 @@ def generate_validation_report(
     hidden_uplift_path: Optional[Union[str, Path]] = None,
     output_path: Optional[Union[str, Path]] = None,
     min_support: int = 30,
+    evaluation_name: str = "Fairness Slice Evaluation",
+    run_id: Optional[str] = None,
+    population_name: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Generate the full validation report including Qini, segments, and optional oracle block.
 
@@ -315,6 +318,9 @@ def generate_validation_report(
         hidden_uplift_path: Optional path to hidden_uplift.json for synthetic oracle checks.
         output_path: Optional path to save the generated JSON report.
         min_support: Minimum treated and control customers for reliable slice effect reporting (30).
+        evaluation_name: Name of the evaluation procedure (default: 'Fairness Slice Evaluation').
+        run_id: Unique identifier for the evaluation run.
+        population_name: Identifier of the evaluated population cohort.
 
     Returns:
         JSON-serializable report dictionary.
@@ -351,8 +357,15 @@ def generate_validation_report(
         hidden_df_or_path=hidden_uplift_path,
     )
 
+    resolved_run_id = run_id or "run_fairness_slice_fixture_v1"
+    resolved_population = population_name or "fixture_v1"
+
     report = {
         "report_version": "1.0",
+        "evaluation_name": evaluation_name,
+        "run_id": resolved_run_id,
+        "population_name": resolved_population,
+        "row_count": len(val_df),
         "candidate_id": candidate_id,
         "model_name": model_name,
         "overall_metrics": overall_block,
@@ -373,6 +386,7 @@ def run_smoke_validation_report(
     dataset_dir: Union[str, Path] = "data/fixtures/fixture_v1",
     include_oracle: bool = True,
     output_path: Optional[Union[str, Path]] = None,
+    run_id: str = "run_fairness_slice_fixture_v1",
 ) -> Dict[str, Any]:
     """Execute smoke validation report generation for candidate U0 on fixture data."""
     from .uplift import train_logistic_t_learner
@@ -387,6 +401,7 @@ def run_smoke_validation_report(
         else None
     )
 
+    pop_name = Path(dataset_dir).name
     return generate_validation_report(
         val_df=val_df,
         uplift_preds=preds.uplift,
@@ -395,16 +410,39 @@ def run_smoke_validation_report(
         model_name=learner.model_name,
         hidden_uplift_path=p_hidden,
         output_path=output_path,
+        evaluation_name="Fairness Slice Evaluation",
+        run_id=run_id,
+        population_name=pop_name,
     )
 
 
 if __name__ == "__main__":
-    report_no_oracle = run_smoke_validation_report(include_oracle=False)
-    print("Report WITHOUT Oracle (Standard Deployment Mode):")
-    print(f"Overall Qini: {report_no_oracle['overall_metrics']['qini_score']}")
-    print(f"Synthetic Oracle present: {report_no_oracle['synthetic_oracle'] is not None}")
+    import argparse
 
-    report_with_oracle = run_smoke_validation_report(include_oracle=True)
-    print("\nReport WITH Oracle (Synthetic Benchmark Mode):")
-    print(f"Overall Qini: {report_with_oracle['overall_metrics']['qini_score']}")
-    print(f"Synthetic Oracle block:\n{json.dumps(report_with_oracle['synthetic_oracle'], indent=2)}")
+    parser = argparse.ArgumentParser(description="Generate Fairness Slice Evaluation report.")
+    parser.add_argument("--dataset-dir", default="data/fixtures/fixture_v1", help="Dataset directory")
+    parser.add_argument(
+        "--output",
+        default="docs/fairness_slice_evaluation.json",
+        help="Path to output JSON result file",
+    )
+    parser.add_argument("--run-id", default="run_fairness_slice_fixture_v1", help="Evaluation run ID")
+    parser.add_argument("--no-oracle", action="store_true", help="Exclude synthetic oracle evaluation")
+    args, _ = parser.parse_known_args()
+
+    # Generate and write Fairness Slice Evaluation
+    report = run_smoke_validation_report(
+        dataset_dir=args.dataset_dir,
+        include_oracle=not args.no_oracle,
+        output_path=args.output,
+        run_id=args.run_id,
+    )
+
+    print("=== Fairness Slice Evaluation ===")
+    print(f"Run ID: {report['run_id']}")
+    print(f"Population: {report['population_name']} ({report['row_count']} validation rows)")
+    print(f"Result file: {args.output}")
+    print(f"Overall Qini: {report['overall_metrics']['qini_score']}")
+    print(f"Evaluated slices: {list(report['segments'].keys())}")
+    if report["synthetic_oracle"]:
+        print(f"Synthetic Oracle Spearman: {report['synthetic_oracle']['spearman_rank_correlation']}")

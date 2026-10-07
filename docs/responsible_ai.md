@@ -25,16 +25,26 @@ Campaign managers must be able to understand and defend every audience selection
 
 ---
 
-## 3. Fairness & Demographic Slicing
+## 3. Fairness Slice Evaluation
 
 To detect and prevent algorithmic bias, CampaignLift includes slice evaluation architecture (`ml/src/campaignlift_ml/report.py`):
 - **Evaluated Slices**:
-  - `age_band` (e.g. 18-24, 25-34, 35-49, 50+)
+  - `age_band` (e.g. 18-24, 25-34, 35-44, 45-54, 55+)
   - `region_code` (e.g. DHK, CTG, SYL, RAJ, KHU, BAR, RAN, MYM)
-  - `kyc_level` (Basic vs Verified)
+  - `kyc_level` (Limited vs Verified)
   - `activity_band` (0, 1-4, 5+ 30-day txns)
   - `prior_exposure_band` (0, 1-2, 3+ past campaigns)
-- **Minimum Support Rule (30/30)**: Slices with fewer than 30 treated and 30 control observations are strictly suppressed (`support: "insufficient"`) to prevent misleading generalizations from small sample sizes.
+- **Minimum Support Rule (30/30)**: Slices with fewer than 30 treated and 30 control observations are strictly suppressed (`status: "insufficient_randomized_support"`, rates set to null) to prevent misleading generalizations from small sample sizes.
+- **Executed Fairness Slice Evaluation**:
+  - **Evaluation Heading**: Fairness Slice Evaluation
+  - **Evaluated Population**: `fixture_v1` (`cl-synth-fixture-20261006-1c11dce`), on-disk dataset in `data/fixtures/fixture_v1`
+  - **Run ID**: `run_fairness_slice_fixture_v1`
+  - **Row Count**: 23 rows (validation cohort from the 103 feature records on disk)
+  - **Result File**: `docs/fairness_slice_evaluation.json`
+  - **Execution Command**: `python -m ml.src.campaignlift_ml.report`
+- **Un-evaluated Populations**:
+  - The 100,000-customer benchmark did not run.
+  - The ml_dev population of 25,000 customers did not run.
 - **Synthetic Disclaimer**: Synthetic regional distributions reflect simulated parameters and do not represent real demographic communities.
 
 ---

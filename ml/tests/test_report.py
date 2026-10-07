@@ -149,3 +149,40 @@ def test_report_writer_saves_json(tmp_path):
     assert loaded["candidate_id"] == "U0"
     assert "overall_metrics" in loaded
     assert loaded["synthetic_oracle"]["label"] == "synthetic_oracle"
+
+
+def test_fairness_slice_evaluation_metadata(tmp_path):
+    """Verify that Fairness Slice Evaluation produces expected metadata and all 5 slices."""
+    out_file = tmp_path / "fairness_slice_evaluation.json"
+    report = run_smoke_validation_report(
+        dataset_dir=FIXTURE_DIR,
+        include_oracle=True,
+        output_path=out_file,
+        run_id="run_fairness_slice_fixture_v1",
+    )
+
+    assert report["evaluation_name"] == "Fairness Slice Evaluation"
+    assert report["run_id"] == "run_fairness_slice_fixture_v1"
+    assert report["row_count"] == 23
+    assert report["population_name"] == "fixture_v1"
+
+    # All five required slices must be present
+    required_slices = [
+        "age_band",
+        "region_code",
+        "kyc_level",
+        "activity_band",
+        "prior_exposure_band",
+    ]
+    for s in required_slices:
+        assert s in report["segments"], f"Missing slice: {s}"
+        assert len(report["segments"][s]) > 0, f"Empty slice: {s}"
+
+    # Verify JSON file on disk matches
+    assert out_file.exists()
+    with out_file.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+    assert data["evaluation_name"] == "Fairness Slice Evaluation"
+    assert data["run_id"] == "run_fairness_slice_fixture_v1"
+    assert data["row_count"] == 23
+

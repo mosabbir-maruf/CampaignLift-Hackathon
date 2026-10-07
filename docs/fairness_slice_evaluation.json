@@ -1,0 +1,403 @@
+{
+  "report_version": "1.0",
+  "evaluation_name": "Fairness Slice Evaluation",
+  "run_id": "run_fairness_slice_fixture_v1",
+  "population_name": "fixture_v1",
+  "row_count": 23,
+  "candidate_id": "U0",
+  "model_name": "logistic_t_learner",
+  "overall_metrics": {
+    "candidate_id": "U0",
+    "model_name": "logistic_t_learner",
+    "n_eval": 23,
+    "n_treated": 8,
+    "n_control": 15,
+    "treatment_rate": 0.34783,
+    "qini_score": -0.13623,
+    "normalized_qini_score": -0.05919,
+    "ate": 0.03333,
+    "top_decile": {
+      "has_sufficient_support": false,
+      "n_treated": 1,
+      "n_control": 2,
+      "n_total": 3,
+      "treated_rate": null,
+      "control_rate": null,
+      "incremental_rate": null,
+      "status": "insufficient_randomized_support",
+      "message": "insufficient randomized support (treated=1 < 30 or control=2 < 30)"
+    },
+    "overall_incremental": {
+      "has_sufficient_support": false,
+      "n_treated": 8,
+      "n_control": 15,
+      "n_total": 23,
+      "treated_rate": null,
+      "control_rate": null,
+      "incremental_rate": null,
+      "status": "insufficient_randomized_support",
+      "message": "insufficient randomized support (treated=8 < 30 or control=15 < 30)"
+    }
+  },
+  "segments": {
+    "age_band": {
+      "18-24": {
+        "n_samples": 11,
+        "n_treated": 5,
+        "n_control": 6,
+        "treatment_rate": 0.4545,
+        "mean_predicted_uplift": -0.05851,
+        "mean_predicted_response": 0.60619,
+        "slice_qini_score": -0.4545,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 5,
+          "n_control": 6,
+          "n_total": 11,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=5 < 30 or control=6 < 30)"
+        }
+      },
+      "25-34": {
+        "n_samples": 9,
+        "n_treated": 2,
+        "n_control": 7,
+        "treatment_rate": 0.2222,
+        "mean_predicted_uplift": 0.18984,
+        "mean_predicted_response": 0.65173,
+        "slice_qini_score": 0.6032,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 2,
+          "n_control": 7,
+          "n_total": 9,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=2 < 30 or control=7 < 30)"
+        }
+      },
+      "35-44": {
+        "n_samples": 2,
+        "n_treated": 1,
+        "n_control": 1,
+        "treatment_rate": 0.5,
+        "mean_predicted_uplift": 0.15668,
+        "mean_predicted_response": 0.81054,
+        "slice_qini_score": null,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 1,
+          "n_control": 1,
+          "n_total": 2,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=1 < 30 or control=1 < 30)"
+        }
+      },
+      "45-54": {
+        "n_samples": 1,
+        "n_treated": 0,
+        "n_control": 1,
+        "treatment_rate": 0.0,
+        "mean_predicted_uplift": 0.26868,
+        "mean_predicted_response": 0.86992,
+        "slice_qini_score": null,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 0,
+          "n_control": 1,
+          "n_total": 1,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=0 < 30 or control=1 < 30)"
+        }
+      }
+    },
+    "region_code": {
+      "CTG": {
+        "n_samples": 9,
+        "n_treated": 4,
+        "n_control": 5,
+        "treatment_rate": 0.4444,
+        "mean_predicted_uplift": -0.01169,
+        "mean_predicted_response": 0.66796,
+        "slice_qini_score": -0.1778,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 4,
+          "n_control": 5,
+          "n_total": 9,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=4 < 30 or control=5 < 30)"
+        }
+      },
+      "DHK": {
+        "n_samples": 7,
+        "n_treated": 1,
+        "n_control": 6,
+        "treatment_rate": 0.1429,
+        "mean_predicted_uplift": 0.15425,
+        "mean_predicted_response": 0.5462,
+        "slice_qini_score": null,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 1,
+          "n_control": 6,
+          "n_total": 7,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=1 < 30 or control=6 < 30)"
+        }
+      },
+      "KHU": {
+        "n_samples": 1,
+        "n_treated": 1,
+        "n_control": 0,
+        "treatment_rate": 1.0,
+        "mean_predicted_uplift": -0.06403,
+        "mean_predicted_response": 0.57515,
+        "slice_qini_score": null,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 1,
+          "n_control": 0,
+          "n_total": 1,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=1 < 30 or control=0 < 30)"
+        }
+      },
+      "MYM": {
+        "n_samples": 2,
+        "n_treated": 1,
+        "n_control": 1,
+        "treatment_rate": 0.5,
+        "mean_predicted_uplift": 0.15668,
+        "mean_predicted_response": 0.81054,
+        "slice_qini_score": null,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 1,
+          "n_control": 1,
+          "n_total": 2,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=1 < 30 or control=1 < 30)"
+        }
+      },
+      "RAN": {
+        "n_samples": 1,
+        "n_treated": 1,
+        "n_control": 0,
+        "treatment_rate": 1.0,
+        "mean_predicted_uplift": -0.12177,
+        "mean_predicted_response": 0.77288,
+        "slice_qini_score": null,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 1,
+          "n_control": 0,
+          "n_total": 1,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=1 < 30 or control=0 < 30)"
+        }
+      },
+      "SYL": {
+        "n_samples": 3,
+        "n_treated": 0,
+        "n_control": 3,
+        "treatment_rate": 0.0,
+        "mean_predicted_uplift": 0.18166,
+        "mean_predicted_response": 0.74014,
+        "slice_qini_score": null,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 0,
+          "n_control": 3,
+          "n_total": 3,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=0 < 30 or control=3 < 30)"
+        }
+      }
+    },
+    "kyc_level": {
+      "limited": {
+        "n_samples": 6,
+        "n_treated": 2,
+        "n_control": 4,
+        "treatment_rate": 0.3333,
+        "mean_predicted_uplift": -0.14631,
+        "mean_predicted_response": 0.32668,
+        "slice_qini_score": -0.2083,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 2,
+          "n_control": 4,
+          "n_total": 6,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=2 < 30 or control=4 < 30)"
+        }
+      },
+      "verified": {
+        "n_samples": 17,
+        "n_treated": 6,
+        "n_control": 11,
+        "treatment_rate": 0.3529,
+        "mean_predicted_uplift": 0.14852,
+        "mean_predicted_response": 0.7685,
+        "slice_qini_score": 0.2834,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 6,
+          "n_control": 11,
+          "n_total": 17,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=6 < 30 or control=11 < 30)"
+        }
+      }
+    },
+    "activity_band": {
+      "1-4": {
+        "n_samples": 11,
+        "n_treated": 2,
+        "n_control": 9,
+        "treatment_rate": 0.1818,
+        "mean_predicted_uplift": 0.11114,
+        "mean_predicted_response": 0.56567,
+        "slice_qini_score": -0.4343,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 2,
+          "n_control": 9,
+          "n_total": 11,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=2 < 30 or control=9 < 30)"
+        }
+      },
+      "5+": {
+        "n_samples": 12,
+        "n_treated": 6,
+        "n_control": 6,
+        "treatment_rate": 0.5,
+        "mean_predicted_uplift": 0.03537,
+        "mean_predicted_response": 0.73352,
+        "slice_qini_score": 0.5417,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 6,
+          "n_control": 6,
+          "n_total": 12,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=6 < 30 or control=6 < 30)"
+        }
+      }
+    },
+    "prior_exposure_band": {
+      "0": {
+        "n_samples": 5,
+        "n_treated": 1,
+        "n_control": 4,
+        "treatment_rate": 0.2,
+        "mean_predicted_uplift": -0.04428,
+        "mean_predicted_response": 0.75972,
+        "slice_qini_score": null,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 1,
+          "n_control": 4,
+          "n_total": 5,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=1 < 30 or control=4 < 30)"
+        }
+      },
+      "1-2": {
+        "n_samples": 14,
+        "n_treated": 4,
+        "n_control": 10,
+        "treatment_rate": 0.2857,
+        "mean_predicted_uplift": 0.0983,
+        "mean_predicted_response": 0.61903,
+        "slice_qini_score": -0.05,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 4,
+          "n_control": 10,
+          "n_total": 14,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=4 < 30 or control=10 < 30)"
+        }
+      },
+      "3+": {
+        "n_samples": 4,
+        "n_treated": 3,
+        "n_control": 1,
+        "treatment_rate": 0.75,
+        "mean_predicted_uplift": 0.12305,
+        "mean_predicted_response": 0.63988,
+        "slice_qini_score": null,
+        "incremental_response": {
+          "has_sufficient_support": false,
+          "n_treated": 3,
+          "n_control": 1,
+          "n_total": 4,
+          "treated_rate": null,
+          "control_rate": null,
+          "incremental_rate": null,
+          "status": "insufficient_randomized_support",
+          "message": "insufficient randomized support (treated=3 < 30 or control=1 < 30)"
+        }
+      }
+    }
+  },
+  "synthetic_oracle": {
+    "label": "synthetic_oracle",
+    "caveat": "Synthetic benchmark metric only; unobservable in real production data.",
+    "n_evaluated": 23,
+    "spearman_rank_correlation": -0.25494,
+    "mean_true_uplift_overall": 0.01128,
+    "mean_true_uplift_top_decile_predicted_uplift": 0.04474,
+    "mean_true_uplift_top_decile_response_model": -0.15931
+  }
+}
