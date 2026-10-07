@@ -26,7 +26,7 @@ Judge-facing docs may quote a numeral only when this file has a measured value a
 | Cost per incremental transaction | TO BE MEASURED | | |
 | Net campaign result | TO BE MEASURED | | |
 | Fatigue or negative-uplift share | TO BE MEASURED | | |
-| Fairness run id and population size | TO BE MEASURED | | |
+| Fairness run id and population size | MEASURED | run_fairness_slice_fixture_v1, 23 validation rows (fixture_v1) | python -m ml.src.campaignlift_ml.report -> docs/fairness_slice_evaluation.json |
 | Score latency p50, p95, p99 | TO BE MEASURED | | |
 | Concurrent campaign scoring result | TO BE MEASURED | | |
 | Restart persistence result | TO BE MEASURED | | |

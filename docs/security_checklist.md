@@ -13,7 +13,7 @@ This document provides a comprehensive audit log verifying secrets isolation, pr
 | **3. UI Human Oversight (No Send-Campaign)** | **PASS** | Codebase audit of all 24 frontend TypeScript/React files found 0 dispatch, send, or external campaign trigger actions. All screens prominently display "Decision support" sticky banner. |
 | **4. Prompt Injection Defense & Copilot Grounding** | **PASS** | `backend/app/services/gemini.py` enforces a locked system instruction: answers strictly from verified run JSON context, refuses fabricated ROI/metrics, and explicitly ignores prompt override/persona hijack attempts. |
 | **5. Application Logging & Secret Masking** | **PASS** | Backend settings and HTTP endpoints omit API credentials and sensitive customer profile data from request logs. |
-| **6. Responsible AI Slice & Fairness Evaluation** | **NOT YET EVALUATED** | Slice fairness architecture (`ml/src/campaignlift_ml/report.py`) tests demographic slices (`age_band`, `region_code`, `kyc_level`) and behavioral slices (`activity_band`, `prior_exposure_band`) with 30/30 support rules. Evaluator passed on fixtures (`ml/tests/test_report.py`); full 100,000-customer benchmark slice report is marked **NOT YET EVALUATED** per Decision D-024. |
+| **6. Fairness Slice Evaluation** | **PASS (FIXTURE)** | Fairness Slice Evaluation executed on on-disk `fixture_v1` population (run ID: `run_fairness_slice_fixture_v1`, 23 rows, result file: `docs/fairness_slice_evaluation.json`). Slices evaluated: `age_band`, `region_code`, `kyc_level`, `activity_band`, `prior_exposure_band` with 30/30 support rules. The 100,000-customer benchmark did not run; the ml_dev population of 25,000 customers did not run. |
 | **7. Synthetic Oracle Isolation & Boundary Disclaimers** | **PASS** | Hidden oracle values are barred from model training via `assert_no_forbidden_columns`. Synthetic oracle metrics in reports are segregated and explicitly tagged `"label": "synthetic_oracle"` with caveats. |
 
 ---
@@ -66,16 +66,20 @@ This document provides a comprehensive audit log verifying secrets isolation, pr
   - Synthetic data only is utilized throughout local development, preventing PII contamination.
 - **Status**: **PASS**
 
-### 6. Demographic & Behavioral Slicing (Responsible AI)
+### 6. Fairness Slice Evaluation
 - **Requirement**: Enforce slice fairness evaluations across demographic and behavioral cohorts.
 - **Observed**:
-  - The slice reporting module `ml/src/campaignlift_ml/report.py` implements slice evaluations across:
+  - The slice reporting module `ml/src/campaignlift_ml/report.py` executes a **Fairness Slice Evaluation** across demographic and behavioral bands:
     - Demographic: `age_band`, `region_code`, `kyc_level`
     - Behavioral: `activity_band` (0, 1-4, 5+ txns), `prior_exposure_band` (0, 1-2, 3+ campaigns)
-    - Minimum sample size threshold: 30 treated and 30 control observations per slice.
-  - Fixture verification test passed in `ml/tests/test_report.py`.
-  - Full 100k benchmark dataset run status: **NOT YET EVALUATED** (benchmark generation was deferred to avoid compute/disk saturation on development environments).
-- **Status**: **NOT YET EVALUATED**
+    - Minimum sample size threshold: 30 treated and 30 control observations per slice (insufficient support properly suppressed).
+  - **Evaluated Population**: `fixture_v1` (`cl-synth-fixture-20261006-1c11dce`), on-disk dataset in `data/fixtures/fixture_v1`.
+  - **Run ID**: `run_fairness_slice_fixture_v1`
+  - **Row Count**: 23 rows (validation cohort of the on-disk fixture population).
+  - **Result File**: `docs/fairness_slice_evaluation.json`
+  - **Un-evaluated Populations**: The 100,000-customer benchmark did not run. The ml_dev population of 25,000 customers did not run.
+  - Automated tests verified in `ml/tests/test_report.py`.
+- **Status**: **PASS (fixture_v1)** / **100k benchmark did not run**
 
 ### 7. Synthetic-Oracle Boundary Controls
 - **Requirement**: Hidden simulator parameters and true uplift oracle values must never leak into model training or be presented as real-world proof.
