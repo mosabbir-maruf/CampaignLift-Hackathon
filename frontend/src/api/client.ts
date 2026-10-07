@@ -368,6 +368,17 @@ export async function queryCopilot(
   )
 }
 
+export interface LoginResponse {
+  status: string
+  role: "manager" | "viewer"
+  username: string
+}
+
+export interface LogoutResponse {
+  status: string
+  message: string
+}
+
 export interface SessionResponse {
   status: string
   authenticated: boolean
@@ -378,19 +389,15 @@ export interface SessionResponse {
 export async function login(
   username: "manager" | "viewer",
   password: string,
-): Promise<{ status: string role: "manager" | "viewer" username: string }> {
-  return fetchJson<{
-    status: string
-    role: "manager" | "viewer"
-    username: string
-  }>("/auth/login", {
+): Promise<LoginResponse> {
+  return fetchJson<LoginResponse>("/auth/login", {
     method: "POST",
     body: JSON.stringify({ username, password }),
   })
 }
 
-export async function logout(): Promise<{ status: string message: string }> {
-  return fetchJson<{ status: string message: string }>("/auth/logout", {
+export async function logout(): Promise<LogoutResponse> {
+  return fetchJson<LogoutResponse>("/auth/logout", {
     method: "POST",
   })
 }
