@@ -86,6 +86,18 @@ All metrics reported below are copied directly from verified JSON run outputs (`
 - **Mean Predicted Uplift**: `-0.0046`
 - **Standard Deviation of Uplift**: `0.0768`
 
+#### Bootstrap Confidence Intervals (`docs/bootstrap_intervals.json`)
+Percentile bootstrap intervals evaluated using 200 resamples with replacement and random seed `20261006` on the frozen LightGBM S-Learner (candidate `U2`, no refitting performed):
+- **Test Qini Score**:
+  - *Historical Published (Kaggle ml_dev test, $N=2,530$)*: `65.2257`
+  - *Recomputed on-disk test split (`fixture_v1`, $N=16$)*: `1.0438` (differs from historical due to cohort size $N=16$ vs $N=2,530$)
+  - *95% Percentile Bootstrap Interval (2.5%, 97.5%)*: `[-0.1060, 2.2788]`
+- **Test Normalized Qini (AUUC)**:
+  - *Historical Published (Kaggle ml_dev test, $N=2,530$)*: `0.1755`
+  - *Recomputed on-disk test split (`fixture_v1`, $N=16$)*: `0.4841` (differs from historical due to cohort size $N=16$ vs $N=2,530$)
+  - *95% Percentile Bootstrap Interval (2.5%, 97.5%)*: `[-0.1557, 0.9377]`
+- **Pre-committed Configuration**: 200 resamples, seed `20261006`, percentiles `[2.5, 97.5]`, `refit_performed: false`.
+
 ---
 
 ## 5. Segment Fairness & Support Rules
