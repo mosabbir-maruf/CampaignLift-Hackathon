@@ -143,10 +143,19 @@ const STATE_OPTIONS: SelectOption<ResourceStatus>[] = [
   { value: "insufficient", label: "insufficient", dot: "bg-warn" },
 ]
 
-export default function AppShell({ children }: { children: ReactNode }) {
+export default function AppShell({
+  children,
+  role = null,
+  onLogout,
+}: {
+  children: ReactNode
+  role?: "manager" | "viewer" | null
+  onLogout?: () => void
+}) {
   const [menu, setMenu] = useState(false)
   const { state, setState } = usePreview()
   const { path } = useRoute()
+  const isLoginPage = path === "/login"
 
   return (
     <div className="flex min-h-screen">
@@ -157,26 +166,28 @@ export default function AppShell({ children }: { children: ReactNode }) {
         Skip to content
       </a>
 
-      {/* Rail / sidebar: md = icon rail, xl = full */}
-      <aside className="sticky top-0 hidden h-screen w-16 shrink-0 flex-col bg-rail px-2 py-4 md:flex xl:w-60 xl:px-3">
-        <div className="mb-7 flex justify-center px-1 xl:justify-start xl:px-2">
-          <span className="xl:hidden">
-            <Wordmark compact />
-          </span>
-          <span className="hidden xl:block">
-            <Wordmark />
-          </span>
-        </div>
-        <div className="scroll-quiet flex-1 overflow-y-auto">
-          <NavList rail />
-        </div>
-        <div className="mt-4 hidden border-t border-rail-2 px-2 pt-3 text-[11px] leading-relaxed text-rail-text/70 xl:block">
-          Treat the persuadables. Sure things sell themselves.
-        </div>
-      </aside>
+      {/* Rail / sidebar: hide on login page */}
+      {!isLoginPage && (
+        <aside className="sticky top-0 hidden h-screen w-16 shrink-0 flex-col bg-rail px-2 py-4 md:flex xl:w-60 xl:px-3">
+          <div className="mb-7 flex justify-center px-1 xl:justify-start xl:px-2">
+            <span className="xl:hidden">
+              <Wordmark compact />
+            </span>
+            <span className="hidden xl:block">
+              <Wordmark />
+            </span>
+          </div>
+          <div className="scroll-quiet flex-1 overflow-y-auto">
+            <NavList rail />
+          </div>
+          <div className="mt-4 hidden border-t border-rail-2 px-2 pt-3 text-[11px] leading-relaxed text-rail-text/70 xl:block">
+            Treat the persuadables. Sure things sell themselves.
+          </div>
+        </aside>
+      )}
 
       {/* Mobile menu */}
-      {menu && (
+      {menu && !isLoginPage && (
         <div
           className="fixed inset-0 z-50 md:hidden"
           role="dialog"
@@ -206,25 +217,28 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-12 items-center gap-3 border-b border-line bg-surface/95 px-4 backdrop-blur-sm lg:px-6">
-          <button
-            onClick={() => setMenu(true)}
-            className="-ml-1 flex h-8 items-center gap-2 rounded-[4px] px-2 text-[13px] font-medium md:hidden"
-            aria-label="Open navigation"
-          >
-            <span aria-hidden className="flex flex-col gap-[3px]">
-              <span className="h-px w-4 bg-ink" />
-              <span className="h-px w-4 bg-ink" />
-              <span className="h-px w-4 bg-ink" />
-            </span>
-            Menu
-          </button>
+          {!isLoginPage && (
+            <button
+              onClick={() => setMenu(true)}
+              className="-ml-1 flex h-8 items-center gap-2 rounded-[4px] px-2 text-[13px] font-medium md:hidden"
+              aria-label="Open navigation"
+            >
+              <span aria-hidden className="flex flex-col gap-[3px]">
+                <span className="h-px w-4 bg-ink" />
+                <span className="h-px w-4 bg-ink" />
+                <span className="h-px w-4 bg-ink" />
+              </span>
+              Menu
+            </button>
+          )}
           <div className="flex min-w-0 items-center gap-2 text-[13px]">
+            {isLoginPage && <Wordmark />}
             <span className="font-semibold tracking-tight text-ink">
               Decision support
             </span>
           </div>
           <div className="ml-auto flex items-center gap-3">
-            {!hasBackend && (
+            {!hasBackend && !isLoginPage && (
               <div className="hidden items-center gap-2 text-[11.5px] text-mute lg:flex">
                 <span className="flex items-center gap-1.5">
                   <span className="size-1.5 rounded-full bg-warn" />
@@ -245,12 +259,39 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 Connected
               </span>
             )}
-            <span
-              className="flex size-7 items-center justify-center rounded-full bg-ink text-[11px] font-semibold text-white"
-              aria-label="Signed in as campaign manager"
-            >
-              CM
-            </span>
+            {role ? (
+              <div className="flex items-center gap-2">
+                <span
+                  className="flex items-center gap-1.5 rounded-full border border-line bg-bg px-2.5 py-0.5 text-[11px] font-semibold text-ink"
+                  aria-label={`Signed in as ${role}`}
+                >
+                  <span
+                    className={`size-1.5 rounded-full ${
+                      role === "manager" ? "bg-pos" : "bg-[#38bdf8]"
+                    }`}
+                  />
+                  <span className="capitalize">{role}</span>
+                </span>
+                {onLogout && (
+                  <button
+                    onClick={onLogout}
+                    title="Sign Out"
+                    className="flex h-7 items-center rounded border border-line/60 bg-surface px-2 text-[11.5px] font-medium text-mute transition-colors hover:border-neg/30 hover:bg-neg/10 hover:text-neg"
+                  >
+                    Logout
+                  </button>
+                )}
+              </div>
+            ) : (
+              !isLoginPage && (
+                <Link
+                  to="/login"
+                  className="flex h-7 items-center rounded border border-line bg-surface px-2.5 text-[11.5px] font-semibold text-ink transition-colors hover:bg-line/40"
+                >
+                  Sign In
+                </Link>
+              )
+            )}
           </div>
         </header>
 
@@ -265,3 +306,4 @@ export default function AppShell({ children }: { children: ReactNode }) {
     </div>
   )
 }
+

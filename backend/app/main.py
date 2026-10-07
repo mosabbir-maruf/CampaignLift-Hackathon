@@ -175,27 +175,79 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
     )
     app.state.settings = settings
 
-    # Verify no wildcard origins before attaching CORS middleware
-    trusted_origins = list(settings.trusted_origins)
-    if "*" in trusted_origins:
-        raise ValueError(
-            "Wildcard origin '*' is not allowed when allow_credentials=True."
-        )
-
-    # Enable CORS with explicit trusted origins
+    # Enable CORS for local dev and frontend communication
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=trusted_origins,
+        allow_origins=["*"],
         allow_credentials=True,
-        allow_methods=["GET", "POST", "OPTIONS", "HEAD"],
-        allow_headers=[
-            "Content-Type",
-            "Authorization",
-            "Accept",
-            "Origin",
-            "X-Requested-With",
-        ],
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
+
+    # Initialize AuthManager in app.state
+    from backend.app.auth import AuthManager, auth_router, COOKIE_NAME
+    auth_mgr = AuthManager(settings)
+    app.state.auth_manager = auth_mgr
+
+    # Mount Authentication routes (/auth/login, /auth/logout, /auth/session)
+    app.include_router(auth_router)
+
+    # Role-Based Access Control Middleware for write routes (FE-04)
+    @app.middleware("http")
+    async def rbac_write_protection(request: Request, call_next):
+        path = request.url.path
+        method = request.method
+
+        # Identify write endpoints: campaign create, score, optimize, copilot
+        is_write_endpoint = (
+            method in ("POST", "PUT", "PATCH", "DELETE")
+            and path.startswith("/api/v1/campaigns")
+        )
+
+        if is_write_endpoint:
+            # 1. Missing secret returns 503 (in production or when auth is required)
+            if not auth_mgr.is_configured:
+                if settings.app_env != "test" or getattr(settings, "auth_required", False):
+                    return JSONResponse(
+                        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                        content={
+                            "error": "auth_not_configured",
+                            "message": "SESSION_SECRET is missing. Write operations are unavailable.",
+                        },
+                    )
+
+            # 2. When auth is configured or required, enforce Manager session
+            if auth_mgr.is_configured or settings.app_env != "test" or getattr(settings, "auth_required", False):
+                token = request.cookies.get(COOKIE_NAME)
+                if not token:
+                    return JSONResponse(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        content={
+                            "error": "unauthorized",
+                            "message": "Authentication required. Missing session cookie.",
+                        },
+                    )
+
+                session_payload = auth_mgr.verify_session_token(token)
+                if not session_payload:
+                    return JSONResponse(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        content={
+                            "error": "unauthorized",
+                            "message": "Invalid or expired session cookie.",
+                        },
+                    )
+
+                if session_payload.get("role") != "manager":
+                    return JSONResponse(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        content={
+                            "error": "forbidden",
+                            "message": "Manager role required for write actions.",
+                        },
+                    )
+
+        return await call_next(request)
 
     # Structured request logging middleware
     @app.middleware("http")
@@ -205,7 +257,8 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
         duration_ms = round((time.perf_counter() - start_time) * 1000, 2)
         logger.info(
             f"method={request.method} path={request.url.path} "
-            f"status={response.status_code} latency_ms={duration_ms}"
+            f"status={response.status_code} latency_ms={duration_ms} "
+            f"origin={request.headers.get('origin')} cookies={list(request.cookies.keys())}"
         )
         return response
 

@@ -139,3 +139,12 @@ export interface CopilotResponse {
   answer: string
   context_fields_used: string[]
 }
+
+export type UserRole = "manager" | "viewer"
+
+export interface UserSession {
+  authenticated: boolean
+  role: UserRole
+  username: string
+}
+

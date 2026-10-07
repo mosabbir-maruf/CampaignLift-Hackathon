@@ -207,21 +207,36 @@ export class ApiError extends Error {
 
 export function buildUrl(path: string): string {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`
-  if (!BASE_URL) {
+  let base = BASE_URL
+  if (typeof window !== "undefined" && base) {
+    try {
+      const parsed = new URL(base, window.location.origin)
+      if (
+        (window.location.hostname === "127.0.0.1" && parsed.hostname === "localhost") ||
+        (window.location.hostname === "localhost" && parsed.hostname === "127.0.0.1")
+      ) {
+        parsed.hostname = window.location.hostname
+        base = parsed.origin
+      }
+    } catch {
+      // ignore
+    }
+  }
+  if (!base) {
     return normalizedPath
   }
-  // If BASE_URL already ends with /api and path starts with /api/, avoid /api/api/
-  if (BASE_URL.endsWith("/api") && normalizedPath.startsWith("/api/")) {
-    return `${BASE_URL.slice(0, -4)}${normalizedPath}`
+  // If base already ends with /api and path starts with /api/, avoid /api/api/
+  if (base.endsWith("/api") && normalizedPath.startsWith("/api/")) {
+    return `${base.slice(0, -4)}${normalizedPath}`
   }
-  // If BASE_URL is /api and path is top-level endpoint like /ready or /health
+  // If base is /api and path is top-level endpoint like /ready or /health
   if (
-    BASE_URL === "/api" &&
+    base === "/api" &&
     (normalizedPath === "/ready" || normalizedPath === "/health")
   ) {
     return normalizedPath
   }
-  return `${BASE_URL}${normalizedPath}`
+  return `${base}${normalizedPath}`
 }
 
 export async function fetchJson<T>(
@@ -234,6 +249,7 @@ export async function fetchJson<T>(
   const url = buildUrl(path)
 
   const res = await fetch(url, {
+    credentials: "include",
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -350,9 +366,39 @@ export async function queryCopilot(
   )
 }
 
+export interface SessionResponse {
+  status: string
+  authenticated: boolean
+  role?: "manager" | "viewer"
+  username?: string
+}
+
+export async function login(
+  username: "manager" | "viewer",
+  password: string,
+): Promise<{ status: string; role: "manager" | "viewer"; username: string }> {
+  return fetchJson<{ status: string; role: "manager" | "viewer"; username: string }>("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ username, password }),
+  })
+}
+
+export async function logout(): Promise<{ status: string; message: string }> {
+  return fetchJson<{ status: string; message: string }>("/auth/logout", {
+    method: "POST",
+  })
+}
+
+export async function getSession(): Promise<SessionResponse> {
+  return fetchJson<SessionResponse>("/auth/session")
+}
+
 export const apiClient = {
   getHealth,
   getReady,
+  login,
+  logout,
+  getSession,
   createCampaign,
   getCampaign,
   scoreCampaign,
