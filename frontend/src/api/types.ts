@@ -4,7 +4,7 @@
 
 export type TargetingStatus = "high_incremental" | "low_incremental" | "likely_without_offer" | "negative_uplift" | "insufficient_support"
 
-export type StrategyKey = "random" | "response" | "uplift"
+export type StrategyKey = "random" | "response" | "uplift" | "uplift_plus_budget"
 
 export interface CampaignConfig {
   name: string

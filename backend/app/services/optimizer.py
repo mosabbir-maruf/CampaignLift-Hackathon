@@ -188,33 +188,17 @@ def optimize_campaign_budget(
         assumed_value = None  # Zero value treated as not provided
 
     # -------------------------------------------------------------------------
-    # 1. Strategy: Uplift
+    # 1. Strategy: Pure Uplift
+    # Ranks strictly by predicted causal uplift descending
     # -------------------------------------------------------------------------
     uplift_candidates = list(eligible_customers)
     if request.exclude_negative_uplift:
         uplift_candidates = [c for c in uplift_candidates if float(c["uplift"]) >= 0]
 
-    if assumed_value is not None:
-        # Rank by net value: (uplift * value) - unit_cost
-        def uplift_key(c: Dict[str, Any]) -> Tuple[float, float, str]:
-            uplift_val = float(c["uplift"])
-            net_val = (uplift_val * assumed_value) - unit_cost_bdt
-            return (net_val, uplift_val, c["customer_id"])
+    uplift_candidates.sort(
+        key=lambda c: (-float(c["uplift"]), -float(c["p_treat"]), c["customer_id"])
+    )
 
-        # Skip rows with negative net value
-        uplift_candidates = [
-            c for c in uplift_candidates
-            if ((float(c["uplift"]) * assumed_value) - unit_cost_bdt) >= 0
-        ]
-        # Sort descending by net_val, tie-break uplift descending, customer_id ascending
-        uplift_candidates.sort(key=lambda c: (-uplift_key(c)[0], -uplift_key(c)[1], c["customer_id"]))
-    else:
-        # Rank strictly by predicted uplift descending, tie-break p_treat descending, customer_id ascending
-        uplift_candidates.sort(
-            key=lambda c: (-float(c["uplift"]), -float(c["p_treat"]), c["customer_id"])
-        )
-
-    # Greedy knapsack selection under budget
     selected_uplift: List[Dict[str, Any]] = []
     current_spend_uplift = 0.0
 
@@ -229,11 +213,9 @@ def optimize_campaign_budget(
             else:
                 break
     else:
-        # Zero cost offer: allocate up to max_customers
         cap = request.max_customers or len(uplift_candidates)
         selected_uplift = uplift_candidates[:cap]
 
-    # Calculate expected incremental value (sum of predicted uplifts, NEVER multiplied by fake ROI)
     expected_inc_val_uplift = round(sum(float(c["uplift"]) for c in selected_uplift), 4)
 
     # -------------------------------------------------------------------------
@@ -293,6 +275,59 @@ def optimize_campaign_budget(
     expected_inc_val_random = round(sum(float(c["uplift"]) for c in selected_random), 4)
 
     # -------------------------------------------------------------------------
+    # 4. Strategy: Uplift + Budget Optimizer (uplift_plus_budget)
+    # Ranks by net value ((uplift * assumed_value) - unit_cost) dropping negative
+    # net value when assumed_value is supplied. When assumed_value is not supplied,
+    # ranks by predicted uplift and stops when marginal predicted uplift is below zero.
+    # -------------------------------------------------------------------------
+    up_budget_candidates = list(eligible_customers)
+    if assumed_value is not None:
+        def net_val_key(c: Dict[str, Any]) -> Tuple[float, float, str]:
+            u_val = float(c["uplift"])
+            net_val = (u_val * assumed_value) - unit_cost_bdt
+            return (net_val, u_val, c["customer_id"])
+
+        up_budget_candidates = [
+            c for c in up_budget_candidates
+            if ((float(c["uplift"]) * assumed_value) - unit_cost_bdt) >= 0
+        ]
+        up_budget_candidates.sort(
+            key=lambda c: (-net_val_key(c)[0], -net_val_key(c)[1], c["customer_id"])
+        )
+    else:
+        up_budget_candidates.sort(
+            key=lambda c: (-float(c["uplift"]), -float(c["p_treat"]), c["customer_id"])
+        )
+
+    selected_uplift_plus_budget: List[Dict[str, Any]] = []
+    current_spend_uplift_plus_budget = 0.0
+
+    if unit_cost_bdt > 0:
+        for c in up_budget_candidates:
+            if assumed_value is None and float(c["uplift"]) < 0:
+                break
+            if current_spend_uplift_plus_budget + unit_cost_bdt <= budget_bdt:
+                if (
+                    request.max_customers is None
+                    or len(selected_uplift_plus_budget) < request.max_customers
+                ):
+                    selected_uplift_plus_budget.append(c)
+                    current_spend_uplift_plus_budget += unit_cost_bdt
+                else:
+                    break
+            else:
+                break
+    else:
+        if assumed_value is None:
+            up_budget_candidates = [c for c in up_budget_candidates if float(c["uplift"]) >= 0]
+        cap = request.max_customers or len(up_budget_candidates)
+        selected_uplift_plus_budget = up_budget_candidates[:cap]
+
+    expected_inc_val_uplift_plus_budget = round(
+        sum(float(c["uplift"]) for c in selected_uplift_plus_budget), 4
+    )
+
+    # -------------------------------------------------------------------------
     # Evaluation on Factual Test Outcomes
     # -------------------------------------------------------------------------
     treatments, outcomes = load_test_exposures_and_outcomes(fixture_dir)
@@ -322,23 +357,34 @@ def optimize_campaign_budget(
             measured_incremental_response=inc_rate,
             cost_per_incremental_txn_bdt=cost_per_inc,
             negative_uplift_selected_share=neg_share,
+            campaign_id=campaign["id"],
+            eligible_population_count=len(eligible_customers),
+            budget_bdt=budget_bdt,
         )
 
-    uplift_item = build_metric_item(
-        "uplift", selected_uplift, current_spend_uplift, expected_inc_val_uplift
+    random_item = build_metric_item(
+        "random", selected_random, current_spend_random, expected_inc_val_random
     )
     response_item = build_metric_item(
         "response", selected_response, current_spend_response, expected_inc_val_response
     )
-    random_item = build_metric_item(
-        "random", selected_random, current_spend_random, expected_inc_val_random
+    uplift_item = build_metric_item(
+        "uplift", selected_uplift, current_spend_uplift, expected_inc_val_uplift
+    )
+    uplift_plus_budget_item = build_metric_item(
+        "uplift_plus_budget",
+        selected_uplift_plus_budget,
+        current_spend_uplift_plus_budget,
+        expected_inc_val_uplift_plus_budget,
     )
 
     comparison_response = StrategyComparisonResponse(
         campaign_id=campaign["id"],
         run_id=scored_customers[0].get("run_id") if scored_customers else None,
         evaluation_split="fixture",
-        strategies=[random_item, response_item, uplift_item],
+        eligible_population_count=len(eligible_customers),
+        budget_bdt=budget_bdt,
+        strategies=[random_item, response_item, uplift_item, uplift_plus_budget_item],
     )
 
     # -------------------------------------------------------------------------
@@ -351,9 +397,10 @@ def optimize_campaign_budget(
 
         # Save individual strategy allocations
         for strat_item, sel_list in [
-            (uplift_item, selected_uplift),
-            (response_item, selected_response),
             (random_item, selected_random),
+            (response_item, selected_response),
+            (uplift_item, selected_uplift),
+            (uplift_plus_budget_item, selected_uplift_plus_budget),
         ]:
             cursor.execute(
                 """
@@ -398,13 +445,23 @@ def optimize_campaign_budget(
         )
         conn.commit()
 
+    primary_selected = (
+        selected_uplift_plus_budget if assumed_value is not None else selected_uplift
+    )
+    primary_spend = (
+        current_spend_uplift_plus_budget if assumed_value is not None else current_spend_uplift
+    )
+    primary_exp_val = (
+        expected_inc_val_uplift_plus_budget if assumed_value is not None else expected_inc_val_uplift
+    )
+
     return OptimizeResponse(
         strategy="uplift",
-        selected_count=len(selected_uplift),
+        selected_count=len(primary_selected),
         budget_bdt=budget_bdt,
-        spend_bdt=round(current_spend_uplift, 2),
-        expected_incremental_value=expected_inc_val_uplift,
+        spend_bdt=round(primary_spend, 2),
+        expected_incremental_value=primary_exp_val,
         customers_excluded_negative=neg_uplift_count if request.exclude_negative_uplift else 0,
-        selected_customer_ids=[c["customer_id"] for c in selected_uplift],
+        selected_customer_ids=[c["customer_id"] for c in primary_selected],
         comparison=comparison_response,
     )

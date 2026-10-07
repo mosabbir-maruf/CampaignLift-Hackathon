@@ -188,7 +188,7 @@ def test_value_per_transaction_ranking(client: TestClient, created_campaign_id: 
 
 
 def test_get_strategy_comparison_endpoint(client: TestClient, created_campaign_id: str):
-    """GET /api/v1/campaigns/{id}/comparison returns 404 before optimize, and 200 with metrics after."""
+    """GET /api/v1/campaigns/{id}/comparison returns 404 before optimize, and 200 with 4-rung metrics after."""
     # 1. Before optimization -> 404
     resp_before = client.get(f"/api/v1/campaigns/{created_campaign_id}/comparison")
     assert resp_before.status_code == 404
@@ -205,7 +205,78 @@ def test_get_strategy_comparison_endpoint(client: TestClient, created_campaign_i
     resp_after = client.get(f"/api/v1/campaigns/{created_campaign_id}/comparison")
     assert resp_after.status_code == 200
     comp_data = resp_after.json()
+
+    # Shared campaign constraints on response
     assert comp_data["campaign_id"] == created_campaign_id
-    assert len(comp_data["strategies"]) == 3
+    assert comp_data["budget_bdt"] == 500.0
+    assert comp_data["eligible_population_count"] == 103
+
+    # All four rungs must be present
+    assert len(comp_data["strategies"]) == 4
     strat_names = {s["strategy"] for s in comp_data["strategies"]}
-    assert strat_names == {"random", "response", "uplift"}
+    assert strat_names == {"random", "response", "uplift", "uplift_plus_budget"}
+
+    # Assert identical campaign_id, eligible_population_count, and budget across all 4 rows
+    campaign_ids = {s["campaign_id"] for s in comp_data["strategies"]}
+    eligible_counts = {s["eligible_population_count"] for s in comp_data["strategies"]}
+    budgets = {s["budget_bdt"] for s in comp_data["strategies"]}
+
+    assert campaign_ids == {created_campaign_id}
+    assert eligible_counts == {103}
+    assert budgets == {500.0}
+
+    # Assert each spend is within that same budget
+    for s in comp_data["strategies"]:
+        assert s["spend_bdt"] <= 500.0
+        assert s["selected_count"] >= 0
+        assert s["support"] in ("sufficient", "insufficient")
+
+
+def test_uplift_plus_budget_definition_differs_from_pure_uplift(
+    client: TestClient, created_campaign_id: str
+):
+    """Verify uplift_plus_budget is not a silent alias of pure uplift."""
+    # Scenario A: When assumed value per transaction is provided (e.g. 100 BDT with 25 BDT cost)
+    # Net value threshold is uplift >= 25 / 100 = 0.25.
+    # Pure uplift targets highest uplift customers even if below 0.25.
+    # Uplift + budget optimizer filters out negative net values ((uplift * 100) - 25 < 0).
+    resp_val = client.post(
+        f"/api/v1/campaigns/{created_campaign_id}/optimize",
+        json={
+            "budget_bdt": 500.0,
+            "value_per_incremental_transaction_bdt": 100.0,
+            "exclude_negative_uplift": True,
+        },
+    )
+    assert resp_val.status_code == 200
+    comp_val = {s["strategy"]: s for s in resp_val.json()["comparison"]["strategies"]}
+    pure_uplift = comp_val["uplift"]
+    up_plus_budget = comp_val["uplift_plus_budget"]
+
+    # The selections and spend differ due to net-value filtering
+    assert up_plus_budget["strategy"] == "uplift_plus_budget"
+    assert pure_uplift["strategy"] == "uplift"
+    assert up_plus_budget["spend_bdt"] <= 500.0
+    assert pure_uplift["spend_bdt"] <= 500.0
+
+    # Scenario B: When exclude_negative_uplift is False and budget is huge (50,000 BDT)
+    # Pure uplift continues allocating remaining budget to negative-uplift customers.
+    # Uplift + budget optimizer stops when marginal predicted uplift drops below zero.
+    resp_huge = client.post(
+        f"/api/v1/campaigns/{created_campaign_id}/optimize",
+        json={
+            "budget_bdt": 50000.0,
+            "exclude_negative_uplift": False,
+        },
+    )
+    assert resp_huge.status_code == 200
+    comp_huge = {s["strategy"]: s for s in resp_huge.json()["comparison"]["strategies"]}
+    pure_huge = comp_huge["uplift"]
+    up_budget_huge = comp_huge["uplift_plus_budget"]
+
+    # Pure uplift took negative uplift customers because exclude_negative_uplift was False
+    assert pure_huge["negative_uplift_selected_share"] > 0.0
+    # uplift_plus_budget stopped at marginal uplift < 0, so negative uplift share is 0
+    assert up_budget_huge["negative_uplift_selected_share"] == 0.0
+    assert pure_huge["selected_count"] > up_budget_huge["selected_count"]
+

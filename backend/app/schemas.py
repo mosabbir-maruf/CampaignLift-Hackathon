@@ -120,7 +120,18 @@ class StrategyMetricItem(BaseModel):
     """Performance metrics for one targeting strategy."""
 
     model_config = ConfigDict(extra="forbid")
-    strategy: Literal["random", "response", "uplift"]
+    strategy: Literal["random", "response", "uplift", "uplift_plus_budget"] = Field(
+        ...,
+        description=(
+            "Targeting strategy: 'random' (uniform sampling under budget), "
+            "'response' (rank by response propensity p_treat under budget), "
+            "'uplift' (rank strictly by predicted causal uplift under budget), "
+            "'uplift_plus_budget' (causal uplift with budget optimizer: ranks by net value "
+            "((uplift * assumed_value) - unit_cost) dropping negative net value when assumed value "
+            "is supplied, or ranks by predicted uplift and stops when marginal predicted uplift "
+            "is below zero, greedy under the same budget constraint)."
+        ),
+    )
     selected_count: int
     spend_bdt: float
     expected_incremental_value: float
@@ -128,6 +139,13 @@ class StrategyMetricItem(BaseModel):
     measured_incremental_response: Optional[float] = None
     cost_per_incremental_txn_bdt: Optional[float] = None
     negative_uplift_selected_share: float
+    campaign_id: Optional[str] = Field(default=None, description="Shared campaign ID")
+    eligible_population_count: Optional[int] = Field(
+        default=None, description="Shared eligible population count"
+    )
+    budget_bdt: Optional[float] = Field(
+        default=None, description="Shared budget constraint in BDT"
+    )
 
 
 class StrategyComparisonResponse(BaseModel):
@@ -137,6 +155,12 @@ class StrategyComparisonResponse(BaseModel):
     campaign_id: str
     run_id: Optional[str] = None
     evaluation_split: Optional[str] = "fixture"
+    eligible_population_count: Optional[int] = Field(
+        default=None, description="Shared eligible population count across all strategies"
+    )
+    budget_bdt: Optional[float] = Field(
+        default=None, description="Shared budget constraint in BDT across all strategies"
+    )
     strategies: List[StrategyMetricItem] = Field(default_factory=list)
 
 
