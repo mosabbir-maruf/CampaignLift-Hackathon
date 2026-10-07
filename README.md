@@ -13,7 +13,8 @@
 </p>
 
 <p align="center">
-  <strong>Live Demo:</strong> <a href="https://devtree.online/">https://devtree.online/</a>
+  <strong>Live Demo:</strong> <a href="https://devtree.online/">https://devtree.online/</a><br />
+  <sub>⚠️ <strong>Note:</strong> The live demo is online, but does not yet have the latest Phase 2 code deployed. To test and evaluate the full Phase 2 features and updates, please run the project locally or via Docker following the instructions below.</sub>
 </p>
 
 <p align="center">
@@ -166,7 +167,7 @@ Configuration is managed via `.env` (never commit real credentials to version co
 
 ## Production Deployment
 
-- **Live Deployment**: [https://devtree.online/](https://devtree.online/)
+- **Live Deployment**: [https://devtree.online/](https://devtree.online/) *(⚠️ Note: The live deployment is online but has not yet been updated with the latest Phase 2 code. Please run locally or via Docker Compose below for the latest version).*
 
 CampaignLift is distributed as multi-architecture container images via GitHub Container Registry:
 - **Frontend Image**: [`ghcr.io/mosabbir-maruf/campaignlift-frontend:latest`](https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-frontend) (`linux/amd64`, `linux/arm64`)
