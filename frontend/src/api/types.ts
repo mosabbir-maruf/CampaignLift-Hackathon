@@ -139,3 +139,61 @@ export interface CopilotResponse {
   answer: string
   context_fields_used: string[]
 }
+
+export type ValueAssumption = "ASSUMED" | "NOT_PROVIDED"
+
+export interface StrategyBusinessScorecard {
+  strategy: StrategyKey
+  selected_count: number
+  spend_bdt: number
+  support: "sufficient" | "insufficient"
+  measured_incremental_response: number | null
+  expected_incremental_transactions: number | null
+  cost_per_incremental_transaction_bdt: number | null
+  value_assumption: ValueAssumption
+  net_result: number | null
+  fatigue_rate: number | null
+  negative_uplift_share: number | null
+}
+
+export interface SyntheticExperimentBusinessScorecard {
+  scorecard_name: string
+  name: string
+  evidence_boundary: string
+  strategies: StrategyBusinessScorecard[]
+}
+
+export interface StrategyMetricItem {
+  strategy: StrategyKey
+  selected_count: number
+  spend_bdt: number
+  expected_incremental_value: number
+  support: "sufficient" | "insufficient"
+  measured_incremental_response?: number | null
+  cost_per_incremental_txn_bdt?: number | null
+  cost_per_incremental_transaction_bdt?: number | null
+  negative_uplift_selected_share: number
+  expected_incremental_transactions?: number | null
+  net_result?: number | null
+  value_assumption?: ValueAssumption
+  fatigue_rate?: number | null
+  negative_uplift_share?: number | null
+  scorecard?: StrategyBusinessScorecard
+  campaign_id?: string
+  eligible_population_count?: number
+  budget_bdt?: number
+}
+
+export interface StrategyComparisonResponse {
+  campaign_id: string
+  run_id?: string
+  evaluation_split?: string
+  scorecard_name: string
+  name?: string
+  evidence_boundary: string
+  eligible_population_count?: number
+  budget_bdt?: number
+  strategies: StrategyMetricItem[]
+  scorecard?: SyntheticExperimentBusinessScorecard
+}
+
