@@ -18,3 +18,9 @@ logs/
 # Allow frontend source lib directory
 !src/lib/
 !src/lib/**
+
+# Certificates & keys
+certs/
+*.pem
+*.key
+*.crt

@@ -1,296 +1,314 @@
 # CampaignLift Production Infrastructure & Deployment Guide
 
-This document specifies the production container deployment architecture, CI/CD pipeline, and operational procedures for CampaignLift on AWS EC2 or standard Linux VPS environments.
+Production container topology, Cloudflare TLS ingress, CI/CD automation, and AWS EC2 operational runbook.
+
+<p align="left">
+  <a href="https://devtree.online/" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.shields.io/badge/Live_Demo-devtree.online-2ea44f.svg?logo=cloudflare&logoColor=white" alt="Live Demo" />
+  </a>
+  <a href="https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-backend">
+    <img src="https://img.shields.io/badge/Docker-backend--image-2496ed.svg?logo=docker&logoColor=white" alt="Docker Backend Image" />
+  </a>
+  <a href="https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-frontend">
+    <img src="https://img.shields.io/badge/Docker-frontend--image-2496ed.svg?logo=docker&logoColor=white" alt="Docker Frontend Image" />
+  </a>
+  <a href="../docker-compose.yml">
+    <img src="https://img.shields.io/badge/Docker_Compose-v2.20+-2496ed.svg?logo=docker&logoColor=white" alt="Docker Compose" />
+  </a>
+  <a href="https://docs.aws.amazon.com/ec2/" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.shields.io/badge/AWS-EC2-FF9900.svg?logo=amazonec2&logoColor=white" alt="AWS EC2" />
+  </a>
+  <a href="https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.shields.io/badge/Cloudflare-SSL%20Origin-F38020.svg?logo=cloudflare&logoColor=white" alt="Cloudflare SSL" />
+  </a>
+  <a href="../LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" />
+  </a>
+</p>
 
 ---
 
-## 1. Architecture
+## 1. Production Architecture
 
-CampaignLift uses a decoupled two-container architecture orchestrated by Docker Compose:
+CampaignLift operates as a decoupled two-container micro-stack orchestrated by Docker Compose behind a hardened Nginx reverse proxy with TLS termination:
 
-```
-+-----------------------------------------------------------------------------------+
-| Host VPS / AWS EC2 Instance                                                        |
-|                                                                                   |
-|  Public Ingress: Port 80 (or ${PORT})                                             |
-|         │                                                                         |
-|         ▼                                                                         |
-|  +───────────────────────────────────────────────────+                            |
-|  | campaignlift-frontend (Nginx Alpine)              |                            |
-|  |  • Serves compiled React 19 SPA static assets     |                            |
-|  |  • Client-side SPA routing fallback (index.html)  |                            |
-|  |  • Static asset caching with immutable headers    |                            |
-|  |  • Reverse proxy: /api/*  ───► http://api:8000/api|                            |
-|  |  • Reverse proxy: /health ───► http://api:8000/hea|                            |
-|  |  • Reverse proxy: /ready  ───► http://api:8000/rea|                            |
-|  +─────────────────────────┬─────────────────────────+                            |
-|                            │                                                      |
-|       Isolated Docker      │ HTTP on internal port 8000                           |
-|       Bridge Network       │ (Port 8000 NOT published to host)                    |
-|       (campaignlift-net)   ▼                                                      |
-|  +───────────────────────────────────────────────────+                            |
-|  | campaignlift-backend (FastAPI / Python 3.11-slim) |                            |
-|  |  • Uvicorn ASGI server with forwarded proxy hdrs  |                            |
-|  |  • LightGBM inference & S-learner decision engine |                            |
-|  |  • Non-root runtime user (appuser, UID 1000)      |                            |
-|  |  • Pre-packaged model artifacts & feature tables  |                            |
-|  |  • Optional server-side Gemini Copilot integration|                            |
-|  +─────────────────────────┬─────────────────────────+                            |
-|                            │                                                      |
-|                            ▼                                                      |
-|  +───────────────────────────────────────────────────+                            |
-|  | Named Volume: campaignlift-db                      |                            |
-|  |  • Persists SQLite database (/app/db) across       |                            |
-|  |    container restarts, upgrades, and redeployments|                            |
-|  +───────────────────────────────────────────────────+                            |
-+-----------------------------------------------------------------------------------+
+```text
++-----------------------------------------------------------------------------------------+
+| Host: AWS EC2 Ubuntu 24.04 LTS (devtree.online)                                         |
+|                                                                                         |
+|  Public Ingress: Port 80 (HTTP) -> 301 Redirect to HTTPS                                |
+|  Public Ingress: Port 443 (HTTPS) with Cloudflare Origin Certificate TLS                |
+|         │                                                                               |
+|         ▼                                                                               |
+|  +─────────────────────────────────────────────────────────+                            |
+|  | campaignlift-frontend (Nginx 1.27 Alpine)               |                            |
+|  |  • Port 80: HTTP-to-HTTPS permanent redirect (301)       |                            |
+|  |  • Port 443: TLS termination (/etc/nginx/certs/ro)      |                            |
+|  |  • Serves compiled React 19 SPA static assets           |                            |
+|  |  • Client-side SPA routing fallback (index.html)        |                            |
+|  |  • Static asset caching with immutable Cache-Control    |                            |
+|  |  • Reverse proxy: /api/*  ───► http://api:8000/api/*    |                            |
+|  |  • Health proxy:  /health ───► http://api:8000/health    |                            |
+|  |  • Health proxy:  /ready  ───► http://api:8000/ready     |                            |
+|  +────────────────────────────┬────────────────────────────+                            |
+|                               │                                                         |
+|       Isolated Docker         │ HTTP on internal port 8000                              |
+|       Bridge Network          │ (Port 8000 NOT published to host)                       |
+|       (campaignlift-net)      ▼                                                         |
+|  +─────────────────────────────────────────────────────────+                            |
+|  | campaignlift-backend (FastAPI / Python 3.11-slim)       |                            |
+|  |  • Uvicorn ASGI server with forwarded proxy headers     |                            |
+|  |  • Causal uplift inference (LightGBM S-Learner)         |                            |
+|  |  • Greedy knapsack budget optimizer                     |                            |
+|  |  • Pre-packaged model artifacts & feature tables        |                            |
+|  |  • Grounded Google Gemini 2.5 Flash decision copilot    |                            |
+|  |  • Non-root runtime user (appuser, UID 1000)            |                            |
+|  +────────────────────────────┬────────────────────────────+                            |
+|                               │                                                         |
+|                               ▼                                                         |
+|  +─────────────────────────────────────────────────────────+                            |
+|  | Named Volume: campaignlift-db                           |                            |
+|  |  • Persists SQLite database (/app/db/campaignlift.db)   |                            |
+|  |    across container restarts, upgrades, and redeploys   |                            |
+|  +─────────────────────────────────────────────────────────+                            |
++-----------------------------------------------------------------------------------------+
 ```
 
 ---
 
-## 2. Local Production-Like Docker Compose Run
+## 2. Live Production Deployment
 
-To test the exact production image deployment locally without building from source:
+The production application is live and publicly verified:
+
+- **Primary Application URL**: [https://devtree.online/](https://devtree.online/)
+- **Alternative Ingress**: [https://www.devtree.online/](https://www.devtree.online/)
+- **Liveness Probe**: `https://devtree.online/health` (HTTP 200 `{"status":"ok"}`)
+- **Readiness Probe**: `https://devtree.online/ready` (HTTP 200 `{"status":"ready", ...}`)
+- **Hosting Platform**: AWS EC2 VPS running Ubuntu Linux
+- **SSL/TLS Mode**: Cloudflare Full (strict Origin Certificate validation)
+- **Container Registry**: GitHub Container Registry (`ghcr.io`)
+
+---
+
+## 3. GHCR Image Registry & Multi-Arch Distribution
+
+Pre-built multi-architecture images (`linux/amd64`, `linux/arm64`) are published to the GitHub Container Registry:
+
+| Service | Container Image | Target Architecture |
+| :--- | :--- | :--- |
+| **Frontend Workstation** | `ghcr.io/mosabbir-maruf/campaignlift-frontend:latest` | `linux/amd64`, `linux/arm64` |
+| **Backend API Engine** | `ghcr.io/mosabbir-maruf/campaignlift-backend:latest` | `linux/amd64`, `linux/arm64` |
+
+*Package registries:*
+- Frontend: [`ghcr.io/mosabbir-maruf/campaignlift-frontend`](https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-frontend)
+- Backend: [`ghcr.io/mosabbir-maruf/campaignlift-backend`](https://github.com/mosabbir-maruf/CampaignLift-Hackathon/pkgs/container/campaignlift-backend)
+
+---
+
+## 4. Local Production-Like Run
+
+To test the exact production multi-container stack locally without compiling from source:
 
 ```bash
-# 1. Copy environment template
+# 1. Clone repository
+git clone https://github.com/mosabbir-maruf/CampaignLift-Hackathon.git
+cd CampaignLift-Hackathon
+
+# 2. Copy canonical environment configuration
 cp .env.example .env
 
-# 2. Start the production stack in detached mode
+# 3. Pull latest pre-built container images
+docker compose pull
+
+# 4. Start the stack in detached mode
 docker compose up -d
 
-# 3. Verify container status and healthchecks
+# 5. Verify service health
 docker compose ps
 
-# 4. Test endpoints
-curl -i http://localhost/health
-curl -i http://localhost/ready
-curl -i http://localhost/api/v1/campaigns
+# 6. Test health endpoints
+curl -f http://localhost/health
+curl -f http://localhost/ready
 
-# 5. Stop the stack
+# 7. Stop the stack
 docker compose down
 ```
 
 ---
 
-## 3. GHCR Image Naming
+## 5. Automated CI/CD Pipeline
 
-Images are published to the GitHub Container Registry (GHCR) using lowercase-safe package names:
+The GitHub Actions pipeline (`.github/workflows/ci-cd.yml`) automates verification, multi-arch packaging, and registry retention:
 
-- **Frontend Image**: `ghcr.io/<owner>/campaignlift-frontend`
-- **Backend Image**: `ghcr.io/<owner>/campaignlift-backend`
+### Quality Gates (Pull Requests & Pushes)
+1. **Frontend Gate**:
+   - Node 22 setup with pnpm.
+   - TypeScript compile-time verification: `pnpm run typecheck` (`tsc --noEmit`).
+   - Linter and style checks: `pnpm run lint` (`oxfmt --check src`).
+   - Production bundle compilation: `pnpm run build` (`vite build`).
+2. **Backend Gate**:
+   - Python 3.11 setup with dependency caching.
+   - Code formatting & linting: `ruff check backend/app`.
+   - Static type checking: `mypy backend/app`.
+   - Automated unit & integration tests: `pytest backend/tests/ -v` (50 passing tests).
 
-*Example:* `ghcr.io/mosabbir-maruf/campaignlift-frontend:latest`
-
----
-
-## 4. CI Workflow
-
-Automated testing and validation are executed by GitHub Actions (`.github/workflows/ci-cd.yml`):
-
-### Pull Requests (`pull_request`)
-- **Trigger**: Any pull request targeting the `main` branch.
-- **Frontend Job**:
-  - `actions/checkout@v7`
-  - `actions/setup-node@v7` (Node 22)
-  - `pnpm install --frozen-lockfile`
-  - `pnpm run typecheck` (`tsc --noEmit`)
-  - `pnpm run lint` (`oxfmt --check src`)
-  - `pnpm run build` (`vite build`)
-- **Backend Job**:
-  - `actions/checkout@v7`
-  - `actions/setup-python@v5` (Python 3.11)
-  - Install dependencies (`libgomp1`, requirements, linters, pytest)
-  - `ruff check --line-length=120 --select=E,F,W --ignore=E501 backend/app`
-  - `mypy backend/app --ignore-missing-imports --explicit-package-bases`
-  - `pytest backend/tests/ -v` (50 unit & integration tests)
-- **Policy**: PRs execute validation ONLY. No Docker images are built or pushed on PRs.
-
-### Push to `main` (`push`)
-- Runs both Frontend and Backend quality gates.
-- Upon successful validation, builds and publishes both Docker images to GHCR using Docker Buildx.
-- Automatically triggers the GHCR retention cleanup script.
+### Automated Build & Publish (`main` Branch Push Only)
+- Sets up QEMU and Docker Buildx.
+- Authenticates to GitHub Container Registry (`ghcr.io`).
+- Builds dual-architecture images (`linux/amd64`, `linux/arm64`) with `provenance: false` to ensure multi-arch manifest compatibility.
+- Tags images with `latest`, `sha-<short-sha>`, and `sha-<full-sha>`.
+- Executes automated package retention cleanup via `scripts/cleanup-ghcr.py`.
 
 ---
 
-## 5. Image Tagging
+## 6. Image Tagging & Rollback Strategy
 
-Every image build pushed to `main` receives two tags:
-1. `latest`: Mutable floating tag referencing the current tip of `main`.
-2. `sha-<full-commit-sha>` (and `sha-<short-sha>`): Immutable Git commit SHA tag ensuring exact reproducibility and atomic rollback capability.
+Every build published to `ghcr.io` receives both mutable and immutable tags:
+- `latest`: Floating tag pointing to the latest successful build on `main`.
+- `sha-<commit-sha>`: Immutable tag linking directly to the Git commit SHA.
 
-*Example:*
-- `ghcr.io/mosabbir-maruf/campaignlift-backend:latest`
-- `ghcr.io/mosabbir-maruf/campaignlift-backend:sha-614b08f883...`
-
----
-
-## 6. GHCR Retention Policy
-
-To manage registry storage efficiently and comply with retention standards:
-- **Rule**: Retain only the newest **TWO (2)** published versions for each application image package (`campaignlift-frontend` and `campaignlift-backend`).
-- **Implementation**: Handled by `scripts/cleanup-ghcr.py`.
-- **Semantics**:
-  - Fetches package versions from the GitHub API and sorts by `created_at` descending.
-  - The two newest versions (by timestamp) are retained.
-  - Any version bearing the `latest` tag is protected from deletion regardless of age.
-  - Older versions are pruned.
-  - Operates strictly on CampaignLift's packages; never touches third-party or unrelated packages.
-  - Gracefully exits with a clear notice if running without package-deletion permissions.
-
----
-
-## 7. VPS / AWS EC2 Deployment Procedure
-
-A host machine requires only Docker Engine and Docker Compose. No host installation of Node.js, Python, npm, pip, or Nginx is needed.
-
-### Step 1: Log in to GHCR on the Host
-If images are private, authenticate using a GitHub Personal Access Token (PAT) with `read:packages` scope:
-```bash
-echo "$CR_PAT" | docker login ghcr.io -u <YOUR_GITHUB_USERNAME> --password-stdin
-```
-
-### Step 2: Prepare Deployment Directory
-```bash
-mkdir -p /opt/campaignlift && cd /opt/campaignlift
-
-# Download canonical docker-compose and environment template
-curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/docker-compose.yml -o docker-compose.yml
-curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/.env.example -o .env
-```
-
-### Step 3: Configure Environment Variables
-Edit `/opt/campaignlift/.env` with your deployment values:
-```bash
-nano .env
-```
-Ensure `FRONTEND_IMAGE` and `BACKEND_IMAGE` point to your GHCR repository.
-
-### Step 4: Pull and Launch
-```bash
-# Pull latest images from GHCR
-docker compose pull
-
-# Start containers
-docker compose up -d
-
-# Verify containers are healthy
-docker compose ps
-```
-
----
-
-## 8. Runtime Environment Variables
-
-All secrets are runtime configuration only and must never be committed or baked into images:
-
-| Variable | Scope | Default / Example | Purpose |
-|---|---|---|---|
-| `PORT` | Host / Compose | `80` | Host port mapped to Nginx reverse proxy |
-| `FRONTEND_IMAGE` | Compose | `ghcr.io/<owner>/campaignlift-frontend:latest` | Frontend container image repository and tag |
-| `BACKEND_IMAGE` | Compose | `ghcr.io/<owner>/campaignlift-backend:latest` | Backend container image repository and tag |
-| `APP_ENV` | Backend | `production` | FastAPI execution environment |
-| `LOG_LEVEL` | Backend | `INFO` | Logging verbosity (`DEBUG`, `INFO`, `WARNING`, `ERROR`) |
-| `DATABASE_URL` | Backend | `sqlite:////app/db/campaignlift.db` | Persistent SQLite database connection URL |
-| `MODEL_ARTIFACT_DIR` | Backend | `artifacts/models/...` | Path to ML model artifacts inside container |
-| `FEATURE_TABLE_PATH` | Backend | `data/fixtures/fixture_v1/features.json` | Path to feature tables inside container |
-| `DATASET_VERSION` | Backend | `cl-synth-ml_dev-20261006-8ad556a` | Active dataset version identifier |
-| `GEMINI_API_KEY` | Backend | *(secret string)* | Optional Gemini API key for Copilot |
-| `GEMINI_MODEL` | Backend | `gemini-2.5-flash` | Gemini model name for Copilot |
-
----
-
-## 9. Health Checks & Verification
-
-Both containers feature automated Docker `HEALTHCHECK` instructions:
-
-- **Frontend Container**:
-  - Probe: `wget -qO- http://127.0.0.1:80/ || exit 1`
-  - Interval: `30s`, Timeout: `5s`, Retries: `3`
-- **Backend Container**:
-  - Probe: `curl -f http://localhost:8000/health || exit 1`
-  - Interval: `10s`, Timeout: `5s`, Retries: `3`
-- **Readiness Dependency**:
-  - The `frontend` service waits for `backend` to achieve `condition: service_healthy` before routing incoming traffic.
-
----
-
-## 10. Container Logs
-
-View and follow container logs directly via Docker Compose:
+### Atomic Rollback Procedure
+If a regression occurs, revert immediately to an immutable SHA image without rebuilding:
 
 ```bash
-# Combined output
-docker compose logs -f
-
-# Backend service logs
-docker compose logs -f backend
-
-# Frontend/Nginx access and error logs
-docker compose logs -f frontend
-```
-
----
-
-## 11. Rollback Using Immutable SHA Tags
-
-If a deployment must be rolled back to a previous known good version:
-
-```bash
-# Set specific immutable SHA tags in the environment or .env file
-export FRONTEND_IMAGE=ghcr.io/<owner>/campaignlift-frontend:sha-<previous-commit-sha>
-export BACKEND_IMAGE=ghcr.io/<owner>/campaignlift-backend:sha-<previous-commit-sha>
+# Set target commit tags in .env
+export FRONTEND_IMAGE=ghcr.io/mosabbir-maruf/campaignlift-frontend:sha-<known-good-sha>
+export BACKEND_IMAGE=ghcr.io/mosabbir-maruf/campaignlift-backend:sha-<known-good-sha>
 
 # Pull and redeploy
 docker compose pull
 docker compose up -d
 
-# Verify running version
+# Verify rollback
 docker compose ps
 ```
 
 ---
 
-## 12. Required AWS / VPS Manual Setup
+## 7. Registry Retention Policy
 
-The following steps are performed once on the host instance before first deployment:
-1. **Provision Virtual Server**: Ubuntu 22.04/24.04 LTS or Amazon Linux 2023 on AWS EC2 (t3.small or t3.medium recommended) or VPS provider.
-2. **Install Docker & Docker Compose**:
+To manage registry disk footprint cleanly:
+- **Policy**: Retains only the newest **2 versions** for both `campaignlift-frontend` and `campaignlift-backend`.
+- **Implementation**: Handled automatically in CI by `scripts/cleanup-ghcr.py`.
+- **Protection**: Tags containing `latest` are protected from deletion.
+- **Safety**: Multi-arch parent manifest lists and child platform layers are preserved without breaking manifest trees.
+
+---
+
+## 8. AWS EC2 Production Deployment Runbook
+
+### Host Requirements
+- **OS**: Ubuntu 22.04 LTS or 24.04 LTS
+- **Instance Sizing**: `t3.small` (2 vCPU, 2 GB RAM) or `t3.medium`
+- **Installed Software**: Docker Engine 24.0+ and Docker Compose v2.20+
+
+### Step-by-Step Production Setup
+
+1. **Install Docker Engine**:
    ```bash
-   sudo apt-get update && sudo apt-get install -y docker.io docker-compose-v2
-   sudo systemctl enable --now docker
+   sudo apt-get update && sudo apt-get install -y ca-certificates curl gnupg
+   sudo install -m 0755 -d /etc/apt/keyrings
+   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+   sudo chmod a+r /etc/apt/keyrings/docker.gpg
+   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+   sudo apt-get update && sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
    sudo usermod -aG docker $USER
    ```
-3. **Configure Firewall / Security Groups**:
-   - Inbound TCP `80` (HTTP) from `0.0.0.0/0`
-   - Inbound TCP `443` (HTTPS) from `0.0.0.0/0` (if terminating SSL with Certbot or ALB)
-   - Inbound TCP `22` (SSH) from trusted administrator IP only
-   - Internal port `8000` must **NOT** be open in the firewall or AWS Security Group.
-4. **Configure DNS**: Point your domain name (A Record) to the VPS/EC2 public elastic IP.
-5. **(Optional) HTTPS Termination**: Use Let's Encrypt / Certbot on the host or place an AWS Application Load Balancer (ALB) in front of Port 80.
+
+2. **Configure Host Security Group / Firewall**:
+   - `TCP 80` (HTTP) from `0.0.0.0/0` (Nginx permanent redirect to HTTPS)
+   - `TCP 443` (HTTPS) from `0.0.0.0/0` (Nginx TLS termination)
+   - `TCP 22` (SSH) restricted to authorized management IPs
+   - `TCP 8000` **NOT published** to the host or internet (strictly internal to Docker bridge)
+
+3. **Install Cloudflare Origin Certificates**:
+   ```bash
+   mkdir -p /home/ubuntu/campaignlift/certs
+   chmod 700 /home/ubuntu/campaignlift/certs
+
+   # Place Origin Certificate and Key
+   nano /home/ubuntu/campaignlift/certs/origin.pem
+   nano /home/ubuntu/campaignlift/certs/origin.key
+   chmod 600 /home/ubuntu/campaignlift/certs/origin.key
+   ```
+
+4. **Deploy Application Stack**:
+   ```bash
+   mkdir -p /home/ubuntu/campaignlift && cd /home/ubuntu/campaignlift
+
+   # Clone or pull configuration
+   git clone https://github.com/mosabbir-maruf/CampaignLift-Hackathon.git .
+   cp .env.example .env
+
+   # Pull pre-built images and start daemon
+   docker compose pull
+   docker compose up -d
+   ```
+
+5. **Verify Running Services**:
+   ```bash
+   docker compose ps
+   curl -k https://localhost/health
+   curl -k https://localhost/ready
+   ```
 
 ---
 
-## 13. What Is Automated by GitHub Actions
+## 9. HTTPS Termination & Cloudflare Configuration
 
-- Automated lint checks on every PR and push (oxfmt for frontend, ruff for backend).
-- Automated type checks on every PR and push (TypeScript `tsc` for frontend, `mypy` for backend).
-- Automated execution of all 50 unit and integration tests on backend.
-- Automated production bundle compilation of frontend SPA.
-- Automated multi-stage Docker build of `campaignlift-frontend`.
-- Automated Docker build of `campaignlift-backend`.
-- Automated publication of images to GitHub Container Registry (`ghcr.io`).
-- Automated generation of `latest` and immutable `sha-<commit-sha>` tags.
-- Automated cleanup of old GHCR image versions, enforcing retention of the 2 newest versions.
+CampaignLift implements end-to-end TLS encryption:
+
+1. **DNS**:
+   - `devtree.online` -> A Record pointing to EC2 Public Elastic IP (Proxied through Cloudflare).
+   - `www.devtree.online` -> CNAME pointing to `devtree.online` (Proxied).
+2. **Cloudflare SSL/TLS Encryption Mode**:
+   - Set to **Full** (strict encryption between Cloudflare edge and EC2 origin).
+3. **Nginx Container Ingress (`frontend/nginx.conf`)**:
+   - Port 80 server block receives plain HTTP and responds with `301 Moved Permanently` to `https://$host$request_uri`.
+   - Port 443 server block terminates TLS using `/etc/nginx/certs/origin.pem` and `/etc/nginx/certs/origin.key`.
+   - All certificates are mounted **read-only** (`:ro`) and are never committed to version control.
 
 ---
 
-## 14. What Requires Manual Infrastructure Setup
+## 10. Runtime Environment Variables Matrix
 
-The following aspects remain intentionally under manual or external operator control to keep infrastructure simple, transparent, and portable:
-- Initial VPS / AWS EC2 server creation and base OS installation.
-- Security group and firewall configuration (ports 80, 443, 22).
-- Domain DNS record management.
-- Initial creation of `/opt/campaignlift/.env` with production secrets (`GEMINI_API_KEY`).
-- Docker login authentication on the server for private GHCR access.
-- Invocation of `docker compose pull && docker compose up -d` on the server during scheduled releases (or through an optional lightweight webhook listener).
+All configuration is supplied at runtime via `.env`:
+
+| Variable | Scope | Default / Value | Description |
+| :--- | :--- | :--- | :--- |
+| `PORT` | Host / Ingress | `80` | Host HTTP ingress port |
+| `CERTS_DIR` | Host / Ingress | `/home/ubuntu/campaignlift/certs` | Host directory containing SSL certificates |
+| `FRONTEND_IMAGE` | Docker Compose | `ghcr.io/mosabbir-maruf/campaignlift-frontend:latest` | Frontend container image repository |
+| `BACKEND_IMAGE` | Docker Compose | `ghcr.io/mosabbir-maruf/campaignlift-backend:latest` | Backend container image repository |
+| `APP_ENV` | Backend | `production` | Execution environment (`local`, `production`) |
+| `LOG_LEVEL` | Backend | `INFO` | Application log verbosity |
+| `DATABASE_URL` | Backend | `sqlite:////app/db/campaignlift.db` | Persistent SQLite database file URI |
+| `MODEL_ARTIFACT_DIR` | Backend | `artifacts/models/...` | Path to trained LightGBM model artifact directory |
+| `FEATURE_TABLE_PATH` | Backend | `data/fixtures/fixture_v1/features.json` | Path to customer cohort feature fixture |
+| `DATASET_VERSION` | Backend | `cl-synth-ml_dev-20261006-8ad556a` | Version identifier for synthetic MFS dataset |
+| `GEMINI_API_KEY` | Backend | `""` | Google Gemini API key for decision copilot |
+| `GEMINI_MODEL` | Backend | `gemini-2.5-flash` | Gemini model name |
+
+---
+
+## 11. Health Checks & Verification
+
+Docker Compose monitors service health automatically:
+
+```bash
+# Check service health status
+docker compose ps
+
+# Inspect live container logs
+docker compose logs -f
+
+# Backend service logs
+docker compose logs -f backend
+
+# Frontend Nginx proxy logs
+docker compose logs -f frontend
+```
+
+- **Frontend Health**: Probes Nginx local web server every 30s.
+- **Backend Health**: Probes `/health` every 10s.
+- **Service Dependency**: The frontend depends on backend achieving `service_healthy` before routing incoming requests.

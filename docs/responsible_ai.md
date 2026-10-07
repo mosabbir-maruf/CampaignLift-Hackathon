@@ -1,6 +1,6 @@
 # Responsible AI & Governance
 
-This document turns the ethical AI guidelines (AI Hackathon Rulebook Section 6 and Student Guideline Section 14) into concrete engineering constraints and operational safeguards within CampaignLift.
+This document establishes the ethical AI principles, concrete engineering constraints, and operational safeguards within CampaignLift.
 
 ---
 
