@@ -113,7 +113,7 @@ class Settings:
     log_level: str = field(
         default_factory=lambda: os.getenv("LOG_LEVEL", "INFO").upper()
     )
-    trusted_origins: list[str] = field(default=None)  # type: ignore[assignment]
+    trusted_origins: list[str] = field(default=None)  # type: ignore[arg-type,assignment]
 
     def __post_init__(self) -> None:
         """Validate and normalize settings fields."""
