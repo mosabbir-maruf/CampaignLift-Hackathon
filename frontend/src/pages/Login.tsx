@@ -139,7 +139,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             disabled={loading}
             className="mt-2 flex h-10 w-full items-center justify-center rounded-lg bg-[#1DB584] text-[13.5px] font-semibold text-white shadow-sm transition-all hover:bg-[#189b70] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Authenticating..." : `Sign In as ${role === "manager" ? "Manager" : "Viewer"}`}
+            {loading
+              ? "Authenticating..."
+              : `Sign In as ${role === "manager" ? "Manager" : "Viewer"}`}
           </button>
         </form>
 

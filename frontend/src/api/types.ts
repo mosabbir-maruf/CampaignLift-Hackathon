@@ -147,4 +147,3 @@ export interface UserSession {
   role: UserRole
   username: string
 }
-

@@ -212,8 +212,10 @@ export function buildUrl(path: string): string {
     try {
       const parsed = new URL(base, window.location.origin)
       if (
-        (window.location.hostname === "127.0.0.1" && parsed.hostname === "localhost") ||
-        (window.location.hostname === "localhost" && parsed.hostname === "127.0.0.1")
+        (window.location.hostname === "127.0.0.1" &&
+          parsed.hostname === "localhost") ||
+        (window.location.hostname === "localhost" &&
+          parsed.hostname === "127.0.0.1")
       ) {
         parsed.hostname = window.location.hostname
         base = parsed.origin
@@ -376,15 +378,19 @@ export interface SessionResponse {
 export async function login(
   username: "manager" | "viewer",
   password: string,
-): Promise<{ status: string; role: "manager" | "viewer"; username: string }> {
-  return fetchJson<{ status: string; role: "manager" | "viewer"; username: string }>("/auth/login", {
+): Promise<{ status: string role: "manager" | "viewer" username: string }> {
+  return fetchJson<{
+    status: string
+    role: "manager" | "viewer"
+    username: string
+  }>("/auth/login", {
     method: "POST",
     body: JSON.stringify({ username, password }),
   })
 }
 
-export async function logout(): Promise<{ status: string; message: string }> {
-  return fetchJson<{ status: string; message: string }>("/auth/logout", {
+export async function logout(): Promise<{ status: string message: string }> {
+  return fetchJson<{ status: string message: string }>("/auth/logout", {
     method: "POST",
   })
 }
