@@ -17,8 +17,8 @@ Judge-facing docs may quote a numeral only when this file has a measured value a
 
 | Metric | Status | Value | Command / Evidence Source |
 | --- | --- | --- | --- |
-| Frozen-test AUUC point estimate and bootstrap interval | TO BE MEASURED | | |
-| Frozen-test Qini point estimate and bootstrap interval | TO BE MEASURED | | |
+| Frozen-test AUUC point estimate and bootstrap interval | MEASURED | Point: 0.4841 (Historical: 0.1755), 95% CI: [-0.1557, 0.9377] | python -m campaignlift_ml.bootstrap -> docs/bootstrap_intervals.json |
+| Frozen-test Qini point estimate and bootstrap interval | MEASURED | Point: 1.0438 (Historical: 65.2257), 95% CI: [-0.1060, 2.2788] | python -m campaignlift_ml.bootstrap -> docs/bootstrap_intervals.json |
 | Repeated-seed AUUC spread | TO BE MEASURED | | |
 | Assignment-sensitivity comparison | TO BE MEASURED | | |
 | Ablation ladder: random, response, uplift, uplift_plus_budget | TO BE MEASURED | | |
