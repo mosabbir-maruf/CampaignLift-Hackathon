@@ -19,8 +19,8 @@ Judge-facing docs may quote a numeral only when this file has a measured value a
 | --- | --- | --- | --- |
 | Frozen-test AUUC point estimate and bootstrap interval | MEASURED | Point: 0.4841 (Historical: 0.1755), 95% CI: [-0.1557, 0.9377] | python -m campaignlift_ml.bootstrap -> docs/bootstrap_intervals.json |
 | Frozen-test Qini point estimate and bootstrap interval | MEASURED | Point: 1.0438 (Historical: 65.2257), 95% CI: [-0.1060, 2.2788] | python -m campaignlift_ml.bootstrap -> docs/bootstrap_intervals.json |
-| Repeated-seed AUUC spread | TO BE MEASURED | | |
-| Assignment-sensitivity comparison | TO BE MEASURED | | |
+| Repeated-seed AUUC spread | MEASURED | 5 of 5 seeds finished. Mean AUUC: 0.4453, Spread: 1.0390 (Min: -0.1700, Max: 0.8690, Std: 0.4336) | python -m campaignlift_ml.sensitivity -> docs/sensitivity_analysis.json |
+| Assignment-sensitivity comparison | MEASURED | Baseline (p=0.5): S-Learner AUUC -0.0504 vs T-Learner -0.0592 vs Propensity -0.2569; Shifted (p=0.3): S-Learner AUUC 0.2482 vs T-Learner -0.1314 vs Propensity -0.3577 | python -m campaignlift_ml.sensitivity -> docs/sensitivity_analysis.json |
 | Ablation ladder: random, response, uplift, uplift_plus_budget | TO BE MEASURED | | |
 | Incremental transactions | TO BE MEASURED | | |
 | Cost per incremental transaction | TO BE MEASURED | | |

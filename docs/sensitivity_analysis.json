@@ -1,0 +1,120 @@
+{
+  "report_version": "1.0",
+  "evaluation_name": "Repeated-Seed Stability and Assignment Sensitivity",
+  "dataset_dir": "data/fixtures/fixture_v1",
+  "frozen_model": "cl-model-ml_dev_20261006-lgbm_s_learner-r01",
+  "champion_status": "unchanged",
+  "repeated_seeds": {
+    "summary": {
+      "seeds_requested": 5,
+      "seeds_completed": 5,
+      "mean_auuc": 0.4453,
+      "std_auuc": 0.4336,
+      "min_auuc": -0.17,
+      "max_auuc": 0.869,
+      "auuc_spread": 1.039
+    },
+    "seed_results": [
+      {
+        "seed": 20261006,
+        "model": "lightgbm_s_learner",
+        "validation_auuc": 0.0189,
+        "validation_qini": 0.0435,
+        "n_train": 64,
+        "n_val": 23,
+        "status": "completed"
+      },
+      {
+        "seed": 20261007,
+        "model": "lightgbm_s_learner",
+        "validation_auuc": 0.8212,
+        "validation_qini": 1.8899,
+        "n_train": 64,
+        "n_val": 23,
+        "status": "completed"
+      },
+      {
+        "seed": 20261008,
+        "model": "lightgbm_s_learner",
+        "validation_auuc": -0.17,
+        "validation_qini": -0.3913,
+        "n_train": 64,
+        "n_val": 23,
+        "status": "completed"
+      },
+      {
+        "seed": 20261009,
+        "model": "lightgbm_s_learner",
+        "validation_auuc": 0.869,
+        "validation_qini": 2.0,
+        "n_train": 64,
+        "n_val": 23,
+        "status": "completed"
+      },
+      {
+        "seed": 20261010,
+        "model": "lightgbm_s_learner",
+        "validation_auuc": 0.6877,
+        "validation_qini": 1.5826,
+        "n_train": 64,
+        "n_val": 23,
+        "status": "completed"
+      }
+    ]
+  },
+  "assignment_sensitivity": {
+    "target_shifted_treatment_rate": 0.3,
+    "table_columns": [
+      "condition",
+      "model",
+      "AUUC",
+      "top_decile_incremental_rate",
+      "n"
+    ],
+    "comparison_table": [
+      {
+        "condition": "baseline_rct (p=0.5)",
+        "model": "response_propensity",
+        "AUUC": -0.2569,
+        "top_decile_incremental_rate": -0.5,
+        "n": 23
+      },
+      {
+        "condition": "baseline_rct (p=0.5)",
+        "model": "logistic_t_learner",
+        "AUUC": -0.0592,
+        "top_decile_incremental_rate": 1.0,
+        "n": 23
+      },
+      {
+        "condition": "baseline_rct (p=0.5)",
+        "model": "lightgbm_s_learner",
+        "AUUC": -0.0504,
+        "top_decile_incremental_rate": 0.0,
+        "n": 23
+      },
+      {
+        "condition": "shifted_assignment (p=0.3)",
+        "model": "response_propensity",
+        "AUUC": -0.3577,
+        "top_decile_incremental_rate": -1.0,
+        "n": 21
+      },
+      {
+        "condition": "shifted_assignment (p=0.3)",
+        "model": "logistic_t_learner",
+        "AUUC": -0.1314,
+        "top_decile_incremental_rate": 0.0,
+        "n": 21
+      },
+      {
+        "condition": "shifted_assignment (p=0.3)",
+        "model": "lightgbm_s_learner",
+        "AUUC": 0.2482,
+        "top_decile_incremental_rate": 0.0,
+        "n": 21
+      }
+    ]
+  },
+  "created_at": "2026-10-07T04:59:03Z"
+}

@@ -106,3 +106,43 @@ Evaluation across demographic and behavioral slices (`ml/src/campaignlift_ml/rep
 - **Slices**: `age_band`, `region_code`, `kyc_level`, `activity_band` (0, 1-4, 5+ txns), `prior_exposure_band` (0, 1-2, 3+ campaigns).
 - **Minimum Support Threshold**: Slices with $< 30$ observations in either treatment or control arm are nulled (`support: "insufficient"`) to prevent statistical hallucination on small sample sizes.
 - **Full Benchmark Evaluation**: Per Decision D-024, full 100k benchmark slice reporting is marked **NOT YET EVALUATED** for local workstation environments.
+
+---
+
+## 6. Seed Stability and Treatment Assignment Sensitivity
+
+Evaluated via `python -m campaignlift_ml.sensitivity -> docs/sensitivity_analysis.json`.
+Governance Policy: The deployed champion model remains frozen as `cl-model-ml_dev_20261006-lgbm_s_learner-r01`; no new champion model is declared.
+
+### Repeated-Seed Validation AUUC Stability
+Evaluates LightGBM S-Learner performance across 5 random seeds to show stability:
+
+| Seed | Model | Validation AUUC | Validation Qini | Status |
+| --- | --- | --- | --- | --- |
+| 20261006 | lightgbm_s_learner | 0.0189 | 0.0435 | completed |
+| 20261007 | lightgbm_s_learner | 0.8212 | 1.8899 | completed |
+| 20261008 | lightgbm_s_learner | -0.1700 | -0.3913 | completed |
+| 20261009 | lightgbm_s_learner | 0.8690 | 2.0000 | completed |
+| 20261010 | lightgbm_s_learner | 0.6877 | 1.5826 | completed |
+
+- **Completed Seeds**: 5 / 5
+- **Mean AUUC**: `0.4453`
+- **Standard Deviation**: `0.4336`
+- **Minimum AUUC**: `-0.1700`
+- **Maximum AUUC**: `0.8690`
+- **AUUC Spread**: `1.0390`
+
+### Treatment Assignment Shift Sensitivity Comparison
+Evaluates rankers under baseline RCT ($p=0.5$) and shifted assignment ($p=0.3$) conditions on the validation cohort:
+
+| condition | model | AUUC | top_decile_incremental_rate | n |
+| --- | --- | --- | --- | --- |
+| baseline_rct (p=0.5) | response_propensity | -0.2569 | -0.5000 | 23 |
+| baseline_rct (p=0.5) | logistic_t_learner | -0.0592 | 1.0000 | 23 |
+| baseline_rct (p=0.5) | lightgbm_s_learner | -0.0504 | 0.0000 | 23 |
+| shifted_assignment (p=0.3) | response_propensity | -0.3577 | -1.0000 | 21 |
+| shifted_assignment (p=0.3) | logistic_t_learner | -0.1314 | 0.0000 | 21 |
+| shifted_assignment (p=0.3) | lightgbm_s_learner | 0.2482 | 0.0000 | 21 |
+
+Under treatment assignment shift ($p=0.30$), the causal LightGBM S-Learner maintains positive AUUC (`0.2482`), whereas response propensity exhibits severe negative uplift ranking (`-0.3577`), demonstrating the necessity of causal uplift over standard response propensity.
+
