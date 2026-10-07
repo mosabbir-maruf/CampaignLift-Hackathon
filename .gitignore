@@ -66,6 +66,9 @@ artifacts/models/**/*.pkl
 *.pkl
 *.bin
 
+# Ensure baseline model artifact binary is tracked for CI and Docker builds
+!artifacts/models/**/model.joblib
+
 # OS & Editor
 .DS_Store
 Thumbs.db

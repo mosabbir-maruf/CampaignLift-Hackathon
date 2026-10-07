@@ -1,0 +1,48 @@
+{
+  "report_version": "1.0",
+  "evaluation_name": "Percentile Bootstrap Intervals on Frozen Test Split",
+  "model_version": "cl-model-ml_dev_20261006-lgbm_s_learner-r01",
+  "candidate_id": "U2",
+  "dataset_dir": "data/fixtures/fixture_v1",
+  "test_n_samples": 16,
+  "precommitted_settings": {
+    "n_resamples": 200,
+    "seed": 20261006,
+    "percentiles": [
+      2.5,
+      97.5
+    ],
+    "refit_performed": false
+  },
+  "metrics": {
+    "qini": {
+      "metric_name": "test_qini",
+      "point_estimate": 1.04375,
+      "ci_lower": -0.10595,
+      "ci_upper": 2.278802,
+      "resamples_completed": 200,
+      "seed": 20261006,
+      "percentiles": [
+        2.5,
+        97.5
+      ],
+      "historical_published": 65.2257,
+      "differs_from_historical": true
+    },
+    "auuc": {
+      "metric_name": "test_auuc",
+      "point_estimate": 0.484058,
+      "ci_lower": -0.155704,
+      "ci_upper": 0.937654,
+      "resamples_completed": 200,
+      "seed": 20261006,
+      "percentiles": [
+        2.5,
+        97.5
+      ],
+      "historical_published": 0.1755,
+      "differs_from_historical": true
+    }
+  },
+  "created_at": "2026-10-07T04:46:13Z"
+}

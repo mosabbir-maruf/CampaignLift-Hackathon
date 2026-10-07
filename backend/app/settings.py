@@ -24,6 +24,58 @@ def resolve_path(raw_path: str | Path, base_dir: Path = REPO_ROOT) -> Path:
     return p
 
 
+DEFAULT_LOCAL_ORIGINS: tuple[str, ...] = (
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+)
+
+
+def parse_trusted_origins(
+    raw_origins: str | list[str] | tuple[str, ...] | None = None,
+    app_env: str = "local",
+    allow_credentials: bool = True,
+) -> list[str]:
+    """Parse comma-separated origin string or iterable into clean trusted origins.
+
+    Trims whitespace, ignores empty entries, and strictly rejects wildcard '*'
+    when credentials are enabled. Sensible local development defaults are only
+    applied in local/dev/test environments when no explicit origins are supplied.
+    """
+    if raw_origins is None:
+        raw_env = os.getenv("TRUSTED_ORIGINS")
+        if raw_env is not None:
+            raw_origins = raw_env
+        elif app_env in ("local", "dev", "development", "test"):
+            return list(DEFAULT_LOCAL_ORIGINS)
+        else:
+            return []
+
+    if isinstance(raw_origins, (list, tuple, set)):
+        items = [str(x) for x in raw_origins]
+    else:
+        items = str(raw_origins).split(",")
+
+    cleaned: list[str] = []
+    for item in items:
+        origin = item.strip()
+        if not origin:
+            continue
+        if origin == "*":
+            if allow_credentials:
+                raise ValueError(
+                    "Wildcard origin '*' is not allowed when allow_credentials=True. "
+                    "Specify explicit trusted origins."
+                )
+            raise ValueError(
+                "Wildcard origin '*' is not permitted in trusted origins configuration."
+            )
+        if origin.endswith("/") and not origin.endswith("://"):
+            origin = origin.rstrip("/")
+        cleaned.append(origin)
+
+    return cleaned
+
+
 @dataclass
 class Settings:
     """Backend application configuration loaded from environment variables."""
@@ -65,8 +117,13 @@ class Settings:
     manager_password: Optional[str] = None
     viewer_password: Optional[str] = None
     auth_required: bool = False
+    trusted_origins: list[str] = field(default=None)  # type: ignore[arg-type,assignment]
 
     def __post_init__(self) -> None:
+        """Validate and normalize settings fields."""
+        self.trusted_origins = parse_trusted_origins(
+            self.trusted_origins, app_env=self.app_env
+        )
         if self.app_env != "test":
             if self.session_secret is None:
                 self.session_secret = os.getenv("SESSION_SECRET") or None

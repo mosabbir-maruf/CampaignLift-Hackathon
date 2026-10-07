@@ -248,6 +248,15 @@ def compute_qini_score(
     return res.qini_score
 
 
+def compute_auuc(
+    y_true: Union[np.ndarray, pd.Series],
+    uplift_preds: Union[np.ndarray, pd.Series],
+    treatment: Union[np.ndarray, pd.Series],
+) -> float:
+    """Convenience helper returning the Area Under Uplift Curve (normalized Qini)."""
+    return compute_qini_score(y_true, uplift_preds, treatment, normalized=True)
+
+
 def compute_cumulative_gain_curve(
     y_true: Union[np.ndarray, pd.Series],
     uplift_preds: Union[np.ndarray, pd.Series],

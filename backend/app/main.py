@@ -175,13 +175,26 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
     )
     app.state.settings = settings
 
-    # Enable CORS for local dev and frontend communication
+    # Verify no wildcard origins before attaching CORS middleware
+    trusted_origins = list(settings.trusted_origins)
+    if "*" in trusted_origins:
+        raise ValueError(
+            "Wildcard origin '*' is not allowed when allow_credentials=True."
+        )
+
+    # Enable CORS with explicit trusted origins
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=trusted_origins,
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=["GET", "POST", "OPTIONS", "HEAD"],
+        allow_headers=[
+            "Content-Type",
+            "Authorization",
+            "Accept",
+            "Origin",
+            "X-Requested-With",
+        ],
     )
 
     # Initialize AuthManager in app.state
