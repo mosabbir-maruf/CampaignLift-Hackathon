@@ -140,7 +140,6 @@ export interface CopilotResponse {
   context_fields_used: string[]
 }
 
-<<<<<<< HEAD
 export type UserRole = "manager" | "viewer"
 
 export interface UserSession {
