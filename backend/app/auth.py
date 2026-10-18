@@ -17,9 +17,11 @@ import hashlib
 import hmac
 import json
 import logging
+import re
 import secrets
 import time
 from typing import Any, Dict, Literal, Optional, Tuple
+from urllib.parse import quote, unquote
 
 from fastapi import APIRouter, Depends, Request, Response, status
 from fastapi.responses import JSONResponse
@@ -31,6 +33,7 @@ logger = logging.getLogger("campaignlift.auth")
 
 COOKIE_NAME = "session"
 SESSION_TTL_SECONDS = 86400  # 24 hours
+COOKIE_VALUE_RE = re.compile(r"^[A-Za-z0-9._~-]+$")
 
 
 class LoginRequest(BaseModel):
@@ -133,7 +136,7 @@ class AuthManager:
         """Verify signature and expiration of session token. Returns payload dict or None."""
         if not self.session_secret or not token:
             return None
-        token = token.strip('"').strip("'")
+        token = unquote(token.strip('"').strip("'"))
         parts = token.split(".")
         if len(parts) != 2:
             return None
@@ -202,13 +205,23 @@ def login(
             },
         )
 
-    role = req.username  # manager or viewer
-    token = auth_mgr.create_session_token(req.username, role)
+    principal = "manager" if req.username == "manager" else "viewer"
+    role = principal
+    token = auth_mgr.create_session_token(principal, role)
+    if not COOKIE_VALUE_RE.fullmatch(token):
+        logger.warning("Generated session token contains unsafe cookie characters.")
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": "token_generation_failed",
+                "message": "Unable to create a safe session token.",
+            },
+        )
 
     # Set HttpOnly session cookie
     response.set_cookie(
         key=COOKIE_NAME,
-        value=token,
+        value=quote(token, safe=""),
         httponly=True,
         samesite="lax",
         secure=False,
@@ -219,7 +232,7 @@ def login(
     return LoginResponse(
         status="ok",
         role=role,
-        username=req.username,
+        username=principal,
     )
 
 
