@@ -140,6 +140,15 @@ export interface CopilotResponse {
   context_fields_used: string[]
 }
 
+<<<<<<< HEAD
+export type UserRole = "manager" | "viewer"
+
+export interface UserSession {
+  authenticated: boolean
+  role: UserRole
+  username: string
+}
+
 export type ValueAssumption = "ASSUMED" | "NOT_PROVIDED"
 
 export interface StrategyBusinessScorecard {
@@ -196,4 +205,3 @@ export interface StrategyComparisonResponse {
   strategies: StrategyMetricItem[]
   scorecard?: SyntheticExperimentBusinessScorecard
 }
-

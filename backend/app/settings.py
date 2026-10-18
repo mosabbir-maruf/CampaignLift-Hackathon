@@ -113,6 +113,10 @@ class Settings:
     log_level: str = field(
         default_factory=lambda: os.getenv("LOG_LEVEL", "INFO").upper()
     )
+    session_secret: Optional[str] = None
+    manager_password: Optional[str] = None
+    viewer_password: Optional[str] = None
+    auth_required: bool = False
     trusted_origins: list[str] = field(default=None)  # type: ignore[arg-type,assignment]
 
     def __post_init__(self) -> None:
@@ -120,6 +124,15 @@ class Settings:
         self.trusted_origins = parse_trusted_origins(
             self.trusted_origins, app_env=self.app_env
         )
+        if self.app_env != "test":
+            if self.session_secret is None:
+                self.session_secret = os.getenv("SESSION_SECRET") or None
+            if self.manager_password is None:
+                self.manager_password = os.getenv("MANAGER_PASSWORD") or None
+            if self.viewer_password is None:
+                self.viewer_password = os.getenv("VIEWER_PASSWORD") or None
+            if not self.auth_required:
+                self.auth_required = os.getenv("AUTH_REQUIRED", "false").lower() in ("true", "1", "yes")
 
     @property
     def resolved_model_artifact_dir(self) -> Path:
