@@ -17,6 +17,7 @@ import hashlib
 import hmac
 import json
 import logging
+import re
 import secrets
 import time
 from typing import Any, Dict, Literal, Optional, Tuple
@@ -31,6 +32,7 @@ logger = logging.getLogger("campaignlift.auth")
 
 COOKIE_NAME = "session"
 SESSION_TTL_SECONDS = 86400  # 24 hours
+COOKIE_VALUE_RE = re.compile(r"^[A-Za-z0-9._~-]+$")
 
 
 class LoginRequest(BaseModel):
@@ -204,6 +206,15 @@ def login(
 
     role = req.username  # manager or viewer
     token = auth_mgr.create_session_token(req.username, role)
+    if not COOKIE_VALUE_RE.fullmatch(token):
+        logger.warning("Generated session token contains unsafe cookie characters.")
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": "token_generation_failed",
+                "message": "Unable to create a safe session token.",
+            },
+        )
 
     # Set HttpOnly session cookie
     response.set_cookie(

@@ -110,6 +110,24 @@ def test_login_manager_and_viewer(client: TestClient):
     assert resp_bad.json()["error"] == "invalid_credentials"
 
 
+def test_login_rejects_unsafe_cookie_token(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+):
+    """Login returns 500 when token contains unsafe cookie characters."""
+    monkeypatch.setattr(
+        client.app.state.auth_manager,
+        "create_session_token",
+        lambda *_args, **_kwargs: "unsafe\r\ntoken",
+    )
+
+    resp = client.post(
+        "/auth/login",
+        json={"username": "manager", "password": "test-manager-password-456"},
+    )
+    assert resp.status_code == 500
+    assert resp.json()["error"] == "token_generation_failed"
+
+
 def test_session_endpoint(client: TestClient):
     """GET /auth/session reflects role or returns 401 when logged out."""
     # Logged out
