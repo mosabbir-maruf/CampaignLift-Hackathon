@@ -21,6 +21,7 @@ import re
 import secrets
 import time
 from typing import Any, Dict, Literal, Optional, Tuple
+from urllib.parse import quote, unquote
 
 from fastapi import APIRouter, Depends, Request, Response, status
 from fastapi.responses import JSONResponse
@@ -135,7 +136,7 @@ class AuthManager:
         """Verify signature and expiration of session token. Returns payload dict or None."""
         if not self.session_secret or not token:
             return None
-        token = token.strip('"').strip("'")
+        token = unquote(token.strip('"').strip("'"))
         parts = token.split(".")
         if len(parts) != 2:
             return None
@@ -219,7 +220,7 @@ def login(
     # Set HttpOnly session cookie
     response.set_cookie(
         key=COOKIE_NAME,
-        value=token,
+        value=quote(token, safe=""),
         httponly=True,
         samesite="lax",
         secure=False,
