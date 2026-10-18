@@ -205,8 +205,9 @@ def login(
             },
         )
 
-    role = req.username  # manager or viewer
-    token = auth_mgr.create_session_token(req.username, role)
+    principal = "manager" if req.username == "manager" else "viewer"
+    role = principal
+    token = auth_mgr.create_session_token(principal, role)
     if not COOKIE_VALUE_RE.fullmatch(token):
         logger.warning("Generated session token contains unsafe cookie characters.")
         return JSONResponse(
@@ -231,7 +232,7 @@ def login(
     return LoginResponse(
         status="ok",
         role=role,
-        username=req.username,
+        username=principal,
     )
 
 
